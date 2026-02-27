@@ -1,0 +1,8 @@
+node_modules
+.pnpm-store
+dist
+output
+.fonttools
+.playwright-cli
+.tooling
+.DS_Store

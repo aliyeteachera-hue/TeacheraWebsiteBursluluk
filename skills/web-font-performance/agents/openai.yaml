@@ -1,0 +1,4 @@
+interface:
+  display_name: "Web Font Performance"
+  short_description: "Audit and optimize local web fonts for faster page loads."
+  default_prompt: "Audit font usage, keep only required families/weights, and update local @font-face declarations for performance."
