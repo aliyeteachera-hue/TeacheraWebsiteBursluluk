@@ -15,8 +15,6 @@ const SPEAKUP_VIDEO_INLINE_BASE =
   'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-inline&app_id=58479';
 const SPEAKUP_VIDEO_FULLSCREEN_BASE =
   'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-fullscreen&app_id=58479';
-const SPEAKUP_VIDEO_INLINE_SRC =
-  `${SPEAKUP_VIDEO_INLINE_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&muted=0`;
 const SPEAKUP_VIDEO_FULLSCREEN_SRC =
   `${SPEAKUP_VIDEO_FULLSCREEN_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&muted=1`;
 
@@ -279,8 +277,10 @@ export default function SpeakUpPage() {
   /* ── Video Mute State ── */
   const [isInlineVideoStarted, setIsInlineVideoStarted] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [inlineUnmuteRequested, setInlineUnmuteRequested] = useState(false);
   const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
   const [showFullscreenSoundPrompt, setShowFullscreenSoundPrompt] = useState(false);
+  const inlineVideoSrc = `${SPEAKUP_VIDEO_INLINE_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&autoplay=1&muted=${inlineUnmuteRequested ? 0 : 1}`;
 
   const postToPlayer = (
     iframe: HTMLIFrameElement | null,
@@ -303,6 +303,16 @@ export default function SpeakUpPage() {
     syncIframeVolume(fullscreenIframeRef.current, muted);
   };
 
+  const forceInlineAudio = () => {
+    [0, 140, 320, 680].forEach((delay) => {
+      window.setTimeout(() => {
+        postToPlayer(inlineIframeRef.current, 'setMuted', false);
+        postToPlayer(inlineIframeRef.current, 'setVolume', 1);
+        postToPlayer(inlineIframeRef.current, 'play');
+      }, delay);
+    });
+  };
+
   const toggleMute = (event?: { stopPropagation?: () => void }) => {
     event?.stopPropagation?.();
     setIsMuted((prev) => {
@@ -323,20 +333,15 @@ export default function SpeakUpPage() {
   const startInlineVideo = (event?: { stopPropagation?: () => void }) => {
     event?.stopPropagation?.();
     setIsInlineVideoStarted(true);
+    setInlineUnmuteRequested(false);
     setIsMuted(true);
   };
 
   const enableInlineSound = (event?: { stopPropagation?: () => void }) => {
     event?.stopPropagation?.();
+    setInlineUnmuteRequested(true);
     setIsMuted(false);
-    postToPlayer(inlineIframeRef.current, 'setMuted', false);
-    postToPlayer(inlineIframeRef.current, 'setVolume', 1);
-    postToPlayer(inlineIframeRef.current, 'play');
-    window.setTimeout(() => {
-      postToPlayer(inlineIframeRef.current, 'setMuted', false);
-      postToPlayer(inlineIframeRef.current, 'setVolume', 1);
-      postToPlayer(inlineIframeRef.current, 'play');
-    }, 220);
+    forceInlineAudio();
   };
 
   const enableFullscreenSound = (event?: { stopPropagation?: () => void }) => {
@@ -356,7 +361,11 @@ export default function SpeakUpPage() {
   const handleInlineIframeLoad = () => {
     const syncPlayback = () => {
       postToPlayer(inlineIframeRef.current, 'play');
-      syncIframeVolume(inlineIframeRef.current, isMuted);
+      if (isMuted) {
+        syncIframeVolume(inlineIframeRef.current, true);
+      } else {
+        forceInlineAudio();
+      }
     };
 
     window.setTimeout(() => {
@@ -625,7 +634,7 @@ export default function SpeakUpPage() {
                     <>
                       <iframe
                         ref={inlineIframeRef}
-                        src={SPEAKUP_VIDEO_INLINE_SRC}
+                        src={inlineVideoSrc}
                         allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
                         referrerPolicy="strict-origin-when-cross-origin"
                         title="Teachera SpeakUP"
