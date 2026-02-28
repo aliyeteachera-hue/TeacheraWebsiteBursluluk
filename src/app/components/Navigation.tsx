@@ -208,7 +208,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
             )}
 
             {/* Divider */}
-            <div className={`hidden sm:block w-px bg-white/[0.08] ${isSpeakUpPage ? 'h-5' : 'h-6'}`} />
+            <div className={`w-px bg-white/[0.08] ${isSpeakUpPage ? 'h-5' : 'h-6'}`} />
 
             {/* ═══ Menu Pill ═══ */}
             <motion.button
@@ -224,7 +224,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
               aria-label="Toggle menu"
             >
               <div className={`flex items-center gap-2 sm:gap-3 rounded-full border border-white/[0.12] sm:border-white/[0.1] bg-transparent sm:bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu ${isSpeakUpPage ? 'px-2.5 sm:px-5 py-1.5 sm:py-2.5' : 'px-3 sm:px-5 py-1.5 sm:py-2.5'}`}>
-                <span className="hidden sm:inline font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.16em] uppercase text-white/55 group-hover/menu:text-white/82 transition-colors duration-300">
+                <span className={`${isSpeakUpPage ? 'hidden sm:inline' : 'inline'} font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.16em] uppercase text-white/55 group-hover/menu:text-white/82 transition-colors duration-300`}>
                   Menü
                 </span>
                 <div className="flex flex-col items-end gap-[3px]">
