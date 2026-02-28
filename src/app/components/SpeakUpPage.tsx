@@ -266,7 +266,6 @@ function FaqItem({ item, index }: { item: { q: string; a: string }; index: numbe
    ══════════════════════════════════════════════════════════════════════ */
 export default function SpeakUpPage() {
   const navigate = useNavigate();
-  const formRef = useRef<HTMLElement>(null);
   const whatRef = useRef<HTMLDivElement>(null);
   const howRef = useRef<HTMLDivElement>(null);
   const videoCardRef = useRef<HTMLDivElement>(null);
@@ -444,6 +443,7 @@ export default function SpeakUpPage() {
     consent: false,
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calViewYear, setCalViewYear] = useState(CAL_MIN.getFullYear());
   const [calViewMonth, setCalViewMonth] = useState(CAL_MIN.getMonth());
@@ -476,19 +476,16 @@ export default function SpeakUpPage() {
     howRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const scrollToForm = (event?: { preventDefault?: () => void }) => {
+  const openFormModal = (event?: { preventDefault?: () => void }) => {
     event?.preventDefault?.();
-    const target = formRef.current ?? document.getElementById('speakup-form');
-    if (!target) return;
+    setSubmitted(false);
+    setCalendarOpen(false);
+    setIsFormModalOpen(true);
+  };
 
-    const headerOffset = 96;
-    const targetTop = target.getBoundingClientRect().top + window.scrollY - headerOffset;
-    window.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
-
-    const url = `${window.location.pathname}${window.location.search}#speakup-form`;
-    if (window.location.hash !== '#speakup-form') {
-      window.history.replaceState(null, '', url);
-    }
+  const closeFormModal = () => {
+    setCalendarOpen(false);
+    setIsFormModalOpen(false);
   };
 
   const toggleSession = (val: string) => {
@@ -499,6 +496,23 @@ export default function SpeakUpPage() {
         : [...prev.sessions, val],
     }));
   };
+
+  useEffect(() => {
+    if (!isFormModalOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const keyHandler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeFormModal();
+    };
+    document.addEventListener('keydown', keyHandler);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', keyHandler);
+    };
+  }, [isFormModalOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -622,7 +636,7 @@ export default function SpeakUpPage() {
               >
                 <button
                   type="button"
-                  onClick={scrollToForm}
+                  onClick={openFormModal}
                   className="h-[48px] px-8 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5"
                 >
                   HEMEN BAŞVUR
@@ -1066,297 +1080,334 @@ export default function SpeakUpPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          4 — BAŞVURU FORMU
+          4 — BAŞVURU FORMU (POPUP)
           ════════════════════════════════════════════════════════ */}
-      <section
-        ref={formRef}
-        id="speakup-form"
-        className="py-20 md:py-28 scroll-mt-16"
-      >
-        <div className="max-w-[700px] mx-auto px-6 md:px-10">
-          <Reveal>
-            <div className="text-center mb-14">
-              <div className="flex items-center gap-3 justify-center mb-6">
-                <div className="w-8 h-[1px] bg-[#E70000]/40" />
-                <span className="text-[#E70000] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.35em]">
-                  BAŞVURU
-                </span>
-                <div className="w-8 h-[1px] bg-[#E70000]/40" />
-              </div>
-              <h2
-                className="text-[#324D47] font-['Neutraface_2_Text:Bold',sans-serif] leading-[1.1]"
-                style={{ fontSize: 'clamp(1.6rem, 4vw, 2.4rem)' }}
-              >
-                Hemen Başvur
-              </h2>
-              <p className="text-[#324D47]/45 font-['Neutraface_2_Text:Book',sans-serif] text-[14px] mt-4 max-w-md mx-auto leading-relaxed">
-                Kontenjanlar sınırlıdır. Formu doldur, eğitim danışmanımız seni arasın.
-              </p>
-            </div>
-          </Reveal>
+      <AnimatePresence>
+        {isFormModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            className="fixed inset-0 z-[92] flex items-start justify-center overflow-y-auto px-4 py-6 md:py-10"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) closeFormModal();
+            }}
+          >
+            <div className="absolute inset-0 bg-[#00000B]/80 backdrop-blur-[2px]" />
 
-          <AnimatePresence mode="wait">
-            {submitted ? (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="bg-[#324D47] rounded-[20px] p-10 md:p-14 text-center"
-              >
-                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Check size={28} className="text-white" />
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              onClick={closeFormModal}
+              className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300 cursor-pointer"
+              aria-label="Başvuru formunu kapat"
+            >
+              <X size={20} />
+            </motion.button>
+
+            <motion.div
+              initial={{ opacity: 0, y: 26, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.97 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="relative z-[93] w-full max-w-[700px] bg-white rounded-[22px] border border-[#324D47]/15 shadow-[0_30px_80px_rgba(0,0,0,0.45)] p-6 md:p-10"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="text-center mb-10 md:mb-12">
+                <div className="flex items-center gap-3 justify-center mb-6">
+                  <div className="w-8 h-[1px] bg-[#E70000]/40" />
+                  <span className="text-[#E70000] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.35em]">
+                    BAŞVURU
+                  </span>
+                  <div className="w-8 h-[1px] bg-[#E70000]/40" />
                 </div>
-                <h3 className="text-white text-[22px] font-['Neutraface_2_Text:Bold',sans-serif] mb-3">
-                  Başvurun Alındı!
-                </h3>
-                <p className="text-white/45 font-['Neutraface_2_Text:Book',sans-serif] text-[14px] leading-relaxed max-w-sm mx-auto mb-8">
-                  Eğitim danışmanlarımız en kısa sürede seninle iletişime geçecek. Seviye tespiti için hazırlıklı ol!
+                <h2
+                  className="text-[#324D47] font-['Neutraface_2_Text:Bold',sans-serif] leading-[1.1]"
+                  style={{ fontSize: 'clamp(1.6rem, 4vw, 2.4rem)' }}
+                >
+                  Hemen Başvur
+                </h2>
+                <p className="text-[#324D47]/45 font-['Neutraface_2_Text:Book',sans-serif] text-[14px] mt-4 max-w-md mx-auto leading-relaxed">
+                  Kontenjanlar sınırlıdır. Formu doldur, eğitim danışmanımız seni arasın.
                 </p>
-                <button
-                  onClick={() => navigate('/')}
-                  className="h-[44px] px-8 rounded-full border border-white/10 hover:border-white/20 text-white/50 hover:text-white font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker tracking-[0.08em] md:tracking-[0.15em] transition-all cursor-pointer"
-                >
-                  ANA SAYFAYA DÖN
-                </button>
-              </motion.div>
-            ) : (
-              <motion.form
-                key="form"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                onSubmit={handleSubmit}
-                className="space-y-6"
-              >
-                {/* Ad Soyad */}
-                <div>
-                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
-                    AD SOYAD <span className="text-[#E70000]">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                    className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors placeholder:text-[#324D47]/25"
-                    placeholder="Adınız ve soyadınız"
-                  />
-                </div>
+              </div>
 
-                {/* Telefon + Email row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
-                      TELEFON <span className="text-[#E70000]">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={e => setFormData(p => ({ ...p, phone: normalizeTrMobileInput(e.target.value) }))}
-                      inputMode="numeric"
-                      maxLength={13}
-                      pattern={TR_MOBILE_PATTERN}
-                      title={TR_MOBILE_TITLE}
-                      className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors placeholder:text-[#324D47]/25"
-                      placeholder="5XX XXX XX XX"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
-                      E-POSTA <span className="text-[#324D47]/30 text-mobile-kicker md:text-[9px] tracking-normal">(önerilir)</span>
-                    </label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                      className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors placeholder:text-[#324D47]/25"
-                      placeholder="ornek@mail.com"
-                    />
-                  </div>
-                </div>
-
-                {/* Bölüm / Sınıf */}
-                <div>
-                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
-                    BÖLÜM / SINIF
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.department}
-                    onChange={e => setFormData(p => ({ ...p, department: e.target.value }))}
-                    className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors placeholder:text-[#324D47]/25"
-                    placeholder="Bilgisayar Mühendisliği / 2. Sınıf"
-                  />
-                </div>
-
-                {/* Seans Tercihi */}
-                <div>
-                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
-                    SEANS TERCİHİN <span className="text-[#E70000]">*</span>
-                    <span className="text-[#324D47]/30 text-mobile-kicker md:text-[9px] ml-2 tracking-normal">(müsait olduğun tüm saatleri işaretle)</span>
-                  </label>
-                  <div className="flex flex-wrap gap-3">
-                    {SESSIONS.map(s => {
-                      const active = formData.sessions.includes(s.value);
-                      return (
-                        <button
-                          key={s.id}
-                          type="button"
-                          onClick={() => toggleSession(s.value)}
-                          className={`h-[44px] px-5 rounded-full border font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-[0.05em] transition-all cursor-pointer flex items-center gap-2 ${
-                            active
-                              ? 'bg-[#324D47] border-[#324D47] text-white'
-                              : 'bg-transparent border-[#324D47]/[0.1] text-[#324D47]/50 hover:border-[#324D47]/25'
-                          }`}
-                        >
-                          {active && <Check size={14} />}
-                          {s.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Seviye */}
-                <div>
-                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
-                    KENDİNİ SEVİYEDE NASIL GÖRÜYORSUN?
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {LEVELS.map(l => {
-                      const active = formData.level === l;
-                      return (
-                        <button
-                          key={l}
-                          type="button"
-                          onClick={() => setFormData(p => ({ ...p, level: l }))}
-                          className={`h-[44px] px-5 rounded-full border font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[12px] tracking-[0.05em] transition-all cursor-pointer ${
-                            active
-                              ? 'bg-[#E70000] border-[#E70000] text-white'
-                              : 'bg-transparent border-[#324D47]/[0.08] text-[#324D47]/40 hover:border-[#324D47]/20'
-                          }`}
-                        >
-                          {l}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Seviye Tespiti Tarihi */}
-                <div>
-                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
-                    SEVİYE TESPİTİ İÇİN GELEBİLECEĞİN TARİH
-                  </label>
-                  <div className="relative" ref={calRef}>
-                    <button
-                      type="button"
-                      onClick={() => setCalendarOpen(!calendarOpen)}
-                      className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-left flex items-center justify-between font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors cursor-pointer"
-                    >
-                      <span className={formData.testDate ? 'text-[#324D47]' : 'text-[#324D47]/25'}>
-                        {formData.testDate ? formatDateTr(formData.testDate) : 'Tarih Seçiniz'}
-                      </span>
-                      <ChevronDown size={15} className={`text-[#324D47]/30 transition-transform duration-200 ${calendarOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    <AnimatePresence>
-                      {calendarOpen && (
-                        <CalendarDropdown
-                          viewYear={calViewYear}
-                          viewMonth={calViewMonth}
-                          selectedDate={formData.testDate}
-                          onSelect={(d) => { setFormData(p => ({ ...p, testDate: d })); setCalendarOpen(false); }}
-                          onPrev={calPrev}
-                          onNext={calNext}
-                        />
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-
-                {/* Seviye Tespiti Saati */}
-                <div>
-                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
-                    SEVİYE TESPİTİ İÇİN GELEBİLECEĞİN SAAT
-                  </label>
-                  <div className="flex flex-wrap gap-3">
-                    {TEST_TIMES.map(t => {
-                      const active = formData.testTime === t;
-                      return (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => setFormData(p => ({ ...p, testTime: t }))}
-                          className={`h-[44px] px-5 rounded-full border font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-[0.05em] transition-all cursor-pointer flex items-center gap-2 ${
-                            active
-                              ? 'bg-[#324D47] border-[#324D47] text-white'
-                              : 'bg-transparent border-[#324D47]/[0.1] text-[#324D47]/50 hover:border-[#324D47]/25'
-                          }`}
-                        >
-                          {active && <Check size={14} />}
-                          {t}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Divider */}
-                <div className="w-full h-[1px] bg-[#324D47]/[0.06] my-2" />
-
-                {/* KVKK */}
-                <div className="space-y-3">
-                  <label className="flex items-start gap-3 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={formData.kvkk}
-                      onChange={e => setFormData(p => ({ ...p, kvkk: e.target.checked }))}
-                      className="mt-1 w-4 h-4 accent-[#E70000] cursor-pointer"
-                    />
-                    <span className="text-[#324D47]/60 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] leading-[1.6] group-hover:text-[#324D47]/80 transition-colors">
-                      <span className="text-[#E70000]">*</span>{' '}
-                      <a
-                        href={LEGAL_KVKK_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="underline cursor-pointer"
+              <AnimatePresence mode="wait">
+                {submitted ? (
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="bg-[#324D47] rounded-[20px] p-10 md:p-14 text-center"
+                  >
+                    <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Check size={28} className="text-white" />
+                    </div>
+                    <h3 className="text-white text-[22px] font-['Neutraface_2_Text:Bold',sans-serif] mb-3">
+                      Başvurun Alındı!
+                    </h3>
+                    <p className="text-white/45 font-['Neutraface_2_Text:Book',sans-serif] text-[14px] leading-relaxed max-w-sm mx-auto mb-8">
+                      Eğitim danışmanlarımız en kısa sürede seninle iletişime geçecek. Seviye tespiti için hazırlıklı ol!
+                    </p>
+                    <div className="flex items-center justify-center gap-3 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={closeFormModal}
+                        className="h-[44px] px-8 rounded-full border border-white/10 hover:border-white/20 text-white/55 hover:text-white font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker tracking-[0.08em] md:tracking-[0.15em] transition-all cursor-pointer"
                       >
-                        KVKK Aydınlatma Metni
-                      </a>'ni okudum ve onaylıyorum.
-                    </span>
-                  </label>
+                        KAPAT
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/')}
+                        className="h-[44px] px-8 rounded-full bg-[#E70000] hover:bg-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker tracking-[0.08em] md:tracking-[0.15em] transition-all cursor-pointer"
+                      >
+                        ANA SAYFAYA DÖN
+                      </button>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.form
+                    key="form"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                    onSubmit={handleSubmit}
+                    className="space-y-6"
+                  >
+                    {/* Ad Soyad */}
+                    <div>
+                      <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
+                        AD SOYAD <span className="text-[#E70000]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+                        className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors placeholder:text-[#324D47]/25"
+                        placeholder="Adınız ve soyadınız"
+                      />
+                    </div>
 
-                  <label className="flex items-start gap-3 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={formData.consent}
-                      onChange={e => setFormData(p => ({ ...p, consent: e.target.checked }))}
-                      className="mt-1 w-4 h-4 accent-[#E70000] cursor-pointer"
-                    />
-                    <span className="text-[#324D47]/60 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] leading-[1.6] group-hover:text-[#324D47]/80 transition-colors">
-                      Teachera'nın benimle arama ve SMS yoluyla iletişime geçmesine izin veriyorum. (opsiyonel)
-                    </span>
-                  </label>
-                </div>
+                    {/* Telefon + Email row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
+                          TELEFON <span className="text-[#E70000]">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          value={formData.phone}
+                          onChange={e => setFormData(p => ({ ...p, phone: normalizeTrMobileInput(e.target.value) }))}
+                          inputMode="numeric"
+                          maxLength={13}
+                          pattern={TR_MOBILE_PATTERN}
+                          title={TR_MOBILE_TITLE}
+                          className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors placeholder:text-[#324D47]/25"
+                          placeholder="5XX XXX XX XX"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
+                          E-POSTA <span className="text-[#324D47]/30 text-mobile-kicker md:text-[9px] tracking-normal">(önerilir)</span>
+                        </label>
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                          className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors placeholder:text-[#324D47]/25"
+                          placeholder="ornek@mail.com"
+                        />
+                      </div>
+                    </div>
 
-                {/* Submit */}
-                <button
-                  type="submit"
-                  disabled={!formData.name || !isPhoneValid || !formData.kvkk || formData.sessions.length === 0}
-                  className="w-full h-[48px] rounded-[30px] bg-[#E70000] hover:bg-[#c40000] disabled:bg-[#324D47]/15 disabled:cursor-not-allowed text-white disabled:text-[#324D47]/30 font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[13px] tracking-[0.08em] md:tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 disabled:shadow-none cursor-pointer flex items-center justify-center gap-2.5"
-                >
-                  BAŞVURUYU GÖNDER
-                  <ArrowUpRight size={15} />
-                </button>
-              </motion.form>
-            )}
-          </AnimatePresence>
-        </div>
-      </section>
+                    {/* Bölüm / Sınıf */}
+                    <div>
+                      <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
+                        BÖLÜM / SINIF
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.department}
+                        onChange={e => setFormData(p => ({ ...p, department: e.target.value }))}
+                        className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors placeholder:text-[#324D47]/25"
+                        placeholder="Bilgisayar Mühendisliği / 2. Sınıf"
+                      />
+                    </div>
+
+                    {/* Seans Tercihi */}
+                    <div>
+                      <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
+                        SEANS TERCİHİN <span className="text-[#E70000]">*</span>
+                        <span className="text-[#324D47]/30 text-mobile-kicker md:text-[9px] ml-2 tracking-normal">(müsait olduğun tüm saatleri işaretle)</span>
+                      </label>
+                      <div className="flex flex-wrap gap-3">
+                        {SESSIONS.map(s => {
+                          const active = formData.sessions.includes(s.value);
+                          return (
+                            <button
+                              key={s.id}
+                              type="button"
+                              onClick={() => toggleSession(s.value)}
+                              className={`h-[44px] px-5 rounded-full border font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-[0.05em] transition-all cursor-pointer flex items-center gap-2 ${
+                                active
+                                  ? 'bg-[#324D47] border-[#324D47] text-white'
+                                  : 'bg-transparent border-[#324D47]/[0.1] text-[#324D47]/50 hover:border-[#324D47]/25'
+                              }`}
+                            >
+                              {active && <Check size={14} />}
+                              {s.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Seviye */}
+                    <div>
+                      <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
+                        KENDİNİ SEVİYEDE NASIL GÖRÜYORSUN?
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {LEVELS.map(l => {
+                          const active = formData.level === l;
+                          return (
+                            <button
+                              key={l}
+                              type="button"
+                              onClick={() => setFormData(p => ({ ...p, level: l }))}
+                              className={`h-[44px] px-5 rounded-full border font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[12px] tracking-[0.05em] transition-all cursor-pointer ${
+                                active
+                                  ? 'bg-[#E70000] border-[#E70000] text-white'
+                                  : 'bg-transparent border-[#324D47]/[0.08] text-[#324D47]/40 hover:border-[#324D47]/20'
+                              }`}
+                            >
+                              {l}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Seviye Tespiti Tarihi */}
+                    <div>
+                      <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
+                        SEVİYE TESPİTİ İÇİN GELEBİLECEĞİN TARİH
+                      </label>
+                      <div className="relative" ref={calRef}>
+                        <button
+                          type="button"
+                          onClick={() => setCalendarOpen(!calendarOpen)}
+                          className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-left flex items-center justify-between font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors cursor-pointer"
+                        >
+                          <span className={formData.testDate ? 'text-[#324D47]' : 'text-[#324D47]/25'}>
+                            {formData.testDate ? formatDateTr(formData.testDate) : 'Tarih Seçiniz'}
+                          </span>
+                          <ChevronDown size={15} className={`text-[#324D47]/30 transition-transform duration-200 ${calendarOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        <AnimatePresence>
+                          {calendarOpen && (
+                            <CalendarDropdown
+                              viewYear={calViewYear}
+                              viewMonth={calViewMonth}
+                              selectedDate={formData.testDate}
+                              onSelect={(d) => { setFormData(p => ({ ...p, testDate: d })); setCalendarOpen(false); }}
+                              onPrev={calPrev}
+                              onNext={calNext}
+                            />
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </div>
+
+                    {/* Seviye Tespiti Saati */}
+                    <div>
+                      <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
+                        SEVİYE TESPİTİ İÇİN GELEBİLECEĞİN SAAT
+                      </label>
+                      <div className="flex flex-wrap gap-3">
+                        {TEST_TIMES.map(t => {
+                          const active = formData.testTime === t;
+                          return (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => setFormData(p => ({ ...p, testTime: t }))}
+                              className={`h-[44px] px-5 rounded-full border font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-[0.05em] transition-all cursor-pointer flex items-center gap-2 ${
+                                active
+                                  ? 'bg-[#324D47] border-[#324D47] text-white'
+                                  : 'bg-transparent border-[#324D47]/[0.1] text-[#324D47]/50 hover:border-[#324D47]/25'
+                              }`}
+                            >
+                              {active && <Check size={14} />}
+                              {t}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="w-full h-[1px] bg-[#324D47]/[0.06] my-2" />
+
+                    {/* KVKK */}
+                    <div className="space-y-3">
+                      <label className="flex items-start gap-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={formData.kvkk}
+                          onChange={e => setFormData(p => ({ ...p, kvkk: e.target.checked }))}
+                          className="mt-1 w-4 h-4 accent-[#E70000] cursor-pointer"
+                        />
+                        <span className="text-[#324D47]/60 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] leading-[1.6] group-hover:text-[#324D47]/80 transition-colors">
+                          <span className="text-[#E70000]">*</span>{' '}
+                          <a
+                            href={LEGAL_KVKK_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="underline cursor-pointer"
+                          >
+                            KVKK Aydınlatma Metni
+                          </a>'ni okudum ve onaylıyorum.
+                        </span>
+                      </label>
+
+                      <label className="flex items-start gap-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={formData.consent}
+                          onChange={e => setFormData(p => ({ ...p, consent: e.target.checked }))}
+                          className="mt-1 w-4 h-4 accent-[#E70000] cursor-pointer"
+                        />
+                        <span className="text-[#324D47]/60 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] leading-[1.6] group-hover:text-[#324D47]/80 transition-colors">
+                          Teachera'nın benimle arama ve SMS yoluyla iletişime geçmesine izin veriyorum. (opsiyonel)
+                        </span>
+                      </label>
+                    </div>
+
+                    {/* Submit */}
+                    <button
+                      type="submit"
+                      disabled={!formData.name || !isPhoneValid || !formData.kvkk || formData.sessions.length === 0}
+                      className="w-full h-[48px] rounded-[30px] bg-[#E70000] hover:bg-[#c40000] disabled:bg-[#324D47]/15 disabled:cursor-not-allowed text-white disabled:text-[#324D47]/30 font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[13px] tracking-[0.08em] md:tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 disabled:shadow-none cursor-pointer flex items-center justify-center gap-2.5"
+                    >
+                      BAŞVURUYU GÖNDER
+                      <ArrowUpRight size={15} />
+                    </button>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ═══════════════════════════════════════════════════════
           5 — SIKCA SORULAN SORULAR
@@ -1412,7 +1463,7 @@ export default function SpeakUpPage() {
             </p>
             <button
               type="button"
-              onClick={scrollToForm}
+              onClick={openFormModal}
               className="h-[48px] px-10 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5 mx-auto"
             >
               HEMEN BAŞVUR
