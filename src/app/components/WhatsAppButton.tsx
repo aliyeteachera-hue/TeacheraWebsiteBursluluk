@@ -129,7 +129,7 @@ export function WhatsAppButton() {
                     <X size={14} />
                   </button>
                 </div>
-                <p className="text-[12px] text-[#F4EBD1]/80 font-['Neutraface_2_Text:Book',sans-serif]">Sorularınız için buradayız</p>
+                <p className="text-mobile-kicker md:text-[12px] text-[#F4EBD1]/80 font-['Neutraface_2_Text:Book',sans-serif]">Sorularınız için buradayız</p>
               </div>
             </div>
             
@@ -147,11 +147,11 @@ export function WhatsAppButton() {
                 </div>
                 <div>
                   <p className="font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] text-[#00000B]">Muazzez</p>
-                  <p className="text-[11px] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif]">Müşteri Temsilcisi</p>
+                  <p className="text-mobile-kicker md:text-[11px] text-[#324D47] font-['Neutraface_2_Text:Book',sans-serif]">Müşteri Temsilcisi</p>
                 </div>
                 <div className="ml-auto flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-[#324D47]" />
-                  <span className="text-[10px] text-[#324D47]/60 font-['Neutraface_2_Text:Demi',sans-serif]">Çevrimiçi</span>
+                  <span className="text-mobile-kicker md:text-[10px] text-[#324D47]/60 font-['Neutraface_2_Text:Demi',sans-serif]">Çevrimiçi</span>
                 </div>
               </div>
               
@@ -162,7 +162,7 @@ export function WhatsAppButton() {
                 className="w-full text-left bg-[#ffffff] rounded-2xl rounded-tl-sm p-3.5 mb-3 shadow-sm border border-[#324D47]/5 relative cursor-pointer hover:border-[#25D366]/40 transition-colors"
               >
                 <div className="absolute top-0 left-0 w-2 h-2 bg-[#ffffff] -translate-x-1/2 rotate-45 border-l border-b border-[#324D47]/5" />
-                <p className="text-[13px] text-[#00000B] font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed">
+                <p className="text-mobile-meta md:text-[13px] text-[#00000B] font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed">
                   Merhaba! Ben Muazzez. Size nasıl yardımcı olabilirim?
                 </p>
               </button>
@@ -170,14 +170,14 @@ export function WhatsAppButton() {
               <button
                 type="button"
                 onClick={handleClick}
-                className="w-full h-[42px] mb-4 px-3.5 rounded-xl bg-[#ffffff] border border-[#324D47]/10 text-[#324D47]/55 text-[12px] font-['Neutraface_2_Text:Book',sans-serif] text-left hover:border-[#25D366]/40 hover:text-[#324D47] transition-colors cursor-pointer"
+                className="w-full h-[44px] mb-4 px-3.5 rounded-xl bg-[#ffffff] border border-[#324D47]/10 text-[#324D47]/55 text-mobile-meta md:text-[12px] font-['Neutraface_2_Text:Book',sans-serif] text-left hover:border-[#25D366]/40 hover:text-[#324D47] transition-colors cursor-pointer"
               >
                 WhatsApp'ta mesaj yazın...
               </button>
               
               <button
                 onClick={handleClick}
-                className="w-full bg-[#324D47] hover:bg-[#3d5e56] text-[#ffffff] py-3 px-4 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-wide transition-colors flex items-center justify-center gap-2.5 shadow-lg shadow-[#324D47]/20"
+                className="w-full min-h-[44px] bg-[#324D47] hover:bg-[#3d5e56] text-[#ffffff] py-3 px-4 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[13px] tracking-[0.04em] md:tracking-wide transition-colors flex items-center justify-center gap-2.5 shadow-lg shadow-[#324D47]/20"
               >
                 <MessageCircle size={16} />
                 WhatsApp'ta Yaz
@@ -250,7 +250,7 @@ export function WhatsAppButton() {
             exit={{ opacity: 0, x: 8, scale: 0.98 }}
             transition={{ duration: 0.24, ease: 'easeOut' }}
           >
-            <p className="text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] text-white/90">Muazzez'e yaz</p>
+            <p className="text-mobile-kicker md:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] text-white/90">Muazzez'e yaz</p>
             <div className="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-4 border-l-[#00000B]" />
           </motion.div>
         )}

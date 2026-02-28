@@ -91,10 +91,10 @@ export default function Academy() {
                 <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-[#00000B] via-[#00000B]/30 to-transparent" />
 
                 <div className="absolute top-4 left-4 flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 bg-[#E70000] text-white text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] uppercase rounded-md">
+                  <span className="px-2.5 py-1 bg-[#E70000] text-white text-mobile-kicker md:text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.1em] md:tracking-[0.15em] uppercase rounded-md">
                     Editörün Seçimi
                   </span>
-                  <span className="px-2.5 py-0.5 bg-white/[0.08] backdrop-blur-md text-white/70 text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.12em] uppercase rounded-md border border-white/10">
+                  <span className="px-2.5 py-1 bg-white/[0.08] backdrop-blur-md text-white/70 text-mobile-kicker md:text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.12em] uppercase rounded-md border border-white/10">
                     {featured.categoryLabel}
                   </span>
                 </div>
@@ -125,7 +125,7 @@ export default function Academy() {
                   {featured.title}
                 </h2>
                 <p
-                  className="text-white/62 text-[12px] sm:text-[13px] font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed mb-3"
+                  className="text-white/62 text-mobile-meta sm:text-[13px] font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed mb-3"
                   style={{
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
@@ -135,7 +135,7 @@ export default function Academy() {
                 >
                   {featured.excerpt}
                 </p>
-                <div className="flex items-center gap-3 text-white/45 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.1em]">
+                <div className="flex items-center gap-3 text-white/45 text-mobile-kicker sm:text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.06em] sm:tracking-[0.1em]">
                   <span className="flex items-center gap-1"><Calendar size={10} /> {featured.date}</span>
                   <span className="w-[3px] h-[3px] rounded-full bg-white/30" />
                   <span className="flex items-center gap-1"><Clock size={10} /> {featured.readTime}</span>
@@ -166,14 +166,14 @@ export default function Academy() {
                   />
                   <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute top-3 left-3">
-                    <span className="bg-white/95 backdrop-blur-md text-[#324D47] text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] px-2.5 py-1 rounded-md tracking-[0.1em] uppercase">
+                    <span className="bg-white/95 backdrop-blur-md text-[#324D47] text-mobile-kicker md:text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] px-2.5 py-1 rounded-md tracking-[0.06em] md:tracking-[0.1em] uppercase">
                       {article.categoryLabel}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex flex-col p-4 md:p-5">
-                  <div className="flex items-center gap-2.5 text-[9px] text-[#324D47]/35 font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.12em] mb-2">
+                  <div className="flex items-center gap-2.5 text-mobile-kicker md:text-[9px] text-[#324D47]/35 font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.07em] md:tracking-[0.12em] mb-2">
                     <span className="flex items-center gap-1"><Calendar size={10} /> {article.date}</span>
                     <span className="w-[3px] h-[3px] rounded-full bg-[#324D47]/15" />
                     <span className="flex items-center gap-1"><Clock size={10} /> {article.readTime}</span>
@@ -184,7 +184,7 @@ export default function Academy() {
                   </h3>
 
                   <p
-                    className="text-[#324D47]/50 text-[11px] md:text-[12px] leading-relaxed font-['Neutraface_2_Text:Book',sans-serif] mb-3 md:mb-4"
+                    className="text-[#324D47]/50 text-mobile-meta md:text-[12px] leading-relaxed font-['Neutraface_2_Text:Book',sans-serif] mb-3 md:mb-4"
                     style={{
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
@@ -215,7 +215,7 @@ export default function Academy() {
           <div className="flex justify-center mt-0 md:mt-2">
             <button
               onClick={() => navigate('/academy')}
-              className="group px-7 py-2.5 bg-white border border-[#324D47]/8 rounded-full text-[#324D47] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] uppercase overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#324D47]/15 cursor-pointer"
+              className="group min-h-[44px] px-7 py-2.5 bg-white border border-[#324D47]/8 rounded-full text-[#324D47] text-mobile-kicker md:text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] uppercase overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#324D47]/15 cursor-pointer"
             >
               <span className="group-hover:text-[#E70000] transition-colors">Academy Sayfasına Git</span>
             </button>
