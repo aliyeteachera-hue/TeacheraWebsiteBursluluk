@@ -220,27 +220,27 @@ function LanguagesAccordionSection() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="relative min-w-[85vw] h-[420px] rounded-2xl overflow-hidden snap-center flex-shrink-0"
+                className="relative min-w-[85vw] h-[470px] rounded-2xl overflow-hidden snap-center flex-shrink-0"
               >
                 <ImageWithFallback src={lang.image} alt={lang.name} className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.95)] via-[rgba(0,0,0,0.4)] to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.88)] via-[rgba(0,0,0,0.48)] to-[rgba(0,0,0,0.06)]" />
 
                 <div className="absolute inset-0 flex flex-col justify-end p-6">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: lang.accent }} />
-                    <span className="text-white/50 text-xs font-['Neutraface_2_Text:Book',sans-serif]">{lang.nativeName}</span>
+                    <span className="text-white/70 text-xs font-['Neutraface_2_Text:Book',sans-serif] drop-shadow-[0_1px_1px_rgba(0,0,0,0.55)]">{lang.nativeName}</span>
                   </div>
 
-                  <h3 className="text-2xl font-['Neutraface_2_Text:Bold',sans-serif] text-white mb-1">{lang.name}</h3>
-                  <p className="text-white/50 text-xs font-['Neutraface_2_Text:Book',sans-serif] mb-4">{lang.description}</p>
+                  <h3 className="text-2xl font-['Neutraface_2_Text:Bold',sans-serif] text-white mb-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)]">{lang.name}</h3>
+                  <p className="text-white/75 text-xs font-['Neutraface_2_Text:Book',sans-serif] mb-4 drop-shadow-[0_1px_1px_rgba(0,0,0,0.55)]">{lang.description}</p>
 
                   <div className="flex flex-wrap gap-2 mb-5">
                     {lang.categories.map((cat, ci) => (
-                      <div key={ci} className="bg-[rgba(255,255,255,0.06)] rounded-lg px-3 py-2 border border-[rgba(255,255,255,0.04)]">
-                        <span className="text-white/60 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif]">{cat.title}</span>
-                        <div className="flex gap-1 mt-1">
+                      <div key={ci} className="bg-[rgba(255,255,255,0.1)] rounded-lg px-3 py-2 border border-[rgba(255,255,255,0.08)]">
+                        <span className="text-white/85 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif]">{cat.title}</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
                           {cat.items?.map((item, i) => (
-                            <span key={i} className="text-[9px] text-white/40 bg-[rgba(0,0,0,0.3)] px-1.5 py-0.5 rounded">
+                            <span key={i} className="text-[9px] text-white/70 bg-[rgba(0,0,0,0.34)] px-1.5 py-0.5 rounded">
                               {item}
                             </span>
                           ))}
