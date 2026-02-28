@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { MessageCircle, X } from 'lucide-react';
 import whatsappImage from 'figma:asset/9694b181704f98419b88c2856e9838e3f6edf1aa.webp';
+import muazzezWhatsappGif from '../../assets/muazzez-whatsapp.gif';
 import { trackEvent } from '../lib/analytics';
 
 export function WhatsAppButton() {
@@ -143,14 +144,12 @@ export function WhatsAppButton() {
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
       >
-        <motion.img
-          src={whatsappImage}
+        <img
+          src={muazzezWhatsappGif}
           alt="WhatsApp Destek"
           className="w-full h-full object-cover will-change-transform"
-          loading="eager"
+          loading="lazy"
           decoding="async"
-          animate={!shouldReduceMotion && !isExpanded ? { scale: [1, 1.08, 1], x: [0, -1, 1, 0], y: [0, -1, 1, 0] } : undefined}
-          transition={!shouldReduceMotion && !isExpanded ? { duration: 4.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
         />
 
         {isExpanded && (
