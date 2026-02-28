@@ -109,7 +109,7 @@ export default function Academy() {
       </div>
 
       {/* ═══ CONTENT — 1 Featured + 3 Grid ═══ */}
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 relative z-20 -mt-12 pb-16">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 relative z-20 -mt-12 pb-10 md:pb-16">
 
         <div className="flex flex-col gap-6">
 
@@ -123,11 +123,11 @@ export default function Academy() {
             onClick={goToFeatured}
           >
             <div className="relative rounded-[24px] overflow-hidden bg-[#0a0a10] shadow-lg shadow-[#324D47]/10 hover:shadow-xl hover:shadow-[#324D47]/15 transition-shadow duration-500">
-              <div className="relative aspect-[1100/828] md:h-[380px] md:aspect-auto bg-[#06070C]">
+              <div className="relative h-[210px] sm:h-[260px] md:h-[380px] bg-[#06070C]">
                 <ImageWithFallback
                   src={featured.image}
                   alt={featured.title}
-                  className="w-full h-full object-cover object-center opacity-90 transition-transform duration-[2s] ease-out md:group-hover:scale-[1.04]"
+                  className="w-full h-full object-contain md:object-cover object-center opacity-90 transition-transform duration-[2s] ease-out md:group-hover:scale-[1.04]"
                   loading="lazy"
                   decoding="async"
                 />
@@ -164,10 +164,18 @@ export default function Academy() {
               </div>
 
               <div className="md:hidden p-5">
-                <h2 className="text-[1.15rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-[1.2] mb-2">
+                <h2 className="text-[1.05rem] sm:text-[1.15rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-[1.2] mb-2">
                   {featured.title}
                 </h2>
-                <p className="text-white/62 text-[13px] line-clamp-3 font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed mb-3">
+                <p
+                  className="text-white/62 text-[12px] sm:text-[13px] font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed mb-3"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
                   {featured.excerpt}
                 </p>
                 <div className="flex items-center gap-3 text-white/45 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.1em]">
@@ -180,7 +188,7 @@ export default function Academy() {
           </motion.div>
 
           {/* ── 3 SMALL CARDS ── */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
             {grid.map((article, index) => (
               <motion.article
                 key={article.slug}
@@ -188,14 +196,14 @@ export default function Academy() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.08, duration: 0.4 }}
-                className="group flex flex-col bg-white rounded-[20px] overflow-hidden shadow-[0_4px_24px_-6px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.08)] transition-all duration-300 border border-[#324D47]/[0.04] hover:-translate-y-1 cursor-pointer h-full"
+                className="group flex flex-col bg-white rounded-[20px] overflow-hidden shadow-[0_4px_24px_-6px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.08)] transition-all duration-300 border border-[#324D47]/[0.04] hover:-translate-y-1 cursor-pointer md:h-full"
                 onClick={() => navigate(`/academy/${article.slug}`)}
               >
-                <div className="aspect-[1100/828] md:h-40 md:aspect-auto overflow-hidden relative bg-[#0a0a10]">
+                <div className="h-[150px] sm:h-[170px] md:h-40 overflow-hidden relative bg-[#0a0a10]">
                   <ImageWithFallback
                     src={article.image}
                     alt={article.title}
-                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out md:group-hover:scale-[1.06]"
+                    className="w-full h-full object-contain md:object-cover object-center transition-transform duration-700 ease-out md:group-hover:scale-[1.06]"
                     loading="lazy"
                     decoding="async"
                   />
@@ -207,22 +215,30 @@ export default function Academy() {
                   </div>
                 </div>
 
-                <div className="flex flex-col flex-1 p-5">
+                <div className="flex flex-col p-4 md:p-5">
                   <div className="flex items-center gap-2.5 text-[9px] text-[#324D47]/35 font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.12em] mb-2">
                     <span className="flex items-center gap-1"><Calendar size={10} /> {article.date}</span>
                     <span className="w-[3px] h-[3px] rounded-full bg-[#324D47]/15" />
                     <span className="flex items-center gap-1"><Clock size={10} /> {article.readTime}</span>
                   </div>
 
-                  <h3 className="text-[16px] font-['Neutraface_2_Text:Bold',sans-serif] text-[#324D47] leading-[1.25] mb-2 group-hover:text-[#E70000] transition-colors duration-300">
+                  <h3 className="text-[15px] md:text-[16px] font-['Neutraface_2_Text:Bold',sans-serif] text-[#324D47] leading-[1.25] mb-2 group-hover:text-[#E70000] transition-colors duration-300">
                     {article.title}
                   </h3>
 
-                  <p className="text-[#324D47]/50 text-[12px] line-clamp-2 leading-relaxed font-['Neutraface_2_Text:Book',sans-serif] mb-4 flex-1">
+                  <p
+                    className="text-[#324D47]/50 text-[11px] md:text-[12px] leading-relaxed font-['Neutraface_2_Text:Book',sans-serif] mb-3 md:mb-4"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
                     {article.excerpt}
                   </p>
 
-                  <div className="flex items-center justify-between border-t border-[#324D47]/[0.06] pt-3 mt-auto">
+                  <div className="hidden md:flex items-center justify-between border-t border-[#324D47]/[0.06] pt-3 mt-auto">
                     <span className="text-[10px] text-[#324D47]/40 font-['Neutraface_2_Text:Demi',sans-serif] flex items-center gap-1.5">
                       <div className="w-5 h-5 rounded-full bg-[#324D47]/[0.06] flex items-center justify-center">
                         <User size={9} className="text-[#324D47]/40" />
@@ -239,7 +255,7 @@ export default function Academy() {
           </div>
 
           {/* CTA */}
-          <div className="flex justify-center mt-2">
+          <div className="flex justify-center mt-0 md:mt-2">
             <button
               onClick={() => navigate('/academy')}
               className="group px-7 py-2.5 bg-white border border-[#324D47]/8 rounded-full text-[#324D47] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] uppercase overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#324D47]/15 cursor-pointer"
