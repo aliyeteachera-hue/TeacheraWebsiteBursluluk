@@ -40,14 +40,11 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { id: 'home', label: 'Ana Sayfa', href: '/', isRoute: true },
-  { id: 'about', label: 'Biz Kimiz?', href: '/biz-kimiz', isRoute: true },
+  { id: 'about', label: 'Biz Kimiz', href: '/biz-kimiz', isRoute: true },
   { id: 'methodology', label: 'Metodoloji', href: '/metodoloji', isRoute: true },
   { id: 'prices', label: 'Fiyatlar', href: '/fiyatlar', isRoute: true },
   { id: 'programs', label: 'Eğitim Programları', href: '/egitimlerimiz', isRoute: true },
-  { id: 'corporate', label: 'Kurumsal Teklif', href: '/kurumsal', isRoute: true },
-  { id: 'speakup', label: 'SpeakUP Campus', href: '/speakup', isRoute: true },
   { id: 'academy', label: 'Teachera Academy', href: '/academy', isRoute: true, highlight: true },
-  { id: 'exam', label: 'Seviye Tespit', href: '/seviye-tespit-sinavi', isRoute: true },
   { id: 'contact', label: 'İletişim', href: '/iletisim', isRoute: true },
 ];
 
