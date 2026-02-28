@@ -11,6 +11,16 @@ const FALLBACK_SITE_URL = 'https://teachera.com.tr';
 const SITE_URL = (import.meta.env.VITE_SITE_URL || FALLBACK_SITE_URL).replace(/\/+$/, '');
 const DEFAULT_OG_IMAGE = `${SITE_URL}/favicon-32x32.png`;
 const DEFAULT_ROBOTS = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
+const PREFERRED_SITELINKS = [
+  { name: 'Ana Sayfa', path: '/' },
+  { name: 'Biz Kimiz', path: '/biz-kimiz' },
+  { name: 'Metodoloji', path: '/metodoloji' },
+  { name: 'Eğitim Programları', path: '/egitimlerimiz' },
+  { name: 'Konya İngilizce Grup Programı', path: '/egitimlerimiz/ingilizce/grup-programi' },
+  { name: 'Teachera Academy', path: '/academy' },
+  { name: 'Seviye Tespit Sınavı', path: '/seviye-tespit-sinavi' },
+  { name: 'İletişim', path: '/iletisim' },
+] as const;
 
 const CORE_KEYWORDS = [
   'konya dil kursu',
@@ -83,12 +93,6 @@ const STATIC_ROUTE_META: Record<string, SeoMeta> = {
     description:
       'SpeakUp, Konya odaklı speaking club programıdır. Üniversite öğrencileri için gerçek konuşma pratiği ve sosyal dil deneyimi sunar.',
     keywords: [...CORE_KEYWORDS, 'konya speaking club', 'konya konuşma kulübü'],
-  },
-  '/konya-ingilizce-kursu': {
-    title: 'Konya İngilizce Kursu | Teachera Dil Okulu',
-    description:
-      'Konya İngilizce kursu arayanlar için Teachera: konuşma odaklı yüz yüze ve online İngilizce programları, seviye tespit ve danışmanlık desteği.',
-    keywords: [...CORE_KEYWORDS, 'konya ingilizce kursu fiyatları', 'selçuklu ingilizce kursu'],
   },
   '/konya-speaking-club': {
     title: 'Konya Speaking Club | SpeakUp Campus Teachera',
@@ -219,6 +223,17 @@ function upsertLinkTag(rel: string, href: string, hreflang?: string) {
   element.setAttribute('href', href);
 }
 
+function upsertJsonLdScript(id: string, payload: unknown) {
+  let script = document.getElementById(id) as HTMLScriptElement | null;
+  if (!script) {
+    script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = id;
+    document.head.appendChild(script);
+  }
+  script.textContent = JSON.stringify(payload);
+}
+
 function resolveMeta(pathname: string): SeoMeta {
   if (STATIC_ROUTE_META[pathname]) {
     return STATIC_ROUTE_META[pathname];
@@ -300,6 +315,26 @@ export default function SeoManager() {
     upsertLinkTag('canonical', canonicalUrl);
     upsertLinkTag('alternate', canonicalUrl, 'tr-TR');
     upsertLinkTag('alternate', canonicalUrl, 'x-default');
+
+    upsertJsonLdScript('teachera-website-jsonld', {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Teachera Dil Okulu',
+      url: SITE_URL,
+      inLanguage: 'tr-TR',
+    });
+
+    upsertJsonLdScript('teachera-sitenav-jsonld', {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Teachera Primary Navigation',
+      itemListElement: PREFERRED_SITELINKS.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        url: `${SITE_URL}${item.path}`,
+      })),
+    });
   }, [location.pathname]);
 
   return null;

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, redirect } from 'react-router';
 import type { ComponentType } from 'react';
 import RootLayout from './components/RootLayout';
 
@@ -27,7 +27,7 @@ export const router = createBrowserRouter([
       { path: 'metodoloji', lazy: lazyComponent(() => import('./components/MethodologyPage')) },
       { path: 'seviye-tespit-sinavi', lazy: lazyComponent(() => import('./components/PlacementExamPage')) },
       { path: 'speakup', lazy: lazyComponent(() => import('./components/SpeakUpPage')) },
-      { path: 'konya-ingilizce-kursu', lazy: lazyComponent(() => import('./components/KonyaSeoLandingPage')) },
+      { path: 'konya-ingilizce-kursu', loader: () => redirect('/egitimlerimiz/ingilizce/grup-programi') },
       { path: 'konya-speaking-club', lazy: lazyComponent(() => import('./components/KonyaSeoLandingPage')) },
       { path: 'konya-online-dil-kursu', lazy: lazyComponent(() => import('./components/KonyaSeoLandingPage')) },
       { path: 'turkiye-online-dil-kursu', lazy: lazyComponent(() => import('./components/KonyaSeoLandingPage')) },
