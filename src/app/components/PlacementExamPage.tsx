@@ -581,45 +581,60 @@ export default function PlacementExamPage() {
                   })}
                 </div>
 
-                <div className="mt-7 flex flex-wrap items-center gap-3">
-                  <button
-                    onClick={goToPrevious}
-                    disabled={currentIndex === 0}
-                    className="h-[42px] px-5 rounded-full border border-[#324D47]/20 text-[#324D47] text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    Önceki
-                  </button>
+                <div className="mt-7 space-y-2.5">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      onClick={goToPrevious}
+                      disabled={currentIndex === 0}
+                      className="h-[42px] px-5 rounded-full border border-[#324D47]/20 text-[#324D47] text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      Önceki
+                    </button>
+
+                    {currentIndex < questions.length - 1 && (
+                      <>
+                        <button
+                          onClick={skipQuestion}
+                          aria-label="Soruyu atla"
+                          className="md:hidden h-[36px] px-2 text-[#324D47]/65 hover:text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-1 transition-colors cursor-pointer"
+                        >
+                          Atla
+                          <ArrowRight size={12} />
+                        </button>
+                        <button
+                          onClick={goToNext}
+                          disabled={!isCurrentAnswered}
+                          className="h-[42px] px-5 rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
+                        >
+                          Sonraki
+                          <ArrowRight size={14} />
+                        </button>
+                      </>
+                    )}
+
+                    {currentIndex === questions.length - 1 && (
+                      <button
+                        onClick={() => void sendExamResult(remainingSeconds === 0 ? 'completed' : 'time_limit_reached')}
+                        disabled={remainingSeconds > 0 || isSendingResult}
+                        className="h-[42px] px-5 rounded-full bg-[#E70000] hover:bg-[#c40000] text-white text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
+                      >
+                        SINAVI BİTİR
+                        <CheckCircle2 size={14} />
+                      </button>
+                    )}
+                  </div>
 
                   {currentIndex < questions.length - 1 && (
-                    <>
+                    <div className="hidden md:flex items-center">
                       <button
                         onClick={skipQuestion}
                         aria-label="Soruyu atla"
-                        className="h-[36px] px-2 text-[#324D47]/65 hover:text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-1 transition-colors cursor-pointer"
+                        className="h-[34px] px-1 text-[#324D47]/60 hover:text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-1 transition-colors cursor-pointer"
                       >
-                        Atla
+                        Soruyu Atla
                         <ArrowRight size={12} />
                       </button>
-                      <button
-                        onClick={goToNext}
-                        disabled={!isCurrentAnswered}
-                        className="h-[42px] px-5 rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
-                      >
-                        Sonraki
-                        <ArrowRight size={14} />
-                      </button>
-                    </>
-                  )}
-
-                  {currentIndex === questions.length - 1 && (
-                    <button
-                      onClick={() => void sendExamResult(remainingSeconds === 0 ? 'completed' : 'time_limit_reached')}
-                      disabled={remainingSeconds > 0 || isSendingResult}
-                      className="h-[42px] px-5 rounded-full bg-[#E70000] hover:bg-[#c40000] text-white text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
-                    >
-                      SINAVI BİTİR
-                      <CheckCircle2 size={14} />
-                    </button>
+                    </div>
                   )}
                 </div>
 
