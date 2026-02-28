@@ -11,6 +11,7 @@ import SeoManager from './SeoManager';
 import LevelAssessmentModal from './LevelAssessment';
 import FreeTrialModal from './FreeTrialModal';
 import { initTracking, trackPageView } from '../lib/analytics';
+import { useLiteMode } from '../lib/useLiteMode';
 
 const WhatsAppButton = lazy(() =>
   import('./WhatsAppButton').then((module) => ({ default: module.WhatsAppButton })),
@@ -21,7 +22,6 @@ export default function RootLayout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState('home');
   const [showDeferredUi, setShowDeferredUi] = useState(false);
-  const [forceReducedMotion, setForceReducedMotion] = useState(false);
   const currentSectionRef = useRef('home');
   const menuScrollLockStateRef = useRef<{
     scrollY: number;
@@ -36,6 +36,7 @@ export default function RootLayout() {
     htmlOverscrollY: string;
   } | null>(null);
   const location = useLocation();
+  const liteMode = useLiteMode();
 
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -47,35 +48,29 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setShowDeferredUi(true);
-    }, 700);
-    return () => window.clearTimeout(timer);
-  }, []);
+    let timeoutId = 0;
+    let idleId: number | null = null;
+    const onReady = () => setShowDeferredUi(true);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 767px)');
-    const setByDevice = () => {
-      const lowCoreDevice = typeof navigator.hardwareConcurrency === 'number'
-        ? navigator.hardwareConcurrency <= 4
-        : false;
-      setForceReducedMotion(mediaQuery.matches || lowCoreDevice);
-    };
-
-    setByDevice();
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', setByDevice);
-      return () => mediaQuery.removeEventListener('change', setByDevice);
+    if ('requestIdleCallback' in window) {
+      idleId = (window as Window & { requestIdleCallback: (cb: IdleRequestCallback, options?: IdleRequestOptions) => number })
+        .requestIdleCallback(onReady, { timeout: 1600 });
+    } else {
+      timeoutId = window.setTimeout(onReady, 900);
     }
 
-    mediaQuery.addListener(setByDevice);
-    return () => mediaQuery.removeListener(setByDevice);
+    return () => {
+      window.clearTimeout(timeoutId);
+      if (idleId !== null && 'cancelIdleCallback' in window) {
+        (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleId);
+      }
+    };
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('teachera-reduce-motion', forceReducedMotion);
+    document.documentElement.classList.toggle('teachera-reduce-motion', liteMode);
     return () => document.documentElement.classList.remove('teachera-reduce-motion');
-  }, [forceReducedMotion]);
+  }, [liteMode]);
 
   useEffect(() => {
     const restoreMenuScrollLock = (restoreScrollPosition: boolean) => {

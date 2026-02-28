@@ -5,6 +5,7 @@ import Group1000004255 from '../../imports/Group1000004255';
 import homeHeroVideo from '../../assets/video/home-hero.mp4';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
+import { useLiteMode } from '../lib/useLiteMode';
 
 /* ─── Orbiting Arc Button ───────────────────────────────────────────────── */
 function OrbitingArcButton({
@@ -120,6 +121,7 @@ export default function Hero() {
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [enableDesktopEffects, setEnableDesktopEffects] = useState(false);
   const [enableHeroMotion, setEnableHeroMotion] = useState(false);
+  const isLiteMode = useLiteMode();
   const { open: openLevelAssessment } = useLevelAssessment();
   const { open: openFreeTrial } = useFreeTrial();
 
@@ -129,7 +131,7 @@ export default function Hero() {
 
     const updateVideoState = () => {
       window.clearTimeout(timer);
-      const shouldEnableMotion = !shouldReduceMotion;
+      const shouldEnableMotion = !shouldReduceMotion && !isLiteMode;
       const shouldEnableDesktopEffects = shouldEnableMotion && mediaQuery.matches;
       setEnableHeroMotion(shouldEnableMotion);
       setEnableDesktopEffects(shouldEnableDesktopEffects);
@@ -138,7 +140,7 @@ export default function Hero() {
         setShouldLoadVideo(false);
         return;
       }
-      timer = window.setTimeout(() => setShouldLoadVideo(true), mediaQuery.matches ? 320 : 180);
+      timer = window.setTimeout(() => setShouldLoadVideo(true), mediaQuery.matches ? 420 : 260);
     };
 
     updateVideoState();
@@ -155,7 +157,7 @@ export default function Hero() {
       window.clearTimeout(timer);
       mediaQuery.removeListener(updateVideoState);
     };
-  }, [shouldReduceMotion]);
+  }, [isLiteMode, shouldReduceMotion]);
 
   const scrollToNext = () => {
     const element = document.getElementById('how-it-works');
@@ -175,7 +177,7 @@ export default function Hero() {
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="none"
               aria-hidden="true"
             >
               <source src={homeHeroVideo} type="video/mp4" />
