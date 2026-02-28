@@ -10,8 +10,10 @@ import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOB
    ═══════════════════════════════════════════════════════════════════════ */
 const HERO_BG = 'https://images.unsplash.com/photo-1582848890404-ed087c1b3f0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
-const SPEAKUP_VIDEO_SRC =
-  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1&playsinline=1&dnt=1';
+const SPEAKUP_VIDEO_INLINE_SRC =
+  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-inline&app_id=58479&autoplay=1&muted=1&loop=1&playsinline=1&dnt=1&api=1&background=1&quality=720p';
+const SPEAKUP_VIDEO_FULLSCREEN_SRC =
+  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-fullscreen&app_id=58479&autoplay=1&muted=0&loop=1&playsinline=1&dnt=1&api=1&title=0&byline=0&portrait=0&quality=1080p';
 
 const SESSIONS = [
   { id: 's1', label: '14:00 – 15:20', value: '14:00-15:20' },
@@ -264,11 +266,13 @@ export default function SpeakUpPage() {
   const formRef = useRef<HTMLDivElement>(null);
   const whatRef = useRef<HTMLDivElement>(null);
   const howRef = useRef<HTMLDivElement>(null);
+  const videoCardRef = useRef<HTMLDivElement>(null);
   const inlineIframeRef = useRef<HTMLIFrameElement>(null);
   const fullscreenIframeRef = useRef<HTMLIFrameElement>(null);
+  const isInlineVideoInView = useInView(videoCardRef, { margin: '-20% 0px -20% 0px' });
 
   /* ── Video Mute State ── */
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
 
   const postToPlayer = (
@@ -297,6 +301,13 @@ export default function SpeakUpPage() {
     setIsMuted((prev) => !prev);
   };
 
+  const openVideoFullscreen = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.();
+    // Browsers block unmuted autoplay; user gesture on fullscreen unlocks audio safely.
+    setIsMuted(false);
+    setIsVideoFullscreen(true);
+  };
+
   const handleInlineIframeLoad = () => {
     window.setTimeout(() => {
       postToPlayer(inlineIframeRef.current, 'play');
@@ -315,6 +326,15 @@ export default function SpeakUpPage() {
     const timerId = window.setTimeout(() => syncAllPlayers(isMuted), 80);
     return () => window.clearTimeout(timerId);
   }, [isMuted]);
+
+  useEffect(() => {
+    if (isVideoFullscreen) return;
+    const timerId = window.setTimeout(() => {
+      postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
+      if (isInlineVideoInView) syncIframeVolume(inlineIframeRef.current, isMuted);
+    }, 100);
+    return () => window.clearTimeout(timerId);
+  }, [isInlineVideoInView, isVideoFullscreen, isMuted]);
 
   useEffect(() => {
     if (!isVideoFullscreen) return;
@@ -337,10 +357,12 @@ export default function SpeakUpPage() {
       window.clearTimeout(timerId);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', keyHandler);
-      postToPlayer(inlineIframeRef.current, 'play');
-      window.setTimeout(() => syncIframeVolume(inlineIframeRef.current, isMuted), 120);
+      postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
+      if (isInlineVideoInView) {
+        window.setTimeout(() => syncIframeVolume(inlineIframeRef.current, isMuted), 120);
+      }
     };
-  }, [isVideoFullscreen, isMuted]);
+  }, [isVideoFullscreen, isMuted, isInlineVideoInView]);
 
   /* ── Form State ── */
   const [formData, setFormData] = useState({
@@ -537,17 +559,19 @@ export default function SpeakUpPage() {
               className="relative order-1 lg:order-2 shrink-0"
             >
               <div
+                ref={videoCardRef}
                 className="relative w-[280px] md:w-[320px] lg:w-[340px] rounded-[24px] overflow-hidden bg-[#1a1a24] shadow-2xl shadow-black/40 cursor-pointer"
                 style={{ aspectRatio: '9/16' }}
-                onClick={() => setIsVideoFullscreen(true)}
+                onClick={openVideoFullscreen}
               >
                 <iframe
                   ref={inlineIframeRef}
-                  src={SPEAKUP_VIDEO_SRC}
+                  src={SPEAKUP_VIDEO_INLINE_SRC}
                   allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
                   title="Teachera SpeakUP"
                   className="absolute inset-0 w-full h-full border-0"
+                  loading="eager"
                   onLoad={handleInlineIframeLoad}
                 />
                 <button
@@ -557,15 +581,15 @@ export default function SpeakUpPage() {
                   {isMuted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
                 </button>
                 <button
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setIsVideoFullscreen(true);
-                  }}
+                  onClick={openVideoFullscreen}
                   className="absolute top-2 left-2 h-8 px-3 bg-[#00000B]/70 rounded-full flex items-center justify-center gap-1.5 cursor-pointer text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em]"
                 >
                   <Maximize2 size={12} />
                   TAM EKRAN
                 </button>
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-3 px-3 py-1.5 rounded-full bg-[#00000B]/70 text-white/90 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em] pointer-events-none">
+                  Reels gibi tam ekran izleyin
+                </div>
               </div>
 
               {/* Floating glow behind video */}
@@ -595,11 +619,12 @@ export default function SpeakUpPage() {
             >
               <iframe
                 ref={fullscreenIframeRef}
-                src={SPEAKUP_VIDEO_SRC}
+                src={SPEAKUP_VIDEO_FULLSCREEN_SRC}
                 allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
                 title="Teachera SpeakUP Fullscreen"
                 className="absolute inset-0 w-full h-full border-0"
+                loading="lazy"
                 onLoad={handleFullscreenIframeLoad}
               />
 
