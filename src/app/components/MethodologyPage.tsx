@@ -1329,7 +1329,7 @@ function PullQuoteSection() {
 
           <div className="flex items-center justify-center gap-3">
             <div className="w-8 h-px bg-[#E70000]/30" />
-            <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[#E70000]/60 text-[10px] tracking-[0.2em] uppercase">
+            <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[#E70000]/60 text-mobile-kicker md:text-[10px] tracking-[0.1em] md:tracking-[0.2em] uppercase">
               Refleks Tabanlı Öğretim
             </span>
             <div className="w-8 h-px bg-[#E70000]/30" />
@@ -1362,7 +1362,7 @@ function CTASection() {
               <Group1000004255 />
             </div>
           </div>
-          <p className="text-[#09090F]/60 text-[13px] sm:text-[15px] md:text-[17px] font-['Neutraface_2_Text:Book',sans-serif] mb-4 md:mb-5">
+          <p className="text-[#09090F]/60 text-mobile-meta sm:text-[15px] md:text-[17px] font-['Neutraface_2_Text:Book',sans-serif] mb-4 md:mb-5">
             Yabancı eğitmenler ve özelleştirilmiş metodolojimizle
           </p>
         </Reveal>
@@ -1377,7 +1377,7 @@ function CTASection() {
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: 0.1 + i * 0.07, type: 'spring', bounce: 0.35 }}
-                className="inline-flex items-center px-2.5 py-0.5 md:px-3 md:py-1 rounded-full border border-[#324D47]/15 bg-[#324D47]/[0.04] text-[#324D47]/80 text-[10px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#324D47]/[0.08] hover:border-[#324D47]/25 transition-all cursor-default"
+                className="inline-flex items-center px-2.5 py-1 md:px-3 md:py-1 rounded-full border border-[#324D47]/15 bg-[#324D47]/[0.04] text-[#324D47]/80 text-mobile-kicker sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#324D47]/[0.08] hover:border-[#324D47]/25 transition-all cursor-default"
               >
                 {lang}
               </motion.span>
@@ -1387,7 +1387,7 @@ function CTASection() {
 
         {/* "konuşarak öğren" highlight */}
         <Reveal delay={0.2}>
-          <p className="text-[#09090F]/60 text-[13px] sm:text-[15px] md:text-[17px] font-['Neutraface_2_Text:Book',sans-serif] mb-8 md:mb-10">
+          <p className="text-[#09090F]/60 text-mobile-meta sm:text-[15px] md:text-[17px] font-['Neutraface_2_Text:Book',sans-serif] mb-8 md:mb-10">
             dillerini{' '}
             <span className="relative inline-block text-[#09090F] font-['Neutraface_2_Text:Demi',sans-serif]">
               konuşarak öğren
@@ -1414,7 +1414,7 @@ function CTASection() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={openFreeTrial}
-              className="group flex items-center gap-2 bg-[#324D47] hover:bg-[#3d5e57] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] sm:text-[13px] tracking-[0.05em] px-6 sm:px-7 py-2.5 sm:py-3 rounded-full transition-all duration-300 cursor-pointer"
+              className="group flex min-h-[44px] items-center gap-2 bg-[#324D47] hover:bg-[#3d5e57] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker sm:text-[13px] tracking-[0.05em] px-6 sm:px-7 py-2.5 sm:py-3 rounded-full transition-all duration-300 cursor-pointer"
             >
               Ücretsiz Deneme Seansı
               <Play size={14} className="group-hover:translate-x-0.5 transition-transform" />
@@ -1423,7 +1423,7 @@ function CTASection() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={openLevelAssessment}
-              className="flex items-center gap-2 border border-[#324D47]/20 hover:border-[#324D47]/40 text-[#09090F]/60 hover:text-[#324D47] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] sm:text-[13px] tracking-[0.05em] px-5 sm:px-6 py-2.5 sm:py-3 rounded-full transition-all cursor-pointer"
+              className="flex min-h-[44px] items-center gap-2 border border-[#324D47]/20 hover:border-[#324D47]/40 text-[#09090F]/60 hover:text-[#324D47] font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker sm:text-[13px] tracking-[0.05em] px-5 sm:px-6 py-2.5 sm:py-3 rounded-full transition-all cursor-pointer"
             >
               Seviyeni Öğren
             </motion.button>

@@ -66,7 +66,7 @@ function ConsentRow({ checked, onChange, children }: { checked: boolean; onChang
       >
         {checked && <Check size={10} className="text-white" strokeWidth={3} />}
       </div>
-      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] text-white/80 leading-relaxed">
+      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] text-white/80 leading-relaxed">
         {children}
       </span>
     </button>
@@ -103,7 +103,7 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
           <div className="flex flex-col items-center text-center mb-8">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-6 h-[1px] bg-white/40" />
-              <span className="text-[10px] text-white/70 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.25em] uppercase">
+              <span className="text-mobile-kicker md:text-[10px] text-white/70 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.12em] md:tracking-[0.25em] uppercase">
                 Öğrenci Portalı
               </span>
               <div className="w-6 h-[1px] bg-white/40" />
@@ -111,7 +111,7 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
             <h2 className="font-['Neutraface_2_Text:Demi',sans-serif] text-[26px] md:text-[32px] text-white leading-tight mb-2">
               Hoş Geldiniz
             </h2>
-            <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] md:text-[14px] text-white/70 max-w-[420px] leading-relaxed">
+            <p className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[14px] text-white/70 max-w-[420px] leading-relaxed">
               Giriş yapın ve portalımızın sunduğu fırsatlardan yararlanın.
             </p>
           </div>
@@ -164,14 +164,14 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
                 }`}>
                   {rememberMe && <Check size={10} className="text-white" strokeWidth={3} />}
                 </div>
-                <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] text-white/80">
+                <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] text-white/80">
                   Beni Hatırla
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => window.open(LOGIN_PORTAL_URL, '_blank', 'noopener,noreferrer')}
-                className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] text-white/80 hover:text-[#F4EBD1] transition-colors underline decoration-white/30 underline-offset-2"
+                className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] text-white/80 hover:text-[#F4EBD1] transition-colors underline decoration-white/30 underline-offset-2"
               >
                 Parolanızı mı Unuttunuz?
               </button>
@@ -193,7 +193,7 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
             {/* Divider */}
             <div className="flex items-center gap-4 my-1">
               <div className="flex-1 h-[1px] bg-white/15" />
-              <span className="text-[11px] text-white/40 font-['Neutraface_2_Text:Book',sans-serif]">veya</span>
+              <span className="text-mobile-kicker md:text-[11px] text-white/40 font-['Neutraface_2_Text:Book',sans-serif]">veya</span>
               <div className="flex-1 h-[1px] bg-white/15" />
             </div>
 
@@ -211,7 +211,7 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
             </button>
 
             {/* ReCAPTCHA */}
-            <p className="text-center font-['Neutraface_2_Text:Book',sans-serif] text-[11px] text-white/40 leading-relaxed">
+            <p className="text-center font-['Neutraface_2_Text:Book',sans-serif] text-mobile-kicker md:text-[11px] text-white/40 leading-relaxed">
               ReCAPTCHA tarafından korunmaktadır ve Google{' '}
               <a
                 href={GOOGLE_PRIVACY_URL}
@@ -281,7 +281,7 @@ function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
           <div className="flex flex-col items-center text-center mb-8">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-6 h-[1px] bg-white/40" />
-              <span className="text-[10px] text-white/70 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.25em] uppercase">
+              <span className="text-mobile-kicker md:text-[10px] text-white/70 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.12em] md:tracking-[0.25em] uppercase">
                 Yeni Hesap
               </span>
               <div className="w-6 h-[1px] bg-white/40" />
@@ -289,7 +289,7 @@ function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
             <h2 className="font-['Neutraface_2_Text:Demi',sans-serif] text-[26px] md:text-[32px] text-white leading-tight mb-2">
               Hesap Oluştur
             </h2>
-            <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] md:text-[14px] text-white/70 max-w-[420px] leading-relaxed">
+            <p className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[14px] text-white/70 max-w-[420px] leading-relaxed">
               Hesap oluşturun ve portalımızın sunduğu fırsatları kullanın.
             </p>
           </div>
@@ -432,7 +432,7 @@ function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
             {/* Divider */}
             <div className="flex items-center gap-4 my-1">
               <div className="flex-1 h-[1px] bg-white/15" />
-              <span className="text-[11px] text-white/40 font-['Neutraface_2_Text:Book',sans-serif]">veya</span>
+              <span className="text-mobile-kicker md:text-[11px] text-white/40 font-['Neutraface_2_Text:Book',sans-serif]">veya</span>
               <div className="flex-1 h-[1px] bg-white/15" />
             </div>
 
@@ -450,7 +450,7 @@ function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
             </button>
 
             {/* ReCAPTCHA */}
-            <p className="text-center font-['Neutraface_2_Text:Book',sans-serif] text-[11px] text-white/40 leading-relaxed">
+            <p className="text-center font-['Neutraface_2_Text:Book',sans-serif] text-mobile-kicker md:text-[11px] text-white/40 leading-relaxed">
               ReCAPTCHA tarafından korunmaktadır ve Google{' '}
               <a
                 href={GOOGLE_PRIVACY_URL}

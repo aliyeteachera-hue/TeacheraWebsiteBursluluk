@@ -174,7 +174,7 @@ export default function LevelAssessmentModal() {
                     <div className="flex flex-col items-center text-center mb-8">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-6 h-[1px] bg-white/40" />
-                        <span className="text-[10px] text-white/70 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.25em] uppercase">
+                        <span className="text-mobile-kicker md:text-[10px] text-white/70 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.12em] md:tracking-[0.25em] uppercase">
                           Ücretsiz Değerlendirme
                         </span>
                         <div className="w-6 h-[1px] bg-white/40" />
@@ -182,7 +182,7 @@ export default function LevelAssessmentModal() {
                       <h2 className="font-['Neutraface_2_Text:Demi',sans-serif] text-[26px] md:text-[32px] text-white leading-tight mb-2">
                         Sınava Başla
                       </h2>
-                      <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] md:text-[14px] text-white/70 max-w-[420px] leading-relaxed">
+                      <p className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[14px] text-white/70 max-w-[420px] leading-relaxed">
                         Mevcut dil seviyenizi belirleyelim ve size özel bir eğitim planı oluşturalım.
                       </p>
                     </div>
@@ -334,7 +334,7 @@ export default function LevelAssessmentModal() {
                       </motion.button>
 
                       {/* Footer note */}
-                      <p className="text-center font-['Neutraface_2_Text:Book',sans-serif] text-[11px] text-white/40 leading-relaxed">
+                      <p className="text-center font-['Neutraface_2_Text:Book',sans-serif] text-mobile-kicker md:text-[11px] text-white/40 leading-relaxed">
                         Bilgileriniz KVKK kapsamında korunmaktadır.
                       </p>
                     </div>
@@ -372,7 +372,7 @@ function ConsentRow({ checked, onChange, children }: { checked: boolean; onChang
       >
         {checked && <Check size={10} className="text-white" strokeWidth={3} />}
       </div>
-      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] text-white/80 leading-relaxed">
+      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] text-white/80 leading-relaxed">
         {children}
       </span>
     </button>
@@ -394,7 +394,7 @@ function DropdownList({ items, selected, onSelect }: { items: { id: string; labe
           key={item.id}
           type="button"
           onClick={() => onSelect(item.id)}
-          className={`w-full px-5 py-2.5 text-left text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors flex items-center justify-between ${
+          className={`w-full px-5 py-2.5 text-left text-mobile-meta md:text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors flex items-center justify-between ${
             selected === item.id
               ? 'bg-[#324D47]/10 text-[#324D47]'
               : 'text-[#00000B] hover:bg-[#F4EBD1]/50'

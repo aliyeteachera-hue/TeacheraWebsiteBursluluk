@@ -230,12 +230,12 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                       )}{' '}
                       saatleri arasında kampüsümüzde ağırlamaktan mutluluk duyacağız.
                     </p>
-                    <p className="text-white/40 font-['Neutraface_2_Text:Book',sans-serif] text-[12px] mb-8">
+                    <p className="text-white/40 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] mb-8">
                       Detaylar, paylaştığınız iletişim bilgileriniz üzerinden iletilecektir.
                     </p>
                     <button
                       onClick={onClose}
-                      className="h-[44px] px-8 rounded-[30px] bg-[#00000B] hover:bg-[#68232E] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] transition-colors duration-300 cursor-pointer"
+                      className="h-[44px] px-8 rounded-[30px] bg-[#00000B] hover:bg-[#68232E] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[14px] tracking-[0.05em] transition-colors duration-300 cursor-pointer"
                     >
                       Tamam
                     </button>
@@ -260,7 +260,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                     <div className="flex flex-col items-center text-center mb-8">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-6 h-[1px] bg-white/40" />
-                        <span className="text-[10px] text-white/70 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.25em] uppercase">
+                        <span className="text-mobile-kicker md:text-[10px] text-white/70 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.12em] md:tracking-[0.25em] uppercase">
                           Kampüs Ziyareti
                         </span>
                         <div className="w-6 h-[1px] bg-white/40" />
@@ -271,7 +271,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                           Randevu Oluştur
                         </h2>
                       </div>
-                      <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] md:text-[14px] text-white/70 max-w-[460px] leading-relaxed">
+                      <p className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[14px] text-white/70 max-w-[460px] leading-relaxed">
                         Kampüsümüze gelin, bir kahve içelim ve dil hedeflerinizi birlikte konuşalım.
                       </p>
                     </div>
@@ -296,7 +296,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                               <div className="w-[14px] h-[10px] rounded-[2px] overflow-hidden relative bg-[#E92434] flex items-center justify-center">
                                 <div className="w-[3px] h-[3px] rounded-full border border-white" />
                               </div>
-                              <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] text-[#302d2d]">+90</span>
+                              <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-meta md:text-[14px] text-[#302d2d]">+90</span>
                               <ChevronDown size={12} className="text-[#292D32]" />
                             </div>
                             <input
@@ -388,13 +388,13 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                               key={slot.id}
                               type="button"
                               onClick={() => setSelectedTime(slot.id)}
-                              className={`h-[44px] rounded-[30px] flex items-center justify-center gap-1.5 text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] border transition-all duration-200 cursor-pointer ${
+                              className={`h-[44px] rounded-[30px] flex items-center justify-center gap-1.5 text-mobile-kicker md:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] border transition-all duration-200 cursor-pointer ${
                                 selectedTime === slot.id
                                   ? 'bg-white text-[#324D47] border-white shadow-lg shadow-black/10'
                                   : 'bg-white/10 text-white/80 border-white/15 hover:bg-white/20 hover:border-white/30'
                               }`}
                             >
-                              <span className="text-[11px]">{slot.icon}</span>
+                              <span className="text-mobile-kicker md:text-[11px]">{slot.icon}</span>
                               <span>{slot.label.split(' – ')[0]}–{slot.label.split(' – ')[1]}</span>
                             </button>
                           ))}
@@ -404,7 +404,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                       {/* Disclaimer Note */}
                       <div className="flex items-start gap-2.5 bg-white/8 rounded-[16px] px-4 py-3 border border-white/10">
                         <Info size={14} className="text-[#F4EBD1] mt-0.5 shrink-0" />
-                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-white/60 leading-relaxed">
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] text-white/60 leading-relaxed">
                           Seçtiğiniz tarih ve saat aralığı <span className="text-white/80">kesinleşmiş bir randevu değildir</span>; tercih bildiriminiz olarak değerlendirilecektir. Eğitim danışmanlarımız sizinle iletişime geçerek uygun tarih ve saati birlikte belirleyecektir.
                         </p>
                       </div>
@@ -437,13 +437,13 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                         }`}
                       >
                         <Send size={15} className="text-white" />
-                        <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] text-white tracking-wide">
+                        <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[14px] text-white tracking-[0.05em] md:tracking-wide">
                           Randevu Oluştur
                         </span>
                       </motion.button>
 
                       {/* Footer note */}
-                      <p className="text-center font-['Neutraface_2_Text:Book',sans-serif] text-[11px] text-white/40 leading-relaxed">
+                      <p className="text-center font-['Neutraface_2_Text:Book',sans-serif] text-mobile-kicker md:text-[11px] text-white/40 leading-relaxed">
                         Bilgileriniz KVKK kapsamında korunmaktadır.
                       </p>
                     </div>
@@ -482,7 +482,7 @@ function ConsentRow({ checked, onChange, children }: { checked: boolean; onChang
       >
         {checked && <Check size={10} className="text-white" strokeWidth={3} />}
       </div>
-      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] text-white/80 leading-relaxed">
+      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] text-white/80 leading-relaxed">
         {children}
       </span>
     </button>
@@ -504,7 +504,7 @@ function DropdownList({ items, selected, onSelect }: { items: { id: string; labe
           key={item.id}
           type="button"
           onClick={() => onSelect(item.id)}
-          className={`w-full px-5 py-2.5 text-left text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors flex items-center justify-between ${
+          className={`w-full min-h-[44px] px-5 py-2.5 text-left text-mobile-meta md:text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors flex items-center justify-between ${
             selected === item.id
               ? 'bg-[#324D47]/10 text-[#324D47]'
               : 'text-[#00000B] hover:bg-[#F4EBD1]/50'
@@ -562,7 +562,7 @@ function MiniCalendar({
       {/* Day headers */}
       <div className="grid grid-cols-7 gap-0.5 mb-1">
         {turkishDays.map((d) => (
-          <div key={d} className="text-center text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#686767] py-1">
+          <div key={d} className="text-center text-mobile-kicker md:text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#686767] py-1">
             {d}
           </div>
         ))}
@@ -585,7 +585,7 @@ function MiniCalendar({
               type="button"
               disabled={disabled}
               onClick={() => onSelect(date)}
-              className={`w-full aspect-square rounded-full flex items-center justify-center text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] transition-all duration-150 ${
+              className={`w-full aspect-square rounded-full flex items-center justify-center text-mobile-meta md:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] transition-all duration-150 ${
                 disabled
                   ? 'text-[#d0d0d0] cursor-not-allowed'
                   : isSelected
@@ -602,7 +602,7 @@ function MiniCalendar({
       </div>
 
       {/* Sunday note */}
-      <p className="text-center text-[10px] font-['Neutraface_2_Text:Book',sans-serif] text-[#686767]/60 mt-2">
+      <p className="text-center text-mobile-kicker md:text-[10px] font-['Neutraface_2_Text:Book',sans-serif] text-[#686767]/60 mt-2">
         Pazar günleri ders yapılmamaktadır.
       </p>
     </motion.div>
@@ -746,12 +746,12 @@ function Card({
             {title}
           </h3>
           <p
-            className="font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] mb-3 leading-relaxed"
+            className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-meta md:text-[13px] mb-3 leading-relaxed"
             style={{ color: glowColor }}
           >
             {subtitle}
           </p>
-          <p className="text-[#ffffff]/66 font-['Neutraface_2_Text:Book',sans-serif] text-[13px] leading-relaxed">
+          <p className="text-[#ffffff]/66 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] leading-relaxed">
             {description}
           </p>
         </div>
@@ -771,7 +771,7 @@ function Card({
             onClick={onButtonClick}
             className="w-full inline-flex items-center justify-center gap-2.5 py-2.5 bg-[#ffffff]/6 border border-[#ffffff]/12 rounded-full cursor-pointer"
           >
-            <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff] text-[12px] tracking-wide">
+            <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff] text-mobile-kicker md:text-[12px] tracking-[0.05em] md:tracking-wide">
               {buttonText}
             </span>
             <ArrowRight size={14} className="text-white/80" />

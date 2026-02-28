@@ -943,7 +943,7 @@ export default function SpeakUpPage() {
                 </p>
                 <button
                   onClick={() => navigate('/')}
-                  className="h-[44px] px-8 rounded-full border border-white/10 hover:border-white/20 text-white/50 hover:text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.15em] transition-all cursor-pointer"
+                  className="h-[44px] px-8 rounded-full border border-white/10 hover:border-white/20 text-white/50 hover:text-white font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker tracking-[0.08em] md:tracking-[0.15em] transition-all cursor-pointer"
                 >
                   ANA SAYFAYA DÖN
                 </button>
@@ -960,7 +960,7 @@ export default function SpeakUpPage() {
               >
                 {/* Ad Soyad */}
                 <div>
-                  <label className="block text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] mb-2">
+                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
                     AD SOYAD <span className="text-[#E70000]">*</span>
                   </label>
                   <input
@@ -976,7 +976,7 @@ export default function SpeakUpPage() {
                 {/* Telefon + Email row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] mb-2">
+                    <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
                       TELEFON <span className="text-[#E70000]">*</span>
                     </label>
                     <input
@@ -993,8 +993,8 @@ export default function SpeakUpPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] mb-2">
-                      E-POSTA <span className="text-[#324D47]/30 text-[9px]">(önerilir)</span>
+                    <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
+                      E-POSTA <span className="text-[#324D47]/30 text-mobile-kicker md:text-[9px] tracking-normal">(önerilir)</span>
                     </label>
                     <input
                       type="email"
@@ -1008,7 +1008,7 @@ export default function SpeakUpPage() {
 
                 {/* Bölüm / Sınıf */}
                 <div>
-                  <label className="block text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] mb-2">
+                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
                     BÖLÜM / SINIF
                   </label>
                   <input
@@ -1022,9 +1022,9 @@ export default function SpeakUpPage() {
 
                 {/* Seans Tercihi */}
                 <div>
-                  <label className="block text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] mb-2">
+                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
                     SEANS TERCİHİN <span className="text-[#E70000]">*</span>
-                    <span className="text-[#324D47]/30 text-[9px] ml-2 tracking-normal">(müsait olduğun tüm saatleri işaretle)</span>
+                    <span className="text-[#324D47]/30 text-mobile-kicker md:text-[9px] ml-2 tracking-normal">(müsait olduğun tüm saatleri işaretle)</span>
                   </label>
                   <div className="flex flex-wrap gap-3">
                     {SESSIONS.map(s => {
@@ -1050,7 +1050,7 @@ export default function SpeakUpPage() {
 
                 {/* Seviye */}
                 <div>
-                  <label className="block text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] mb-2">
+                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
                     KENDİNİ SEVİYEDE NASIL GÖRÜYORSUN?
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -1061,7 +1061,7 @@ export default function SpeakUpPage() {
                           key={l}
                           type="button"
                           onClick={() => setFormData(p => ({ ...p, level: l }))}
-                          className={`h-[40px] px-5 rounded-full border font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.05em] transition-all cursor-pointer ${
+                          className={`h-[44px] px-5 rounded-full border font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[12px] tracking-[0.05em] transition-all cursor-pointer ${
                             active
                               ? 'bg-[#E70000] border-[#E70000] text-white'
                               : 'bg-transparent border-[#324D47]/[0.08] text-[#324D47]/40 hover:border-[#324D47]/20'
@@ -1076,7 +1076,7 @@ export default function SpeakUpPage() {
 
                 {/* Seviye Tespiti Tarihi */}
                 <div>
-                  <label className="block text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] mb-2">
+                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
                     SEVİYE TESPİTİ İÇİN GELEBİLECEĞİN TARİH
                   </label>
                   <div className="relative" ref={calRef}>
@@ -1107,7 +1107,7 @@ export default function SpeakUpPage() {
 
                 {/* Seviye Tespiti Saati */}
                 <div>
-                  <label className="block text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] mb-2">
+                  <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
                     SEVİYE TESPİTİ İÇİN GELEBİLECEĞİN SAAT
                   </label>
                   <div className="flex flex-wrap gap-3">
@@ -1144,7 +1144,7 @@ export default function SpeakUpPage() {
                       onChange={e => setFormData(p => ({ ...p, kvkk: e.target.checked }))}
                       className="mt-1 w-4 h-4 accent-[#E70000] cursor-pointer"
                     />
-                    <span className="text-[#324D47]/60 font-['Neutraface_2_Text:Book',sans-serif] text-[12px] leading-[1.6] group-hover:text-[#324D47]/80 transition-colors">
+                    <span className="text-[#324D47]/60 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] leading-[1.6] group-hover:text-[#324D47]/80 transition-colors">
                       <span className="text-[#E70000]">*</span>{' '}
                       <a
                         href={LEGAL_KVKK_URL}
@@ -1165,7 +1165,7 @@ export default function SpeakUpPage() {
                       onChange={e => setFormData(p => ({ ...p, consent: e.target.checked }))}
                       className="mt-1 w-4 h-4 accent-[#E70000] cursor-pointer"
                     />
-                    <span className="text-[#324D47]/60 font-['Neutraface_2_Text:Book',sans-serif] text-[12px] leading-[1.6] group-hover:text-[#324D47]/80 transition-colors">
+                    <span className="text-[#324D47]/60 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] leading-[1.6] group-hover:text-[#324D47]/80 transition-colors">
                       Teachera'nın benimle arama ve SMS yoluyla iletişime geçmesine izin veriyorum. (opsiyonel)
                     </span>
                   </label>
@@ -1175,7 +1175,7 @@ export default function SpeakUpPage() {
                 <button
                   type="submit"
                   disabled={!formData.name || !isPhoneValid || !formData.kvkk || formData.sessions.length === 0}
-                  className="w-full h-[48px] rounded-[30px] bg-[#E70000] hover:bg-[#c40000] disabled:bg-[#324D47]/15 disabled:cursor-not-allowed text-white disabled:text-[#324D47]/30 font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 disabled:shadow-none cursor-pointer flex items-center justify-center gap-2.5"
+                  className="w-full h-[48px] rounded-[30px] bg-[#E70000] hover:bg-[#c40000] disabled:bg-[#324D47]/15 disabled:cursor-not-allowed text-white disabled:text-[#324D47]/30 font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[13px] tracking-[0.08em] md:tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 disabled:shadow-none cursor-pointer flex items-center justify-center gap-2.5"
                 >
                   BAŞVURUYU GÖNDER
                   <ArrowUpRight size={15} />
@@ -1195,7 +1195,7 @@ export default function SpeakUpPage() {
             <div className="text-center mb-14">
               <div className="flex items-center gap-3 justify-center mb-6">
                 <div className="w-8 h-[1px] bg-[#E70000]/40" />
-                <span className="text-[#E70000] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.35em]">
+                <span className="text-[#E70000] text-mobile-kicker md:text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.12em] md:tracking-[0.35em]">
                   MERAK ETTİKLERİNİZ
                 </span>
                 <div className="w-8 h-[1px] bg-[#E70000]/40" />

@@ -1673,7 +1673,7 @@ export default function WhoWeAre() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-center text-[#EEEBF5]/50 font-['Neutraface_2_Text:Book',sans-serif] text-[13px] md:text-[14px] leading-relaxed max-w-[680px] mx-auto mb-10 md:mb-14"
+            className="text-center text-[#EEEBF5]/50 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[14px] leading-relaxed max-w-[680px] mx-auto mb-10 md:mb-14"
           >
             Teachera, Milli Eğitim Bakanlığına bağlı olarak Konya'da Kule Plaza 26. katta yüz yüze eğitimlerimize devam ederken, aynı zamanda online eğitim platformumuz üzerinden{' '}
             <span className="text-white/80 font-['Neutraface_2_Text:Bold',sans-serif]">tüm dünyadan</span>{' '}
@@ -1711,7 +1711,7 @@ export default function WhoWeAre() {
                     <span className="font-['Neutraface_2_Text:Bold',sans-serif] text-[2.2rem] md:text-[2.8rem] leading-none tracking-tighter text-white/[0.08]">
                       26
                     </span>
-                    <span className="block font-['Neutraface_2_Text:Demi',sans-serif] text-[8px] md:text-[9px] tracking-[0.25em] uppercase text-white/20 text-right -mt-1">
+                    <span className="block font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[9px] tracking-[0.12em] md:tracking-[0.25em] uppercase text-white/20 text-right -mt-1">
                       . KAT
                     </span>
                   </motion.div>
@@ -1727,8 +1727,8 @@ export default function WhoWeAre() {
                       </div>
                     </div>
                     <div>
-                      <p className="text-white font-['Neutraface_2_Text:Bold',sans-serif] text-[13px] leading-tight">Kule Plaza, Kat 26</p>
-                      <p className="text-white/40 font-['Neutraface_2_Text:Book',sans-serif] text-[10px]">Selçuklu, Konya</p>
+                      <p className="text-white font-['Neutraface_2_Text:Bold',sans-serif] text-mobile-meta md:text-[13px] leading-tight">Kule Plaza, Kat 26</p>
+                      <p className="text-white/40 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-kicker md:text-[10px]">Selçuklu, Konya</p>
                     </div>
                   </div>
                 </div>
@@ -1738,7 +1738,7 @@ export default function WhoWeAre() {
               <div className="p-6 md:p-7">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#324D47]" />
-                  <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.2em] uppercase text-[#324D47]">
+                  <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[10px] tracking-[0.1em] md:tracking-[0.2em] uppercase text-[#324D47]">
                     Yüz Yüze Eğitim
                   </span>
                 </div>
@@ -1763,7 +1763,7 @@ export default function WhoWeAre() {
                       >
                         <item.icon size={13} style={{ color: item.color }} />
                       </div>
-                      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#EEEBF5]/50">
+                      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] text-[#EEEBF5]/50">
                         {item.text}
                       </span>
                     </div>
@@ -1777,7 +1777,7 @@ export default function WhoWeAre() {
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.02, y: -1 }}
                   whileTap={{ scale: 0.98 }}
-                  className="group/cta inline-flex items-center gap-2.5 px-5 py-2.5 border border-[#324D47]/50 text-[#324D47] rounded-full text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-wide hover:bg-[#324D47] hover:text-white hover:border-[#324D47] transition-all duration-300 cursor-pointer"
+                  className="group/cta inline-flex min-h-[44px] items-center gap-2.5 px-5 py-2.5 border border-[#324D47]/50 text-[#324D47] rounded-full text-mobile-kicker md:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em] md:tracking-wide hover:bg-[#324D47] hover:text-white hover:border-[#324D47] transition-all duration-300 cursor-pointer"
                 >
                   Kampüsü Ziyaret Et
                   <MapPin size={13} className="group-hover/cta:translate-y-[-1px] transition-transform" />
@@ -1822,7 +1822,7 @@ export default function WhoWeAre() {
                       <div className="w-2 h-2 rounded-full bg-[#70C0AE] animate-pulse" />
                       <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#70C0AE]/50 animate-ping" style={{ animationDuration: '2s' }} />
                     </div>
-                    <p className="text-white/60 font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.15em] uppercase">
+                    <p className="text-white/60 font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[10px] tracking-[0.08em] md:tracking-[0.15em] uppercase">
                       Online · Canlı
                     </p>
                   </div>
@@ -1833,7 +1833,7 @@ export default function WhoWeAre() {
               <div className="p-6 md:p-7">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#E70000]" />
-                  <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.2em] uppercase text-[#E70000]/80">
+                  <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[10px] tracking-[0.1em] md:tracking-[0.2em] uppercase text-[#E70000]/80">
                     Online Eğitim
                   </span>
                 </div>
@@ -1858,7 +1858,7 @@ export default function WhoWeAre() {
                       >
                         <item.icon size={13} style={{ color: item.color }} />
                       </div>
-                      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#EEEBF5]/50">
+                      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] text-[#EEEBF5]/50">
                         {item.text}
                       </span>
                     </div>
@@ -1870,7 +1870,7 @@ export default function WhoWeAre() {
                   whileHover={{ scale: 1.02, y: -1 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={openFreeTrial}
-                  className="group/cta inline-flex items-center gap-2.5 px-5 py-2.5 border border-white/20 text-white/80 rounded-full text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-wide hover:bg-white/10 hover:border-white/40 transition-all duration-300 cursor-pointer backdrop-blur-sm"
+                  className="group/cta inline-flex min-h-[44px] items-center gap-2.5 px-5 py-2.5 border border-white/20 text-white/80 rounded-full text-mobile-kicker md:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em] md:tracking-wide hover:bg-white/10 hover:border-white/40 transition-all duration-300 cursor-pointer backdrop-blur-sm"
                 >
                   Online Tanışma Planla
                   <Wifi size={13} className="group-hover/cta:translate-x-0.5 transition-transform" />
@@ -1890,21 +1890,21 @@ export default function WhoWeAre() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 md:gap-10">
               <div className="flex items-center gap-3">
                 <Mail size={14} className="text-white/25" />
-                <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#EEEBF5]/40">
+                <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] text-[#EEEBF5]/40">
                   sales@teachera.com.tr
                 </span>
               </div>
               <div className="hidden sm:block w-1 h-1 rounded-full bg-white/10" />
               <div className="flex items-center gap-3">
                 <Mail size={14} className="text-white/25" />
-                <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#EEEBF5]/40">
+                <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] text-[#EEEBF5]/40">
                   partners@teachera.com.tr
                 </span>
               </div>
               <div className="hidden sm:block w-1 h-1 rounded-full bg-white/10" />
               <div className="flex items-center gap-3">
                 <Clock size={14} className="text-white/25" />
-                <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#EEEBF5]/40">
+                <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] text-[#EEEBF5]/40">
                   Her Gün: 09:00 – 21:30
                 </span>
               </div>

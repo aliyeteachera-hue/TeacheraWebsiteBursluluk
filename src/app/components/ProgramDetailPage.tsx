@@ -2490,12 +2490,12 @@ export default function ProgramDetailPage() {
           <div className="max-w-3xl">
             {/* Language badge */}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="flex items-center gap-3 mb-6">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em]" style={{ backgroundColor: `${accent}CC` }}>
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-white text-mobile-kicker md:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em] md:tracking-[0.08em]" style={{ backgroundColor: `${accent}CC` }}>
                 <div className="w-1.5 h-1.5 rounded-full bg-white/60" />
                 {program.languageLabel}
               </span>
               {program.badges.map(b => (
-                <span key={b} className="text-white/30 text-[11px] font-['Neutraface_2_Text:Book',sans-serif]">{b}</span>
+                <span key={b} className="text-white/30 text-mobile-kicker md:text-[11px] font-['Neutraface_2_Text:Book',sans-serif]">{b}</span>
               ))}
             </motion.div>
 
@@ -2525,7 +2525,7 @@ export default function ProgramDetailPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={openFreeTrial}
-                className="px-5 md:px-6 py-2 md:py-2.5 border border-[#324D47]/60 backdrop-blur-sm text-white rounded-full text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/20 hover:border-[#324D47] transition-all"
+                className="px-5 md:px-6 py-2 md:py-2.5 border border-[#324D47]/60 backdrop-blur-sm text-white rounded-full text-mobile-kicker sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/20 hover:border-[#324D47] transition-all"
               >
                 Ücretsiz Deneme Seansı
               </motion.button>
@@ -2533,7 +2533,7 @@ export default function ProgramDetailPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate('/iletisim')}
-                className="px-5 md:px-6 py-2 md:py-2.5 border border-white/40 backdrop-blur-sm text-white rounded-full text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-white/5 hover:border-white/60 transition-all"
+                className="px-5 md:px-6 py-2 md:py-2.5 border border-white/40 backdrop-blur-sm text-white rounded-full text-mobile-kicker sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-white/5 hover:border-white/60 transition-all"
               >
                 Detaylı Bilgi Al
               </motion.button>
@@ -2549,7 +2549,7 @@ export default function ProgramDetailPage() {
             {/* Left: Description */}
             <Reveal>
               <div>
-                <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.15em] mb-4" style={{ color: accent }}>
+                <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[10px] tracking-[0.08em] md:tracking-[0.15em] mb-4" style={{ color: accent }}>
                   PROGRAM HAKKINDA
                 </span>
                 <h2 className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#09090F] text-2xl md:text-3xl leading-tight mb-6">{program.name}</h2>
@@ -2559,11 +2559,11 @@ export default function ProgramDetailPage() {
                 <div className="grid grid-cols-2 gap-4">
                   {(content.quickStats || defaultQuickStats(program)).map((stat, i) => (
                     <div key={i} className="p-4 rounded-xl bg-[#FAFAF8] border border-[#09090F]/[0.04]">
-                      <span className="font-['Neutraface_2_Text:Bold',sans-serif] text-[11px] tracking-[0.05em] mb-2 block" style={{ color: `${accent}60` }}>
+                      <span className="font-['Neutraface_2_Text:Bold',sans-serif] text-mobile-kicker md:text-[11px] tracking-[0.05em] mb-2 block" style={{ color: `${accent}60` }}>
                         {String(i + 1).padStart(2, '0')}
                       </span>
-                      <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[#09090F] text-[13px] block mb-0.5">{stat.value}</span>
-                      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/40 text-[11px]">{stat.label}</span>
+                      <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[#09090F] text-mobile-meta md:text-[13px] block mb-0.5">{stat.value}</span>
+                      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/40 text-mobile-kicker md:text-[11px]">{stat.label}</span>
                     </div>
                   ))}
                 </div>
@@ -2573,12 +2573,12 @@ export default function ProgramDetailPage() {
             {/* Right: Who is it for */}
             <Reveal delay={0.15}>
               <div>
-                <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.15em] text-[#324D47] mb-4">KİME UYGUN?</span>
+                <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[10px] tracking-[0.08em] md:tracking-[0.15em] text-[#324D47] mb-4">KİME UYGUN?</span>
                 <h2 className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#09090F] text-2xl md:text-3xl leading-tight mb-8">{content.whoIsItFor.title}</h2>
                 <ul className="space-y-4">
                   {content.whoIsItFor.items.map((item, i) => (
                     <motion.li key={i} initial={{ opacity: 0, x: 12 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.08 }} className="flex gap-3 items-baseline">
-                      <span className="font-['Neutraface_2_Text:Bold',sans-serif] text-[11px] tracking-[0.05em] shrink-0" style={{ color: `${accent}60` }}>
+                      <span className="font-['Neutraface_2_Text:Bold',sans-serif] text-mobile-kicker md:text-[11px] tracking-[0.05em] shrink-0" style={{ color: `${accent}60` }}>
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/65 text-[14px] leading-[1.6]">{item}</span>
@@ -2603,7 +2603,7 @@ export default function ProgramDetailPage() {
         <div className="max-w-4xl mx-auto px-6 md:px-10 relative">
           <Reveal>
             <div className="text-center mb-14 md:mb-18">
-              <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.15em] mb-4" style={{ color: accent }}>MÜFREDAT</span>
+              <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[10px] tracking-[0.08em] md:tracking-[0.15em] mb-4" style={{ color: accent }}>MÜFREDAT</span>
               <h2 className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#09090F] text-2xl md:text-3xl">{content.curriculum.title}</h2>
             </div>
           </Reveal>
@@ -2617,7 +2617,7 @@ export default function ProgramDetailPage() {
                   </div>
                   <div className="bg-white rounded-2xl border border-[#09090F]/[0.05] p-5 md:p-6 hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition-shadow">
                     <h3 className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#09090F] text-[15px] mb-2">{mod.name}</h3>
-                    <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/50 text-[13px] leading-[1.7]">{mod.detail}</p>
+                    <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/50 text-mobile-meta md:text-[13px] leading-[1.7]">{mod.detail}</p>
                   </div>
                 </div>
               </Reveal>
@@ -2634,7 +2634,7 @@ export default function ProgramDetailPage() {
         <div className="max-w-3xl mx-auto px-6 md:px-10">
           <Reveal>
             <div className="text-center mb-14">
-              <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.15em] text-[#324D47] mb-4">SIKÇA SORULAN SORULAR</span>
+              <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[10px] tracking-[0.08em] md:tracking-[0.15em] text-[#324D47] mb-4">SIKÇA SORULAN SORULAR</span>
               <h2 className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#09090F] text-2xl md:text-3xl">Merak Edilenler</h2>
             </div>
           </Reveal>
@@ -2650,13 +2650,13 @@ export default function ProgramDetailPage() {
       <section className="py-20 md:py-28 bg-[#FAFAF8]">
         <div className="max-w-3xl mx-auto px-6 md:px-10 text-center">
           <Reveal>
-            <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.15em] mb-4" style={{ color: accent }}>
+            <span className="inline-block font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[10px] tracking-[0.08em] md:tracking-[0.15em] mb-4" style={{ color: accent }}>
               HAREKETE GEÇ
             </span>
             <h2 className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#09090F] text-2xl md:text-3xl leading-tight mb-4">
               {program.name} ile Yolculuğunuza Başlayın
             </h2>
-            <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/50 text-[15px] leading-[1.7] mb-10 max-w-xl mx-auto">
+            <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/50 text-mobile-meta sm:text-[15px] leading-[1.7] mb-10 max-w-xl mx-auto">
               Ücretsiz deneme dersiyle Teachera farkını deneyimleyin veya eğitim danışmanlarımızdan detaylı bilgi alın.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -2664,7 +2664,7 @@ export default function ProgramDetailPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={openFreeTrial}
-                className="px-5 md:px-6 py-2 md:py-2.5 border border-[#324D47]/60 text-[#324D47] rounded-full text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/10 hover:border-[#324D47] transition-all"
+                className="px-5 md:px-6 py-2 md:py-2.5 border border-[#324D47]/60 text-[#324D47] rounded-full text-mobile-kicker sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/10 hover:border-[#324D47] transition-all"
               >
                 Ücretsiz Deneme Seansı
               </motion.button>
@@ -2672,7 +2672,7 @@ export default function ProgramDetailPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate('/iletisim')}
-                className="px-5 md:px-6 py-2 md:py-2.5 border border-[#09090F]/15 text-[#09090F]/50 rounded-full text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:border-[#09090F]/30 hover:text-[#09090F]/70 transition-all"
+                className="px-5 md:px-6 py-2 md:py-2.5 border border-[#09090F]/15 text-[#09090F]/50 rounded-full text-mobile-kicker sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:border-[#09090F]/30 hover:text-[#09090F]/70 transition-all"
               >
                 Detaylı Bilgi Al
               </motion.button>
