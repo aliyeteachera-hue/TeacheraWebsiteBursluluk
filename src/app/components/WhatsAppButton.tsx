@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { MessageCircle, X } from 'lucide-react';
 import whatsappImage from 'figma:asset/9694b181704f98419b88c2856e9838e3f6edf1aa.webp';
-import muazzezWhatsappGif from '../../assets/muazzez-whatsapp.gif';
+import whatsappLoopVideo from '../../assets/video/whatsapp-loop.mp4';
 import { trackEvent } from '../lib/analytics';
 
 export function WhatsAppButton() {
@@ -144,13 +144,17 @@ export function WhatsAppButton() {
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
       >
-        <img
-          src={muazzezWhatsappGif}
-          alt="WhatsApp Destek"
+        <video
           className="w-full h-full object-cover will-change-transform"
-          loading="lazy"
-          decoding="async"
-        />
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-label="WhatsApp Destek"
+        >
+          <source src={whatsappLoopVideo} type="video/mp4" />
+        </video>
 
         {isExpanded && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#324D47]/90">
