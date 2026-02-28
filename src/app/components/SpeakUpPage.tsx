@@ -266,7 +266,7 @@ function FaqItem({ item, index }: { item: { q: string; a: string }; index: numbe
    ══════════════════════════════════════════════════════════════════════ */
 export default function SpeakUpPage() {
   const navigate = useNavigate();
-  const formRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLElement>(null);
   const whatRef = useRef<HTMLDivElement>(null);
   const howRef = useRef<HTMLDivElement>(null);
   const videoCardRef = useRef<HTMLDivElement>(null);
@@ -476,6 +476,19 @@ export default function SpeakUpPage() {
     howRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const scrollToForm = (event?: { preventDefault?: () => void }) => {
+    event?.preventDefault?.();
+    const target = formRef.current ?? document.getElementById('speakup-form');
+    if (!target) return;
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const url = `${window.location.pathname}${window.location.search}#speakup-form`;
+    if (window.location.hash !== '#speakup-form') {
+      window.history.replaceState(null, '', url);
+    }
+  };
+
   const toggleSession = (val: string) => {
     setFormData(prev => ({
       ...prev,
@@ -602,13 +615,14 @@ export default function SpeakUpPage() {
                 transition={{ delay: 0.85, duration: 0.5 }}
                 className="flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start"
               >
-                <a
-                  href="#speakup-form"
+                <button
+                  type="button"
+                  onClick={scrollToForm}
                   className="h-[48px] px-8 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5"
                 >
                   HEMEN BAŞVUR
                   <ArrowUpRight size={15} />
-                </a>
+                </button>
               </motion.div>
             </div>
 
@@ -1391,13 +1405,14 @@ export default function SpeakUpPage() {
             <p className="text-white/30 font-['Neutraface_2_Text:Book',sans-serif] text-[14px] leading-relaxed max-w-sm mx-auto mb-10">
               Kontenjanlar sınırlı. Kampüste İngilizce konuşma pratiğine hemen başla.
             </p>
-            <a
-              href="#speakup-form"
+            <button
+              type="button"
+              onClick={scrollToForm}
               className="h-[48px] px-10 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5 mx-auto"
             >
               HEMEN BAŞVUR
               <ArrowUpRight size={15} />
-            </a>
+            </button>
           </Reveal>
         </div>
       </section>
