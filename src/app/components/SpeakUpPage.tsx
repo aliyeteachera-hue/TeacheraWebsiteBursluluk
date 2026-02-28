@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router';
-import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Maximize2, X, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Maximize2, X, Play } from 'lucide-react';
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
-import TeacheraLogo from '../../imports/TeacheraLogo';
-import neuLogoImg from 'figma:asset/21caa0f68b9225ac66749719ebaf62a436372e41.webp';
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
@@ -571,24 +569,15 @@ export default function SpeakUpPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.85, duration: 0.5 }}
-                className="flex items-center justify-center lg:justify-start"
+                className="flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start"
               >
-                <div className="inline-flex items-center gap-2.5 md:gap-3 rounded-full border border-white/15 bg-white/[0.04] px-4 md:px-5 py-2 md:py-2.5 shadow-[0_8px_28px_rgba(0,0,0,0.25)]">
-                  <div
-                    className="w-[92px] md:w-[108px] aspect-[146/29]"
-                    style={{ '--fill-0': '#ffffff' } as React.CSSProperties}
-                  >
-                    <TeacheraLogo />
-                  </div>
-                  <div className="flex items-center justify-center w-6 h-6 md:w-7 md:h-7 rounded-full border border-[#E8D9A7]/45 bg-[#E8D9A7]/15 text-[#E8D9A7]">
-                    <Sparkles size={12} />
-                  </div>
-                  <img
-                    src={neuLogoImg}
-                    alt="Necmettin Erbakan Üniversitesi"
-                    className="h-[18px] md:h-[22px] object-contain opacity-95"
-                  />
-                </div>
+                <button
+                  onClick={scrollToForm}
+                  className="h-[48px] px-8 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5"
+                >
+                  HEMEN BAŞVUR
+                  <ArrowUpRight size={15} />
+                </button>
               </motion.div>
             </div>
 

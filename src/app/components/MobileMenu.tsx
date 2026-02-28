@@ -44,6 +44,7 @@ const menuItems: MenuItem[] = [
   { id: 'methodology', label: 'Metodoloji', href: '/metodoloji', isRoute: true },
   { id: 'prices', label: 'Fiyatlar', href: '/fiyatlar', isRoute: true },
   { id: 'programs', label: 'Eğitim Programları', href: '/egitimlerimiz', isRoute: true },
+  { id: 'speakup', label: 'SpeakUP', href: '/speakup', isRoute: true },
   { id: 'academy', label: 'Teachera Academy', href: '/academy', isRoute: true, highlight: true },
   { id: 'contact', label: 'İletişim', href: '/iletisim', isRoute: true },
 ];
