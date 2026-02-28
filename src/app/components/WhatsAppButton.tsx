@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { MessageCircle, X } from 'lucide-react';
 import whatsappImage from 'figma:asset/9694b181704f98419b88c2856e9838e3f6edf1aa.webp';
@@ -7,7 +7,33 @@ import { trackEvent } from '../lib/analytics';
 export function WhatsAppButton() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [showSoftPrompt, setShowSoftPrompt] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setShowSoftPrompt(false);
+      return;
+    }
+
+    let hideTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const revealPrompt = () => {
+      if (isExpanded || isHovered) return;
+      setShowSoftPrompt(true);
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => setShowSoftPrompt(false), 2600);
+    };
+
+    const introTimer = setTimeout(revealPrompt, 900);
+    const cycleTimer = setInterval(revealPrompt, 11000);
+
+    return () => {
+      clearTimeout(introTimer);
+      clearInterval(cycleTimer);
+      if (hideTimer) clearTimeout(hideTimer);
+    };
+  }, [isExpanded, isHovered, shouldReduceMotion]);
 
   const handleClick = () => {
     const phoneNumber = '905528674226';
@@ -112,17 +138,19 @@ export function WhatsAppButton() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="relative w-16 h-16 rounded-full shadow-xl overflow-hidden cursor-pointer border border-[#324D47]/20"
-        animate={!shouldReduceMotion && !isExpanded ? { y: [0, -4, 0], scale: [1, 1.02, 1] } : undefined}
-        transition={!shouldReduceMotion && !isExpanded ? { duration: 2.6, repeat: Infinity, ease: 'easeInOut' } : undefined}
+        animate={!shouldReduceMotion && !isExpanded ? { y: [0, -2, 0], scale: [1, 1.015, 1] } : undefined}
+        transition={!shouldReduceMotion && !isExpanded ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
       >
-        <img
+        <motion.img
           src={whatsappImage}
           alt="WhatsApp Destek"
-          className="w-full h-full object-cover"
-          loading="lazy"
+          className="w-full h-full object-cover will-change-transform"
+          loading="eager"
           decoding="async"
+          animate={!shouldReduceMotion && !isExpanded ? { scale: [1, 1.08, 1], x: [0, -1, 1, 0], y: [0, -1, 1, 0] } : undefined}
+          transition={!shouldReduceMotion && !isExpanded ? { duration: 4.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
         />
 
         {isExpanded && (
@@ -141,15 +169,15 @@ export function WhatsAppButton() {
       </motion.button>
 
       <AnimatePresence>
-        {isHovered && !isExpanded && (
+        {(isHovered || showSoftPrompt) && !isExpanded && (
           <motion.div
-            className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-[#00000B] text-[#ffffff] px-4 py-2 rounded-lg whitespace-nowrap"
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 10 }}
-            transition={{ duration: 0.2 }}
+            className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-[#00000B]/88 backdrop-blur-[2px] text-[#ffffff] px-3.5 py-1.5 rounded-lg whitespace-nowrap border border-white/10"
+            initial={{ opacity: 0, x: 8, scale: 0.98 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 8, scale: 0.98 }}
+            transition={{ duration: 0.24, ease: 'easeOut' }}
           >
-            <p className="text-sm font-['Neutraface_2_Text:Demi',sans-serif]">Muazzez'e yaz!</p>
+            <p className="text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] text-white/90">Muazzez'e yaz</p>
             <div className="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-4 border-l-[#00000B]" />
           </motion.div>
         )}
