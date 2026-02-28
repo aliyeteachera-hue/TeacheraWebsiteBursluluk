@@ -1067,7 +1067,6 @@ export default function SpeakUpPage() {
         ref={formRef}
         id="speakup-form"
         className={isApplicationFormOpen ? 'fixed inset-0 z-[95] bg-[#00000B]/85 backdrop-blur-sm overflow-y-auto py-8 px-4' : 'py-20 md:py-28 scroll-mt-16'}
-        onClick={isApplicationFormOpen ? (e) => { if (e.target === e.currentTarget) setIsApplicationFormOpen(false); } : undefined}
       >
         <div className={`max-w-[700px] mx-auto px-6 md:px-10 ${isApplicationFormOpen ? 'relative bg-white rounded-[22px] py-8 md:py-10 shadow-2xl shadow-black/40' : ''}`}>
           {isApplicationFormOpen && (
