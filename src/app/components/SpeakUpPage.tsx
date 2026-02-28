@@ -689,6 +689,16 @@ export default function SpeakUpPage() {
                   )}
                 </div>
               </div>
+              {!isInlineVideoStarted && (
+                <motion.p
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: [0.45, 0.82, 0.45], y: [0, -1, 0] }}
+                  transition={{ duration: 2.6, ease: 'easeInOut', repeat: Infinity }}
+                  className="mt-4 text-center text-white/60 font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] md:text-[12px] tracking-[0.22em] uppercase pointer-events-none select-none"
+                >
+                  Önce Bilgilendirme Videosunu İzle
+                </motion.p>
+              )}
 
               {/* Floating glow behind video */}
               <div className="absolute -inset-10 bg-[#E70000] rounded-full filter blur-[120px] opacity-[0.06] -z-10 pointer-events-none" />
