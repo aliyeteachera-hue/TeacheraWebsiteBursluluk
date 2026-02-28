@@ -322,13 +322,23 @@ html.teachera-reduce-motion [class*='blur-'] {
   }
 
   .text-\[13px\] {
-    font-size: 15px !important;
+    font-size: 15.5px !important;
     line-height: 1.55 !important;
   }
 
   .text-\[14px\] {
     font-size: 16px !important;
     line-height: 1.55 !important;
+  }
+
+  .text-\[15px\] {
+    font-size: 16px !important;
+    line-height: 1.58 !important;
+  }
+
+  .text-\[16px\] {
+    font-size: 17px !important;
+    line-height: 1.58 !important;
   }
 
   .text-xs {
@@ -352,6 +362,15 @@ html.teachera-reduce-motion [class*='blur-'] {
   .tracking-\[0\.16em\],
   .tracking-\[0\.15em\] {
     letter-spacing: 0.08em !important;
+  }
+
+  .tracking-\[0\.12em\],
+  .tracking-\[0\.1em\] {
+    letter-spacing: 0.06em !important;
+  }
+
+  .tracking-\[0\.08em\] {
+    letter-spacing: 0.05em !important;
   }
 
   /* Keep top navbar free-trial CTA balanced after global text scaling */
