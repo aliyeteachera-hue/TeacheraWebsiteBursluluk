@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Maximize2, X } from 'lucide-react';
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+import { useFreeTrial } from './FreeTrialContext';
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
@@ -266,6 +267,7 @@ function FaqItem({ item, index }: { item: { q: string; a: string }; index: numbe
    ══════════════════════════════════════════════════════════════════════ */
 export default function SpeakUpPage() {
   const navigate = useNavigate();
+  const { open: openFreeTrial } = useFreeTrial();
   const formRef = useRef<HTMLDivElement>(null);
   const whatRef = useRef<HTMLDivElement>(null);
   const howRef = useRef<HTMLDivElement>(null);
@@ -472,10 +474,6 @@ export default function SpeakUpPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  const scrollToForm = () => {
-    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   const scrollToHow = () => {
     howRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -607,7 +605,7 @@ export default function SpeakUpPage() {
                 className="flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start"
               >
                 <button
-                  onClick={scrollToForm}
+                  onClick={() => openFreeTrial('speakup_hero_apply')}
                   className="h-[48px] px-8 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5"
                 >
                   HEMEN BAŞVUR
@@ -1392,7 +1390,7 @@ export default function SpeakUpPage() {
               Kontenjanlar sınırlı. Kampüste İngilizce konuşma pratiğine hemen başla.
             </p>
             <button
-              onClick={scrollToForm}
+              onClick={() => openFreeTrial('speakup_bottom_apply')}
               className="h-[48px] px-10 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5 mx-auto"
             >
               HEMEN BAŞVUR
