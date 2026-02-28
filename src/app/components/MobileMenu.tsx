@@ -239,7 +239,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 }}
-                       className="text-white/35 text-[9px] sm:text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] uppercase mb-0.5"
+                       className="text-[#E70000] opacity-75 text-[8px] sm:text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.12em] uppercase mb-0"
                      >
                        Premium Education
                      </motion.p>
