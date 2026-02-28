@@ -25,18 +25,18 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
   const isSpeakUpPage = location.pathname === '/speakup';
   const navHeightClass = isSpeakUpPage
     ? scrolled
-      ? 'h-[64px] md:h-[74px]'
-      : 'h-[80px] md:h-[108px]'
+      ? 'h-[66px] md:h-[74px]'
+      : 'h-[82px] md:h-[108px]'
     : scrolled
-      ? 'h-[68px] md:h-[76px]'
-      : 'h-[88px] md:h-[112px]';
+      ? 'h-[70px] md:h-[76px]'
+      : 'h-[90px] md:h-[112px]';
   const logoSizeClass = isSpeakUpPage
     ? scrolled
-      ? 'w-[96px] sm:w-[108px] md:w-[122px]'
-      : 'w-[108px] sm:w-[124px] md:w-[142px]'
+      ? 'w-[98px] sm:w-[108px] md:w-[122px]'
+      : 'w-[110px] sm:w-[124px] md:w-[142px]'
     : scrolled
-      ? 'w-[102px] sm:w-[122px] md:w-[128px]'
-      : 'w-[114px] sm:w-[138px] md:w-[146px]';
+      ? 'w-[106px] sm:w-[122px] md:w-[128px]'
+      : 'w-[118px] sm:w-[138px] md:w-[146px]';
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const next = latest > 40;
@@ -94,7 +94,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
             onClick={goHome}
           >
             <div
-              className={`transition-all duration-700 ease-out ${logoSizeClass} aspect-[146/29] max-w-[42vw] sm:max-w-none`}
+              className={`transition-all duration-700 ease-out ${logoSizeClass} aspect-[146/29] max-w-[44vw] sm:max-w-none`}
             >
               <TeacheraLogo />
             </div>
@@ -135,7 +135,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
           </motion.div>
 
           {/* ═══ Right: CTAs + Menu ═══ */}
-          <div className={`flex items-center shrink-0 ${isSpeakUpPage ? 'gap-1.5 sm:gap-2.5' : 'gap-2 sm:gap-3.5'}`}>
+          <div className={`flex items-center shrink-0 ${isSpeakUpPage ? 'gap-2 sm:gap-2.5' : 'gap-2.5 sm:gap-3.5'}`}>
 
             {/* ── SpeakUP page: "Hemen Başvur" red CTA ── */}
             {isSpeakUpPage ? (
@@ -160,7 +160,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={scrollToSpeakUpForm}
-                  className="md:hidden mobile-speakup-cta-text flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[11px] sm:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.03em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-md shadow-[#E70000]/15"
+                  className="md:hidden mobile-speakup-cta-text text-mobile-kicker flex min-h-[44px] items-center gap-1 px-3 sm:px-4 py-2 rounded-full bg-[#E70000] border border-[#E70000] text-white font-['Neutraface_2_Text:Demi',sans-serif] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-md shadow-[#E70000]/15"
                 >
                   BAŞVUR
                   <ArrowUpRight size={10} />
@@ -200,7 +200,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={() => openFreeTrial('navigation_mobile_free_trial')}
-                  className="md:hidden mobile-nav-cta-text px-2.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 text-[11px] sm:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
+                  className="md:hidden mobile-nav-cta-text text-mobile-kicker min-h-[44px] px-3.5 sm:px-5 py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 font-['Neutraface_2_Text:Demi',sans-serif] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
                 >
                   Ücretsiz Seans
                 </motion.button>
@@ -208,7 +208,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
             )}
 
             {/* Divider */}
-            <div className={`w-px bg-white/[0.08] ${isSpeakUpPage ? 'h-5' : 'h-6'}`} />
+            <div className={`w-px bg-white/[0.08] ${isSpeakUpPage ? 'h-6' : 'h-7'}`} />
 
             {/* ═══ Menu Pill ═══ */}
             <motion.button
@@ -223,13 +223,13 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
               }`}
               aria-label="Toggle menu"
             >
-              <div className={`flex items-center gap-2 sm:gap-3 rounded-full border border-white/[0.12] sm:border-white/[0.1] bg-transparent sm:bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu ${isSpeakUpPage ? 'px-2.5 sm:px-5 py-1.5 sm:py-2.5' : 'px-3 sm:px-5 py-1.5 sm:py-2.5'}`}>
-                <span className="inline font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.1em] uppercase text-white/62 group-hover/menu:text-white/85 transition-colors duration-300">
+              <div className={`flex min-h-[44px] items-center gap-2 sm:gap-3 rounded-full border border-white/[0.12] sm:border-white/[0.1] bg-transparent sm:bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu ${isSpeakUpPage ? 'px-3 sm:px-5 py-2 sm:py-2.5' : 'px-3.5 sm:px-5 py-2 sm:py-2.5'}`}>
+                <span className="text-mobile-kicker md:text-[11px] md:tracking-[0.1em] inline font-['Neutraface_2_Text:Demi',sans-serif] uppercase text-white/62 group-hover/menu:text-white/85 transition-colors duration-300">
                   Menü
                 </span>
                 <div className="flex flex-col items-end gap-[3px]">
-                  <span className="block w-[16px] sm:w-[20px] h-[1.5px] bg-white/62 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
-                  <span className="block w-[11px] sm:w-[15px] h-[1.5px] bg-white/45 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
+                  <span className="block w-[18px] sm:w-[20px] h-[1.5px] bg-white/62 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
+                  <span className="block w-[13px] sm:w-[15px] h-[1.5px] bg-white/45 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
                 </div>
               </div>
             </motion.button>

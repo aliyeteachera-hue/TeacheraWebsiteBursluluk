@@ -263,6 +263,25 @@ body {
   }
 }
 
+@layer utilities {
+  /* Mobile-first semantic helpers for consistent readability */
+  .text-mobile-body {
+    font-size: 1rem;
+    line-height: 1.58;
+  }
+
+  .text-mobile-meta {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .text-mobile-kicker {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    letter-spacing: 0.05em;
+  }
+}
+
 /* Low-power/mobile performance mode toggled from RootLayout */
 html.teachera-reduce-motion {
   scroll-behavior: auto !important;
@@ -370,6 +389,22 @@ html.teachera-reduce-motion [class*='blur-'] {
   }
 
   .tracking-\[0\.08em\] {
+    letter-spacing: 0.05em !important;
+  }
+
+  .text-mobile-body {
+    font-size: 16px !important;
+    line-height: 1.58 !important;
+  }
+
+  .text-mobile-meta {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+  }
+
+  .text-mobile-kicker {
+    font-size: 13px !important;
+    line-height: 1.45 !important;
     letter-spacing: 0.05em !important;
   }
 

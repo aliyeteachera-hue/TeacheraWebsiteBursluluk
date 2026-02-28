@@ -239,7 +239,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 }}
-                       className="text-[#E70000] opacity-60 text-[10px] sm:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] uppercase mb-0.5"
+                       className="text-mobile-kicker text-[#E70000] opacity-58 font-['Neutraface_2_Text:Demi',sans-serif] uppercase mb-0.5"
                      >
                        Premium Education
                      </motion.p>
@@ -247,14 +247,14 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.3 }}
-                       className="text-[1.5rem] sm:text-[1.6rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white/95 leading-[1.05] tracking-[-0.005em]"
+                       className="text-[1.42rem] sm:text-[1.54rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white/95 leading-[1.08] tracking-[-0.005em]"
                      >
                        Menü
                      </motion.h3>
                   </div>
 
                   {/* Navigation Links */}
-                  <nav className="flex flex-col justify-between gap-1 lg:gap-1.5 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1">
+                  <nav className="flex flex-col justify-between gap-1.5 lg:gap-1.5 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1">
                      {menuItems.map((item, index) => (
                         <motion.button
                            key={item.id}
@@ -262,17 +262,17 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                            animate={{ opacity: 1, x: 0 }}
                            transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 + (index * 0.05), ease: "easeOut" }}
                            onClick={() => handleLinkClick(item)}
-                           className="group relative flex flex-1 lg:flex-none min-h-[52px] items-center justify-between py-2 lg:py-1.5 transition-all duration-500 min-w-0 text-left"
+                           className="group relative flex flex-1 lg:flex-none min-h-[56px] items-center justify-between py-2.5 lg:py-1.5 transition-all duration-500 min-w-0 text-left"
                         >
                            <div className="flex items-center gap-2 lg:gap-3 min-w-0">
                               <span className={`
-                                 text-[12px] sm:text-[13px] lg:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/32 w-5 lg:w-5 group-hover:text-[#324D47] transition-colors
+                                 text-mobile-meta lg:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/35 w-5 lg:w-5 group-hover:text-[#324D47] transition-colors
                               `}>
                                  0{index + 1}
                               </span>
                               
                               <span className={`
-                                 text-[1.34rem] sm:text-[1.44rem] lg:text-[1.42rem] xl:text-[1.58rem] font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.12] break-words min-w-0
+                                 text-[1.3rem] sm:text-[1.4rem] lg:text-[1.42rem] xl:text-[1.58rem] font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.14] break-words min-w-0
                                  ${item.highlight ? 'text-[#E70000]' : 'text-[#ffffff]/80 group-hover:text-white group-hover:translate-x-2'}
                               `}>
                                  {item.label}
@@ -298,7 +298,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                           onClose();
                           openLevelAssessment('mobile_menu_level_assessment');
                         }}
-                        className="w-full flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#324D47] hover:bg-[#3d5e56] text-white border border-[#324D47] rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] transition-all duration-300"
+                        className="text-mobile-kicker w-full min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#324D47] hover:bg-[#3d5e56] text-white border border-[#324D47] rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] transition-all duration-300"
                      >
                         <span>SEVİYE TESPİT</span>
                      </motion.button>
@@ -307,7 +307,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                         animate={{ opacity: 1, y: 0 }}
                         transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.55 }}
                         onClick={handleLogin}
-                        className="w-full flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#ffffff]/5 hover:bg-[#324D47] text-white border border-[#ffffff]/10 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] transition-all duration-300 group"
+                        className="text-mobile-kicker w-full min-h-[44px] flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#ffffff]/5 hover:bg-[#324D47] text-white border border-[#ffffff]/10 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] transition-all duration-300 group"
                      >
                         <User size={16} className="text-[#324D47] group-hover:text-white transition-colors" />
                         <span>GİRİŞ YAP</span>
