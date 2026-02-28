@@ -481,7 +481,9 @@ export default function SpeakUpPage() {
     const target = formRef.current ?? document.getElementById('speakup-form');
     if (!target) return;
 
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const headerOffset = 96;
+    const targetTop = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+    window.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
 
     const url = `${window.location.pathname}${window.location.search}#speakup-form`;
     if (window.location.hash !== '#speakup-form') {
@@ -532,9 +534,12 @@ export default function SpeakUpPage() {
           ═══════════════════════════════════════════════════════ */}
       <section className="relative bg-[#0a0a10] overflow-hidden">
         {/* Background texture */}
-        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        <div
+          className="absolute inset-0 opacity-[0.02] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+        />
 
-        <div className="max-w-[1440px] mx-auto px-5 md:px-10 py-16 md:py-24 lg:py-28">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-5 md:px-10 py-16 md:py-24 lg:py-28">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
             {/* Left — Typography */}
