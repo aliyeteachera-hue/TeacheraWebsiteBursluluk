@@ -11,9 +11,9 @@ import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOB
 const HERO_BG = 'https://images.unsplash.com/photo-1582848890404-ed087c1b3f0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 const SPEAKUP_VIDEO_INLINE_SRC =
-  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-inline&app_id=58479&autoplay=1&muted=1&loop=1&playsinline=1&dnt=1&api=1&background=1&quality=720p';
+  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-inline&app_id=58479&autoplay=1&muted=1&loop=1&playsinline=1&dnt=1&api=1&controls=1&title=0&byline=0&portrait=0&quality=720p';
 const SPEAKUP_VIDEO_FULLSCREEN_SRC =
-  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-fullscreen&app_id=58479&autoplay=1&muted=0&loop=1&playsinline=1&dnt=1&api=1&title=0&byline=0&portrait=0&quality=1080p';
+  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-fullscreen&app_id=58479&autoplay=1&muted=1&loop=1&playsinline=1&dnt=1&api=1&controls=1&title=0&byline=0&portrait=0&quality=1080p';
 
 const SESSIONS = [
   { id: 's1', label: '14:00 – 15:20', value: '14:00-15:20' },
@@ -274,6 +274,7 @@ export default function SpeakUpPage() {
   /* ── Video Mute State ── */
   const [isMuted, setIsMuted] = useState(true);
   const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
+  const [showFullscreenSoundPrompt, setShowFullscreenSoundPrompt] = useState(false);
 
   const postToPlayer = (
     iframe: HTMLIFrameElement | null,
@@ -298,14 +299,32 @@ export default function SpeakUpPage() {
 
   const toggleMute = (event?: { stopPropagation?: () => void }) => {
     event?.stopPropagation?.();
-    setIsMuted((prev) => !prev);
+    setIsMuted((prev) => {
+      const nextMuted = !prev;
+      if (!nextMuted) setShowFullscreenSoundPrompt(false);
+      return nextMuted;
+    });
   };
 
   const openVideoFullscreen = (event?: { stopPropagation?: () => void }) => {
     event?.stopPropagation?.();
-    // Browsers block unmuted autoplay; user gesture on fullscreen unlocks audio safely.
-    setIsMuted(false);
+    setIsMuted(true);
+    setShowFullscreenSoundPrompt(true);
     setIsVideoFullscreen(true);
+  };
+
+  const enableFullscreenSound = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.();
+    setIsMuted(false);
+    setShowFullscreenSoundPrompt(false);
+    postToPlayer(fullscreenIframeRef.current, 'setMuted', false);
+    postToPlayer(fullscreenIframeRef.current, 'setVolume', 1);
+    postToPlayer(fullscreenIframeRef.current, 'play');
+    window.setTimeout(() => {
+      postToPlayer(fullscreenIframeRef.current, 'setMuted', false);
+      postToPlayer(fullscreenIframeRef.current, 'setVolume', 1);
+      postToPlayer(fullscreenIframeRef.current, 'play');
+    }, 220);
   };
 
   const handleInlineIframeLoad = () => {
@@ -355,6 +374,7 @@ export default function SpeakUpPage() {
 
     return () => {
       window.clearTimeout(timerId);
+      setShowFullscreenSoundPrompt(false);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', keyHandler);
       postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
@@ -558,37 +578,39 @@ export default function SpeakUpPage() {
               transition={{ delay: 0.3, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
               className="relative order-1 lg:order-2 shrink-0"
             >
-              <div
-                ref={videoCardRef}
-                className="relative w-[280px] md:w-[320px] lg:w-[340px] rounded-[24px] overflow-hidden bg-[#1a1a24] shadow-2xl shadow-black/40 cursor-pointer"
-                style={{ aspectRatio: '9/16' }}
-                onClick={openVideoFullscreen}
-              >
-                <iframe
-                  ref={inlineIframeRef}
-                  src={SPEAKUP_VIDEO_INLINE_SRC}
-                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  title="Teachera SpeakUP"
-                  className="absolute inset-0 w-full h-full border-0"
-                  loading="eager"
-                  onLoad={handleInlineIframeLoad}
-                />
-                <button
-                  onClick={(event) => toggleMute(event)}
-                  className="absolute top-2 right-2 w-8 h-8 bg-[#324D47]/[0.8] rounded-full flex items-center justify-center cursor-pointer"
-                >
-                  {isMuted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
-                </button>
-                <button
+              <div className="relative rounded-[30px] p-[1.5px] bg-[linear-gradient(140deg,rgba(231,0,0,0.75),rgba(255,255,255,0.35),rgba(50,77,71,0.65))] shadow-[0_24px_70px_rgba(0,0,0,0.55)]">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#E70000] text-white text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] uppercase">
+                  Önce Videoyu İzle
+                </div>
+                <div
+                  ref={videoCardRef}
+                  className="relative w-[280px] md:w-[320px] lg:w-[340px] rounded-[24px] overflow-hidden bg-[#1a1a24] shadow-2xl shadow-black/40 cursor-pointer"
+                  style={{ aspectRatio: '9/16' }}
                   onClick={openVideoFullscreen}
-                  className="absolute top-2 left-2 h-8 px-3 bg-[#00000B]/70 rounded-full flex items-center justify-center gap-1.5 cursor-pointer text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em]"
                 >
-                  <Maximize2 size={12} />
-                  TAM EKRAN
-                </button>
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-3 px-3 py-1.5 rounded-full bg-[#00000B]/70 text-white/90 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em] pointer-events-none">
-                  Reels gibi tam ekran izleyin
+                  <iframe
+                    ref={inlineIframeRef}
+                    src={SPEAKUP_VIDEO_INLINE_SRC}
+                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    title="Teachera SpeakUP"
+                    className="absolute inset-0 w-full h-full border-0"
+                    loading="eager"
+                    onLoad={handleInlineIframeLoad}
+                  />
+                  <button
+                    onClick={(event) => toggleMute(event)}
+                    className="absolute top-2 right-2 w-8 h-8 bg-[#324D47]/[0.8] rounded-full flex items-center justify-center cursor-pointer"
+                  >
+                    {isMuted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
+                  </button>
+                  <button
+                    onClick={openVideoFullscreen}
+                    className="absolute top-2 left-2 h-8 px-3 bg-[#00000B]/70 rounded-full flex items-center justify-center gap-1.5 cursor-pointer text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em]"
+                  >
+                    <Maximize2 size={12} />
+                    TAM EKRAN
+                  </button>
                 </div>
               </div>
 
@@ -635,6 +657,17 @@ export default function SpeakUpPage() {
                 {isMuted ? <VolumeX size={15} className="text-white" /> : <Volume2 size={15} className="text-white" />}
                 {isMuted ? 'SESİ AÇ' : 'SESİ KAPAT'}
               </button>
+
+              {showFullscreenSoundPrompt && (
+                <button
+                  onClick={enableFullscreenSound}
+                  className="absolute inset-0 flex items-center justify-center bg-[#00000B]/15 cursor-pointer"
+                >
+                  <span className="px-5 py-3 rounded-full bg-[#324D47]/92 border border-white/20 text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.08em] uppercase">
+                    Ekrana Dokun: Sesi Aç
+                  </span>
+                </button>
+              )}
 
               <button
                 onClick={() => setIsVideoFullscreen(false)}
