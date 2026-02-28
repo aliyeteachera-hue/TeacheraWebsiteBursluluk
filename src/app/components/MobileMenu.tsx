@@ -254,7 +254,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                   </div>
 
                   {/* Navigation Links */}
-                  <nav className="flex flex-col gap-1 lg:gap-1.5 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1">
+                  <nav className="flex flex-col justify-between gap-1 lg:gap-1.5 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1">
                      {menuItems.map((item, index) => (
                         <motion.button
                            key={item.id}
@@ -262,17 +262,17 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                            animate={{ opacity: 1, x: 0 }}
                            transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 + (index * 0.05), ease: "easeOut" }}
                            onClick={() => handleLinkClick(item)}
-                           className="group relative flex items-center justify-between py-1 lg:py-1.5 transition-all duration-500 min-w-0 text-left"
+                           className="group relative flex flex-1 lg:flex-none min-h-[44px] items-center justify-between py-1.5 lg:py-1.5 transition-all duration-500 min-w-0 text-left"
                         >
                            <div className="flex items-center gap-2 lg:gap-3 min-w-0">
                               <span className={`
-                                 text-[10px] lg:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/20 w-4 lg:w-5 group-hover:text-[#324D47] transition-colors
+                                 text-[11px] sm:text-[12px] lg:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/25 w-5 lg:w-5 group-hover:text-[#324D47] transition-colors
                               `}>
                                  0{index + 1}
                               </span>
                               
                               <span className={`
-                                 text-[1.02rem] sm:text-[1.07rem] lg:text-[1.42rem] xl:text-[1.58rem] font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.08] break-words min-w-0
+                                 text-[1.24rem] sm:text-[1.32rem] lg:text-[1.42rem] xl:text-[1.58rem] font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.06] break-words min-w-0
                                  ${item.highlight ? 'text-[#E70000]' : 'text-[#ffffff]/80 group-hover:text-white group-hover:translate-x-2'}
                               `}>
                                  {item.label}
