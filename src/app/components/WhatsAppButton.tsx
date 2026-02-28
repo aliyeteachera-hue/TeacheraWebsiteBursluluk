@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { MessageCircle, X } from 'lucide-react';
 import whatsappImage from 'figma:asset/9694b181704f98419b88c2856e9838e3f6edf1aa.webp';
@@ -10,8 +10,35 @@ export function WhatsAppButton() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showSoftPrompt, setShowSoftPrompt] = useState(false);
+  const [videoFallback, setVideoFallback] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const retryTimeoutRef = useRef<number | null>(null);
+
+  const clearRetryTimer = () => {
+    if (retryTimeoutRef.current !== null) {
+      window.clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+  };
+
+  const attemptVideoPlay = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || shouldReduceMotion || isExpanded || videoFallback) return;
+
+    const maybePromise = video.play();
+    if (maybePromise && typeof maybePromise.catch === 'function') {
+      maybePromise.catch(() => {
+        clearRetryTimer();
+        retryTimeoutRef.current = window.setTimeout(() => {
+          const retryPromise = video.play();
+          if (retryPromise && typeof retryPromise.catch === 'function') {
+            retryPromise.catch(() => {});
+          }
+        }, 380);
+      });
+    }
+  }, [isExpanded, shouldReduceMotion, videoFallback]);
 
   useEffect(() => {
     if (shouldReduceMotion) {
@@ -43,17 +70,24 @@ export function WhatsAppButton() {
     if (!video || shouldReduceMotion) return;
 
     if (isExpanded) {
+      clearRetryTimer();
       video.pause();
       return;
     }
 
-    const maybePromise = video.play();
-    if (maybePromise && typeof maybePromise.catch === 'function') {
-      maybePromise.catch(() => {
-        // Autoplay can be blocked by browser policy on some devices; ignore silently.
-      });
-    }
-  }, [isExpanded, shouldReduceMotion]);
+    attemptVideoPlay();
+    return () => clearRetryTimer();
+  }, [attemptVideoPlay, isExpanded, shouldReduceMotion]);
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        attemptVideoPlay();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [attemptVideoPlay]);
 
   const handleClick = () => {
     const phoneNumber = '905528674226';
@@ -163,20 +197,34 @@ export function WhatsAppButton() {
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
       >
-        <video
-          ref={videoRef}
-          className="w-full h-full object-cover will-change-transform"
-          autoPlay
-          muted
-          defaultMuted
-          loop
-          playsInline
-          preload="metadata"
-          aria-label="WhatsApp Destek"
-        >
-          <source src={whatsappLoopVideoWebm} type="video/webm" />
-          <source src={whatsappLoopVideo} type="video/mp4" />
-        </video>
+        {videoFallback ? (
+          <img
+            src={whatsappImage}
+            alt="WhatsApp Destek"
+            className="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover will-change-transform"
+            autoPlay
+            muted
+            defaultMuted
+            loop
+            playsInline
+            preload="auto"
+            poster={whatsappImage}
+            aria-label="WhatsApp Destek"
+            onCanPlay={attemptVideoPlay}
+            onLoadedData={attemptVideoPlay}
+            onError={() => setVideoFallback(true)}
+          >
+            <source src={whatsappLoopVideoWebm} type="video/webm" />
+            <source src={whatsappLoopVideo} type="video/mp4" />
+          </video>
+        )}
 
         {isExpanded && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#324D47]/90">

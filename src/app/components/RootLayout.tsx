@@ -227,12 +227,10 @@ export default function RootLayout() {
           <LevelAssessmentModal />
           <FreeTrialModal />
 
-          {showDeferredUi && (
-            <Suspense fallback={null}>
-              <WhatsAppButton />
-              <CookieConsent />
-            </Suspense>
-          )}
+          <Suspense fallback={null}>
+            <WhatsAppButton />
+            {showDeferredUi && <CookieConsent />}
+          </Suspense>
 
           <SpeedInsights sampleRate={0.5} />
         </motion.div>

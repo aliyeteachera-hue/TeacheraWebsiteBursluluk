@@ -6,78 +6,8 @@ import {
   User, Calendar, Search, TrendingUp, BookOpen,
 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { ARTICLE_SLUG_MAP } from './ArticleDetailPage';
 import { openMailDraft } from './formMailto';
-import mentalTranslationCollapseImage from '../../assets/blog/mental-translation-collapse.webp';
-import targetLanguageThinkingImage from '../../assets/blog/target-language-thinking-techniques.webp';
-import grammarTranslationFossilizationImage from '../../assets/blog/gramer-ceviri-fosillesme-dongusu.webp';
-
-/* ═══════════════════════════════════════════════════════════════════════
-   ARTICLE DATA — Academy İçerikleri
-   ═══════════════════════════════════════════════════════════════════════ */
-interface Article {
-  id: number;
-  category: string;
-  title: string;
-  excerpt: string;
-  image: string;
-  readTime: string;
-  author: string;
-  date: string;
-  featured?: boolean;
-  trending?: boolean;
-}
-
-const CEVIRI_HASTALIGI_IMAGE =
-  'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
-
-const articles: Article[] = [
-  {
-    id: 3,
-    category: 'genel',
-    title: 'Hedef Dilde Düşünmeyi Sağlayacak Teknikler',
-    excerpt: 'Lexical chunks, massive input, direct association, circumlocution ve shadowing gibi tekniklerle çeviri refleksini zayıflatıp hedef dilde düşünme becerisi oluşturun.',
-    image: targetLanguageThinkingImage,
-    readTime: '10 dk',
-    author: 'Teachera Akademik İçerik Ekibi',
-    date: '28 Şub 2026',
-    featured: true,
-    trending: true,
-  },
-  {
-    id: 5,
-    category: 'genel',
-    title: 'Yabancı Dil Ediniminde İletişimsel Felç',
-    excerpt: 'Gramer-çeviri yöntemi, çeviri hastalığı ve fosilleşme döngüsünü nörobilişsel temelde inceleyen kapsamlı analiz.',
-    image: grammarTranslationFossilizationImage,
-    readTime: '11 dk',
-    author: 'Teachera Akademik İçerik Ekibi',
-    date: '28 Şub 2026',
-    trending: true,
-  },
-  {
-    id: 2,
-    category: 'genel',
-    title: 'Konuşma Akıcılığının Fiziksel ve İşitsel Çöküşü',
-    excerpt: 'Bilişsel yükün konuşma ritmini nasıl bozduğunu, disfluency fenomenlerini ve zihinsel çevirinin dilsel doğallığı nasıl tahrip ettiğini bilimsel çerçevede inceleyin.',
-    image: mentalTranslationCollapseImage,
-    readTime: '12 dk',
-    author: 'Teachera Akademik İçerik Ekibi',
-    date: '28 Şub 2026',
-    trending: true,
-  },
-  {
-    id: 1,
-    category: 'genel',
-    title: 'Zihinsel Çeviri Tuzağı: Biliyoruz Ama Konuşamıyoruz',
-    excerpt: 'Zihinsel çeviri alışkanlığının konuşma akıcılığını nasıl sabote ettiğini, neden kronik kaygı ürettiğini ve hedef dilde düşünme stratejileriyle nasıl kırılacağını öğrenin.',
-    image: CEVIRI_HASTALIGI_IMAGE,
-    readTime: '8 dk',
-    author: 'Teachera Uzman Ekibi',
-    date: '27 Şub 2026',
-    trending: true,
-  },
-];
+import { ACADEMY_ARTICLES } from '../content/academyArticles';
 
 const categories = [
   { id: 'hepsi', label: 'TÜMÜ' },
@@ -95,7 +25,7 @@ export default function AcademyPage() {
   const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false);
   const [newsletterFeedback, setNewsletterFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const filtered = articles
+  const filtered = ACADEMY_ARTICLES
     .filter((a) => activeCategory === 'hepsi' || a.category === activeCategory)
     .filter((a) =>
       searchQuery === '' ||
@@ -107,7 +37,7 @@ export default function AcademyPage() {
   const featuredArticle = sorted[0];
   const sidebarArticles = sorted.slice(1, 3);
   const gridArticles = sorted.slice(3);
-  const trendingArticles = articles.filter((a) => a.trending);
+  const trendingArticles = ACADEMY_ARTICLES.filter((a) => a.trending);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -257,7 +187,7 @@ export default function AcademyPage() {
               <span key={article.id} className="flex items-center gap-2 whitespace-nowrap">
                 {i > 0 && <span className="w-1 h-1 rounded-full bg-[#324D47]/20 shrink-0" />}
                 <span
-                  onClick={() => { const s = ARTICLE_SLUG_MAP[article.id]; if (s) navigate(`/academy/${s}`); }}
+                  onClick={() => navigate(`/academy/${article.slug}`)}
                   className="text-[12px] text-[#324D47]/70 font-['Neutraface_2_Text:Demi',sans-serif] hover:text-[#E70000] transition-colors cursor-pointer"
                 >
                   {article.title}
@@ -331,7 +261,7 @@ export default function AcademyPage() {
                       viewport={{ once: true }}
                       transition={{ duration: 0.6 }}
                       className="lg:col-span-3 group cursor-pointer"
-                      onClick={() => { const s = ARTICLE_SLUG_MAP[featuredArticle.id]; if (s) navigate(`/academy/${s}`); }}
+                      onClick={() => navigate(`/academy/${featuredArticle.slug}`)}
                     >
                       <div className="relative h-[400px] md:h-[480px] lg:h-full lg:min-h-[520px] rounded-[28px] overflow-hidden bg-[#0a0a10]">
                         <ImageWithFallback
@@ -387,7 +317,7 @@ export default function AcademyPage() {
                             viewport={{ once: true }}
                             transition={{ delay: 0.15 + i * 0.1, duration: 0.5 }}
                             className="group cursor-pointer flex-1"
-                            onClick={() => { const s = ARTICLE_SLUG_MAP[article.id]; if (s) navigate(`/academy/${s}`); }}
+                            onClick={() => navigate(`/academy/${article.slug}`)}
                           >
                             <div className="relative h-full min-h-[240px] rounded-[24px] overflow-hidden bg-[#0a0a10]">
                               <ImageWithFallback
@@ -454,7 +384,7 @@ export default function AcademyPage() {
                           viewport={{ once: true, margin: '-60px' }}
                           transition={{ delay: index * 0.06, duration: 0.5 }}
                           className="group cursor-pointer flex flex-col h-full"
-                          onClick={() => { const s = ARTICLE_SLUG_MAP[article.id]; if (s) navigate(`/academy/${s}`); }}
+                          onClick={() => navigate(`/academy/${article.slug}`)}
                         >
                           {/* Image container */}
                           <div className="relative h-56 rounded-[20px] overflow-hidden mb-5 bg-[#324D47]/[0.04]">

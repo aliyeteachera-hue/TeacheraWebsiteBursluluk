@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-const MOBILE_MEDIA_QUERY = '(max-width: 767px)';
 const LOW_CORE_THRESHOLD = 4;
 const LOW_MEMORY_THRESHOLD_GB = 4;
 const CONSTRAINED_NETWORK_TYPES = new Set(['slow-2g', '2g', '3g']);
@@ -53,7 +52,6 @@ function isConstrainedNetwork() {
 function computeLiteMode() {
   if (typeof window === 'undefined') return false;
   return (
-    window.matchMedia(MOBILE_MEDIA_QUERY).matches ||
     isLowCoreDevice() ||
     isLowMemoryDevice() ||
     isConstrainedNetwork()
@@ -64,35 +62,21 @@ export function useLiteMode() {
   const [liteMode, setLiteMode] = useState(computeLiteMode);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY);
     const network = getNetworkInformation();
     const updateAdaptiveLiteMode = () => {
       setLiteMode(
-        mediaQuery.matches ||
-          isLowCoreDevice() ||
+        isLowCoreDevice() ||
           isLowMemoryDevice() ||
           isConstrainedNetwork(),
       );
     };
 
     updateAdaptiveLiteMode();
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', updateAdaptiveLiteMode);
-    } else {
-      mediaQuery.addListener(updateAdaptiveLiteMode);
-    }
-
     if (network && typeof network.addEventListener === 'function') {
       network.addEventListener('change', updateAdaptiveLiteMode);
     }
 
     return () => {
-      if (typeof mediaQuery.addEventListener === 'function') {
-        mediaQuery.removeEventListener('change', updateAdaptiveLiteMode);
-      } else {
-        mediaQuery.removeListener(updateAdaptiveLiteMode);
-      }
-
       if (network && typeof network.removeEventListener === 'function') {
         network.removeEventListener('change', updateAdaptiveLiteMode);
       }

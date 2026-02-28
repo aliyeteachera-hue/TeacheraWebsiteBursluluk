@@ -6,6 +6,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import mentalTranslationCollapseImage from '../../assets/blog/mental-translation-collapse.webp';
 import targetLanguageThinkingImage from '../../assets/blog/target-language-thinking-techniques.webp';
 import grammarTranslationFossilizationImage from '../../assets/blog/gramer-ceviri-fosillesme-dongusu.webp';
+import { ACADEMY_ARTICLE_BY_SLUG } from '../content/academyArticles';
 
 const DEFAULT_OG_IMAGE = 'https://teachera.com.tr/favicon-32x32.png';
 
@@ -44,8 +45,7 @@ interface FullArticle {
   metaDescription: string;
 }
 
-const CEVIRI_HASTALIGI_IMAGE =
-  'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
+const CEVIRI_HASTALIGI_IMAGE = ACADEMY_ARTICLE_BY_SLUG['ceviri-hastaligi']?.image ?? DEFAULT_OG_IMAGE;
 
 const ARTICLES: Record<string, FullArticle> = {
   'ceviri-hastaligi': {

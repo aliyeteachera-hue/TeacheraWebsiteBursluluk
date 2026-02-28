@@ -4,56 +4,10 @@ import { ArrowRight, Clock, Sparkles, User, Calendar, ArrowUpRight } from 'lucid
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { useNavigate } from 'react-router';
-import mentalTranslationCollapseImage from '../../assets/blog/mental-translation-collapse.webp';
-import targetLanguageThinkingImage from '../../assets/blog/target-language-thinking-techniques.webp';
-import grammarTranslationFossilizationImage from '../../assets/blog/gramer-ceviri-fosillesme-dongusu.webp';
-
-interface Article {
-  slug: string;
-  category: string;
-  categoryLabel: string;
-  title: string;
-  excerpt: string;
-  image: string;
-  readTime: string;
-  author: string;
-  date: string;
-}
-
-const CEVIRI_HASTALIGI_IMAGE =
-  'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
+import { HOME_ACADEMY_ARTICLES } from '../content/academyArticles';
 
 /* ── Ana sayfada gösterilen Academy seçkisi (1 editör + 3 yazı) ── */
-const pickedArticles: Article[] = [
-  {
-    slug: 'hedef-dilde-dusunmeyi-saglayacak-teknikler', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
-    title: 'Hedef Dilde Düşünmeyi Sağlayacak Teknikler',
-    excerpt: 'Çeviri refleksini kırmak için lexical chunks, direct association, shadowing ve constrained output stratejileriyle günlük bir uygulama planı kurun.',
-    image: targetLanguageThinkingImage,
-    readTime: '10 dk', author: 'Teachera Akademik İçerik Ekibi', date: '28 Şub 2026',
-  },
-  {
-    slug: 'iletisimsel-felc-gramer-ceviri-fosillesme-dongusu', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
-    title: 'Yabancı Dil Ediniminde İletişimsel Felç',
-    excerpt: 'Gramer-çeviri yöntemi, çeviri hastalığı ve fosilleşme döngüsünün akıcılığı nasıl kilitlediğini bilimsel çerçevede inceleyin.',
-    image: grammarTranslationFossilizationImage,
-    readTime: '11 dk', author: 'Teachera Akademik İçerik Ekibi', date: '28 Şub 2026',
-  },
-  {
-    slug: 'konusma-akiciliginin-fiziksel-ve-isitsel-cokusu', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
-    title: 'Konuşma Akıcılığının Fiziksel ve İşitsel Çöküşü',
-    excerpt: 'Bilişsel yükün ses, ritim ve beden dilini nasıl kilitlediğini; disfluency ve işlemleme darboğazları üzerinden inceleyin.',
-    image: mentalTranslationCollapseImage,
-    readTime: '12 dk', author: 'Teachera Akademik İçerik Ekibi', date: '28 Şub 2026',
-  },
-  {
-    slug: 'ceviri-hastaligi', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
-    title: 'Zihinsel Çeviri Tuzağı: Biliyoruz Ama Konuşamıyoruz',
-    excerpt: 'Zihinsel çeviri alışkanlığının akıcılığı nasıl sabote ettiğini ve hedef dilde düşünme geçişini adım adım keşfedin.',
-    image: CEVIRI_HASTALIGI_IMAGE,
-    readTime: '8 dk', author: 'Teachera Uzman Ekibi', date: '27 Şub 2026',
-  },
-];
+const pickedArticles = HOME_ACADEMY_ARTICLES;
 
 export default function Academy() {
   const ref = useRef(null);

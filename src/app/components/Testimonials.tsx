@@ -9,6 +9,7 @@ import wessonLogo from '../../assets/partners/wesson.png';
 import mondiLogo from '../../assets/partners/mondi-white.png';
 import mebLogo from '../../assets/partners/meb-white.png';
 import unileverLogo from '../../assets/partners/unilever-white.png';
+import { useLiteMode } from '../lib/useLiteMode';
 
 const AUTOPLAY_MS = 6000;
 const AUTOPLAY_TICK_MS = 120;
@@ -70,7 +71,7 @@ export default function Testimonials() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const shouldReduceMotion = useReducedMotion();
-  const [liteMotionMode, setLiteMotionMode] = useState(false);
+  const liteMotionMode = useLiteMode();
   /* progress counts 0 → 100 for the active dot bar */
   const [progress, setProgress] = useState(0);
 
@@ -84,25 +85,6 @@ export default function Testimonials() {
     () => goTo(current === testimonials.length - 1 ? 0 : current + 1),
     [current, goTo],
   );
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 767px)');
-    const updateLiteMode = () => {
-      const lowCoreDevice = typeof navigator.hardwareConcurrency === 'number'
-        ? navigator.hardwareConcurrency <= 4
-        : false;
-      setLiteMotionMode(mediaQuery.matches || lowCoreDevice);
-    };
-
-    updateLiteMode();
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', updateLiteMode);
-      return () => mediaQuery.removeEventListener('change', updateLiteMode);
-    }
-
-    mediaQuery.addListener(updateLiteMode);
-    return () => mediaQuery.removeListener(updateLiteMode);
-  }, []);
 
   /* Autoplay tick — low-frequency progress + slide advance */
   useEffect(() => {
