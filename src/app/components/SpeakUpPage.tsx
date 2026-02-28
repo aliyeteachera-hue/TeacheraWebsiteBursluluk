@@ -272,6 +272,7 @@ export default function SpeakUpPage() {
   const isInlineVideoInView = useInView(videoCardRef, { margin: '-20% 0px -20% 0px' });
 
   /* ── Video Mute State ── */
+  const [isInlineVideoStarted, setIsInlineVideoStarted] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
   const [showFullscreenSoundPrompt, setShowFullscreenSoundPrompt] = useState(false);
@@ -313,6 +314,12 @@ export default function SpeakUpPage() {
     setIsVideoFullscreen(true);
   };
 
+  const startInlineVideo = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.();
+    setIsInlineVideoStarted(true);
+    setIsMuted(true);
+  };
+
   const enableFullscreenSound = (event?: { stopPropagation?: () => void }) => {
     event?.stopPropagation?.();
     setIsMuted(false);
@@ -347,13 +354,13 @@ export default function SpeakUpPage() {
   }, [isMuted]);
 
   useEffect(() => {
-    if (isVideoFullscreen) return;
+    if (isVideoFullscreen || !isInlineVideoStarted) return;
     const timerId = window.setTimeout(() => {
       postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
       if (isInlineVideoInView) syncIframeVolume(inlineIframeRef.current, isMuted);
     }, 100);
     return () => window.clearTimeout(timerId);
-  }, [isInlineVideoInView, isVideoFullscreen, isMuted]);
+  }, [isInlineVideoInView, isVideoFullscreen, isInlineVideoStarted, isMuted]);
 
   useEffect(() => {
     if (!isVideoFullscreen) return;
@@ -377,12 +384,14 @@ export default function SpeakUpPage() {
       setShowFullscreenSoundPrompt(false);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', keyHandler);
-      postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
-      if (isInlineVideoInView) {
+      if (isInlineVideoStarted) {
+        postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
+      }
+      if (isInlineVideoStarted && isInlineVideoInView) {
         window.setTimeout(() => syncIframeVolume(inlineIframeRef.current, isMuted), 120);
       }
     };
-  }, [isVideoFullscreen, isMuted, isInlineVideoInView]);
+  }, [isVideoFullscreen, isInlineVideoInView, isInlineVideoStarted, isMuted]);
 
   /* ── Form State ── */
   const [formData, setFormData] = useState({
@@ -583,33 +592,72 @@ export default function SpeakUpPage() {
                   ref={videoCardRef}
                   className="relative w-[280px] md:w-[320px] lg:w-[340px] rounded-[24px] overflow-hidden bg-[#1a1a24] shadow-2xl shadow-black/40 cursor-pointer"
                   style={{ aspectRatio: '9/16' }}
-                  onClick={openVideoFullscreen}
+                  onClick={isInlineVideoStarted ? openVideoFullscreen : startInlineVideo}
                 >
-                  <iframe
-                    ref={inlineIframeRef}
-                    src={SPEAKUP_VIDEO_INLINE_SRC}
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    title="Teachera SpeakUP"
-                    className="absolute inset-0 w-full h-full border-0"
-                    loading="eager"
-                    onLoad={handleInlineIframeLoad}
-                  />
-                  <button
-                    onClick={(event) => toggleMute(event)}
-                    className="absolute top-2 right-2 w-8 h-8 bg-[#324D47]/[0.8] rounded-full flex items-center justify-center cursor-pointer"
-                  >
-                    {isMuted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
-                  </button>
-                  <button
-                    onClick={openVideoFullscreen}
-                    className="absolute top-2 left-2 h-8 px-3 bg-[#00000B]/70 rounded-full flex items-center justify-center gap-1.5 cursor-pointer text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em]"
-                  >
-                    <Maximize2 size={12} />
-                    TAM EKRAN
-                  </button>
+                  {isInlineVideoStarted ? (
+                    <>
+                      <iframe
+                        ref={inlineIframeRef}
+                        src={SPEAKUP_VIDEO_INLINE_SRC}
+                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        title="Teachera SpeakUP"
+                        className="absolute inset-0 w-full h-full border-0"
+                        loading="eager"
+                        onLoad={handleInlineIframeLoad}
+                      />
+                      <button
+                        onClick={(event) => toggleMute(event)}
+                        className="absolute top-2 right-2 w-8 h-8 bg-[#324D47]/[0.8] rounded-full flex items-center justify-center cursor-pointer"
+                      >
+                        {isMuted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
+                      </button>
+                      <button
+                        onClick={openVideoFullscreen}
+                        className="absolute top-2 left-2 h-8 px-3 bg-[#00000B]/70 rounded-full flex items-center justify-center gap-1.5 cursor-pointer text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em]"
+                      >
+                        <Maximize2 size={12} />
+                        TAM EKRAN
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <img
+                        src={HERO_BG}
+                        alt="SpeakUP Bilgilendirme Videosu"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,11,0.1),rgba(0,0,11,0.72))]" />
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 group cursor-pointer relative block"
+                        onClick={startInlineVideo}
+                        aria-label="Videoyu oynat"
+                      >
+                        <div className="absolute inset-0 bg-white/10 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
+                        <div className="w-14 h-14 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full flex items-center justify-center group-hover:bg-white/10 transition-all duration-500 relative z-10">
+                          <div className="w-9 h-9 bg-[#E70000] rounded-full flex items-center justify-center pl-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                            <Play fill="currentColor" className="text-white w-3 h-3" />
+                          </div>
+                        </div>
+                      </motion.button>
+                    </>
+                  )}
                 </div>
               </div>
+
+              {!isInlineVideoStarted && (
+                <motion.p
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: [0.45, 0.9, 0.45], y: [0, -3, 0] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="mt-4 text-center text-white/70 text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.14em] uppercase"
+                >
+                  Önce Bilgilendirme Videosunu İzle
+                </motion.p>
+              )}
 
               {/* Floating glow behind video */}
               <div className="absolute -inset-10 bg-[#E70000] rounded-full filter blur-[120px] opacity-[0.06] -z-10 pointer-events-none" />
