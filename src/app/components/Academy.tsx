@@ -123,11 +123,11 @@ export default function Academy() {
             onClick={goToFeatured}
           >
             <div className="relative rounded-[24px] overflow-hidden bg-[#0a0a10] shadow-lg shadow-[#324D47]/10 hover:shadow-xl hover:shadow-[#324D47]/15 transition-shadow duration-500">
-              <div className="relative h-[260px] sm:h-[320px] md:h-[380px] bg-[#06070C] p-2 md:p-0">
+              <div className="relative aspect-[1100/828] md:h-[380px] md:aspect-auto bg-[#06070C]">
                 <ImageWithFallback
                   src={featured.image}
                   alt={featured.title}
-                  className="w-full h-full object-contain md:object-cover object-center opacity-90 transition-transform duration-[2s] ease-out md:group-hover:scale-[1.04]"
+                  className="w-full h-full object-cover object-center opacity-90 transition-transform duration-[2s] ease-out md:group-hover:scale-[1.04]"
                   loading="lazy"
                   decoding="async"
                 />
@@ -191,11 +191,11 @@ export default function Academy() {
                 className="group flex flex-col bg-white rounded-[20px] overflow-hidden shadow-[0_4px_24px_-6px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.08)] transition-all duration-300 border border-[#324D47]/[0.04] hover:-translate-y-1 cursor-pointer h-full"
                 onClick={() => navigate(`/academy/${article.slug}`)}
               >
-                <div className="h-[190px] sm:h-40 overflow-hidden relative bg-[#0a0a10] p-2 md:p-0">
+                <div className="aspect-[1100/828] md:h-40 md:aspect-auto overflow-hidden relative bg-[#0a0a10]">
                   <ImageWithFallback
                     src={article.image}
                     alt={article.title}
-                    className="w-full h-full object-contain md:object-cover object-center transition-transform duration-700 ease-out md:group-hover:scale-[1.06]"
+                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out md:group-hover:scale-[1.06]"
                     loading="lazy"
                     decoding="async"
                   />
