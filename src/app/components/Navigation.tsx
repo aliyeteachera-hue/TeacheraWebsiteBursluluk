@@ -150,7 +150,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   onClick={scrollToSpeakUpForm}
                   className="hidden md:flex items-center gap-2 px-6 py-2 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.14em] cursor-pointer hover:bg-[#c40000] hover:border-[#c40000] transition-all duration-500 shadow-lg shadow-[#E70000]/20 hover:shadow-[#E70000]/35"
                 >
-                  HEMEN BASVUR
+                  HEMEN BAŞVUR
                   <ArrowUpRight size={13} />
                 </motion.button>
 
@@ -162,7 +162,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   onClick={scrollToSpeakUpForm}
                   className="md:hidden mobile-speakup-cta-text flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[10px] sm:text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.04em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-md shadow-[#E70000]/15"
                 >
-                  BASVUR
+                  BAŞVUR
                   <ArrowUpRight size={10} />
                 </motion.button>
               </>
