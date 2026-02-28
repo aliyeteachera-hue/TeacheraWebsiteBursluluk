@@ -265,14 +265,14 @@ export default function Programs() {
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.96)] via-[rgba(0,0,0,0.62)] to-[rgba(0,0,0,0.2)]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.9)] via-[rgba(0,0,0,0.4)] to-transparent" />
 
                 {/* Collapsed state */}
                 {!isActive && (
                   <div className="absolute inset-0 flex items-end p-3 lg:p-6">
-                    <div className="flex h-[72%] min-w-0 flex-col items-center justify-end gap-2 rounded-full border border-[rgba(255,255,255,0.16)] bg-[rgba(0,0,0,0.58)] px-1.5 py-2 lg:gap-2.5 lg:px-2 lg:py-3">
+                    <div className="flex min-w-0 items-center gap-1.5 lg:gap-2">
                       <div className="h-1.5 w-1.5 shrink-0 rounded-full lg:h-2 lg:w-2" style={{ backgroundColor: lang.accent }} />
-                      <span className="max-h-full overflow-hidden text-white text-[10px] leading-[0.92] lg:text-xs font-['Neutraface_2_Text:Demi',sans-serif] [writing-mode:vertical-lr] rotate-180 whitespace-nowrap">
+                      <span className="text-white text-[11px] leading-none lg:text-sm font-['Neutraface_2_Text:Demi',sans-serif] [writing-mode:vertical-lr] rotate-180 whitespace-nowrap">
                         {lang.name}
                       </span>
                     </div>
@@ -289,34 +289,32 @@ export default function Programs() {
                       transition={{ duration: 0.3, delay: 0.2 }}
                       className="absolute inset-0 flex flex-col justify-end p-8"
                     >
-                      <div className="max-w-[95%] rounded-2xl border border-[rgba(255,255,255,0.1)] bg-[rgba(0,0,0,0.44)] px-5 py-4">
-                        {/* Language badge */}
-                        <div className="mb-3 flex items-center gap-3">
-                          <div className="h-3 w-3 rounded-full" style={{ backgroundColor: lang.accent }} />
-                          <span className="text-sm text-white/80 font-['Neutraface_2_Text:Book',sans-serif]">{lang.nativeName}</span>
-                        </div>
+                      {/* Language badge */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: lang.accent }} />
+                        <span className="text-white/60 text-sm font-['Neutraface_2_Text:Book',sans-serif]">{lang.nativeName}</span>
+                      </div>
 
-                        <h3 className="mb-2 text-3xl leading-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] font-['Neutraface_2_Text:Bold',sans-serif]">{lang.name}</h3>
-                        <p className="mb-6 text-sm text-white/80 font-['Neutraface_2_Text:Book',sans-serif]">{lang.description}</p>
+                      <h3 className="text-3xl font-['Neutraface_2_Text:Bold',sans-serif] text-white mb-2">{lang.name}</h3>
+                      <p className="text-white/60 text-sm font-['Neutraface_2_Text:Book',sans-serif] mb-6">{lang.description}</p>
 
-                        {/* Categories */}
-                        <div className="mb-1 flex flex-wrap gap-3">
-                          {lang.categories.map((cat, ci) => (
-                            <div key={ci} className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.1)] px-4 py-3">
-                              <div className="mb-2 flex items-center gap-2 text-xs text-white/90 font-['Neutraface_2_Text:Demi',sans-serif]">
-                                {cat.icon}
-                                <span>{cat.title}</span>
-                              </div>
-                              <div className="flex flex-wrap gap-1">
-                                {cat.items?.map((item, i) => (
-                                  <span key={i} className="rounded-md bg-[rgba(0,0,0,0.34)] px-2 py-0.5 text-[11px] text-white/75">
-                                    {item}
-                                  </span>
-                                ))}
-                              </div>
+                      {/* Categories */}
+                      <div className="flex flex-wrap gap-3 mb-6">
+                        {lang.categories.map((cat, ci) => (
+                          <div key={ci} className="bg-[rgba(255,255,255,0.08)] backdrop-blur-sm rounded-xl px-4 py-3 border border-[rgba(255,255,255,0.06)]">
+                            <div className="flex items-center gap-2 mb-2 text-white/80 text-xs font-['Neutraface_2_Text:Demi',sans-serif]">
+                              {cat.icon}
+                              <span>{cat.title}</span>
                             </div>
-                          ))}
-                        </div>
+                            <div className="flex flex-wrap gap-1">
+                              {cat.items?.map((item, i) => (
+                                <span key={i} className="text-[11px] text-[rgba(255,255,255,0.6)] bg-[rgba(0,0,0,0.2)] px-2 py-0.5 rounded-md">
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
                       </div>
 
                       {/* Action Button */}
@@ -350,44 +348,42 @@ export default function Programs() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="relative min-w-[85vw] h-[470px] rounded-2xl overflow-hidden snap-center flex-shrink-0"
+                className="relative min-w-[85vw] h-[420px] rounded-2xl overflow-hidden snap-center flex-shrink-0"
               >
                 <ImageWithFallback src={lang.image} alt={lang.name} className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.97)] via-[rgba(0,0,0,0.72)] to-[rgba(0,0,0,0.28)]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.95)] via-[rgba(0,0,0,0.4)] to-transparent" />
 
-                <div className="absolute inset-0 flex flex-col justify-end p-4">
-                  <div className="rounded-2xl border border-[rgba(255,255,255,0.1)] bg-[rgba(0,0,0,0.5)] p-4">
-                    <div className="mb-2 flex items-center gap-2">
-                      <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: lang.accent }} />
-                      <span className="text-xs text-white/75 font-['Neutraface_2_Text:Book',sans-serif]">{lang.nativeName}</span>
-                    </div>
-
-                    <h3 className="mb-1 text-2xl leading-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] font-['Neutraface_2_Text:Bold',sans-serif]">{lang.name}</h3>
-                    <p className="mb-4 text-xs text-white/75 font-['Neutraface_2_Text:Book',sans-serif]">{lang.description}</p>
-
-                    <div className="mb-5 flex flex-wrap gap-2">
-                      {lang.categories.map((cat, ci) => (
-                        <div key={ci} className="rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.1)] px-3 py-2">
-                          <span className="text-[10px] text-white/85 font-['Neutraface_2_Text:Demi',sans-serif]">{cat.title}</span>
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {cat.items?.map((item, i) => (
-                              <span key={i} className="rounded bg-[rgba(0,0,0,0.34)] px-1.5 py-0.5 text-[9px] text-white/70">
-                                {item}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <button
-                      onClick={() => navigate(`/egitimlerimiz/${LANGUAGE_LANDING_SLUGS[lang.id] || 'ingilizce/grup-programi'}`)}
-                      className="group flex items-center gap-2 self-start rounded-full bg-white px-6 py-3 text-sm text-black font-['Neutraface_2_Text:Bold',sans-serif]"
-                    >
-                      <span>Keşfet</span>
-                      <ChevronRight size={14} className="transition-transform group-hover:translate-x-1" />
-                    </button>
+                <div className="absolute inset-0 flex flex-col justify-end p-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: lang.accent }} />
+                    <span className="text-white/50 text-xs font-['Neutraface_2_Text:Book',sans-serif]">{lang.nativeName}</span>
                   </div>
+
+                  <h3 className="text-2xl font-['Neutraface_2_Text:Bold',sans-serif] text-white mb-1">{lang.name}</h3>
+                  <p className="text-white/50 text-xs font-['Neutraface_2_Text:Book',sans-serif] mb-4">{lang.description}</p>
+
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {lang.categories.map((cat, ci) => (
+                      <div key={ci} className="bg-[rgba(255,255,255,0.06)] rounded-lg px-3 py-2 border border-[rgba(255,255,255,0.04)]">
+                        <span className="text-white/60 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif]">{cat.title}</span>
+                        <div className="flex gap-1 mt-1">
+                          {cat.items?.map((item, i) => (
+                            <span key={i} className="text-[9px] text-white/40 bg-[rgba(0,0,0,0.3)] px-1.5 py-0.5 rounded">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => navigate(`/egitimlerimiz/${LANGUAGE_LANDING_SLUGS[lang.id] || 'ingilizce/grup-programi'}`)}
+                    className="group flex items-center gap-2 self-start px-6 py-3 bg-white text-black rounded-full text-sm font-['Neutraface_2_Text:Bold',sans-serif]"
+                  >
+                    <span>Keşfet</span>
+                    <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
                 </div>
               </motion.div>
             ))}
