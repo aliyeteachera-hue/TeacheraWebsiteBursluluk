@@ -8,7 +8,7 @@ import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOB
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
    ═══════════════════════════════════════════════════════════════════════ */
-const HERO_BG = 'https://images.unsplash.com/photo-1582848890404-ed087c1b3f0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
+const HERO_BG = 'https://vumbnail.com/1168669335.jpg';
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 const SPEAKUP_VIDEO_EMBED_BASE =
   'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=0&app_id=58479';
@@ -629,24 +629,26 @@ export default function SpeakUpPage() {
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,11,0.1),rgba(0,0,11,0.72))]" />
-                      <motion.button
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.2, duration: 0.5 }}
-                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 group cursor-pointer relative block"
-                        onClick={startInlineVideo}
-                        aria-label="Videoyu oynat"
-                      >
-                        <div className="absolute inset-0 bg-white/10 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
-                        <div className="w-14 h-14 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full flex items-center justify-center group-hover:bg-white/10 transition-all duration-500 relative z-10">
-                          <div className="w-9 h-9 bg-[#E70000] rounded-full flex items-center justify-center pl-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300">
-                            <span
-                              aria-hidden="true"
-                              className="inline-block w-0 h-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-white ml-[1px]"
-                            />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <motion.button
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.2, duration: 0.5 }}
+                          className="group cursor-pointer relative block pointer-events-auto"
+                          onClick={startInlineVideo}
+                          aria-label="Videoyu oynat"
+                        >
+                          <div className="absolute inset-0 bg-white/10 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
+                          <div className="w-14 h-14 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full flex items-center justify-center group-hover:bg-white/10 transition-all duration-500 relative z-10">
+                            <div className="w-9 h-9 bg-[#E70000] rounded-full flex items-center justify-center pl-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                              <span
+                                aria-hidden="true"
+                                className="inline-block w-0 h-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-white ml-[1px]"
+                              />
+                            </div>
                           </div>
-                        </div>
-                      </motion.button>
+                        </motion.button>
+                      </div>
                     </>
                   )}
                 </div>
