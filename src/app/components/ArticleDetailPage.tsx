@@ -44,6 +44,9 @@ interface FullArticle {
   metaDescription: string;
 }
 
+const CEVIRI_HASTALIGI_IMAGE =
+  'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
+
 const ARTICLES: Record<string, FullArticle> = {
   'ceviri-hastaligi': {
     slug: 'ceviri-hastaligi',
@@ -52,7 +55,7 @@ const ARTICLES: Record<string, FullArticle> = {
     title: 'Zihinsel Çeviri Tuzağı:\nBiliyoruz Ama\nKonuşamıyoruz',
     subtitle: 'Dil öğrenme yolculuğunda masum görünen zihinsel çeviri alışkanlığı, konuşma akıcılığını sabote eden en büyük bilişsel bariyere dönüşebilir.',
     epigraph: 'Akıcılık, doğru kelimeyi bulmaktan önce düşünceyi hedef dilde akıta bilmektir.',
-    heroImage: mentalTranslationCollapseImage,
+    heroImage: CEVIRI_HASTALIGI_IMAGE,
     author: 'Teachera Uzman Ekibi',
     authorRole: 'Dil Eğitimi Araştırma Birimi',
     date: '27 Şubat 2026',

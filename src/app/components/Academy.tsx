@@ -20,6 +20,9 @@ interface Article {
   date: string;
 }
 
+const CEVIRI_HASTALIGI_IMAGE =
+  'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
+
 /* ── Ana sayfada gösterilen Academy seçkisi (1 editör + 3 yazı) ── */
 const pickedArticles: Article[] = [
   {
@@ -47,7 +50,7 @@ const pickedArticles: Article[] = [
     slug: 'ceviri-hastaligi', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
     title: 'Zihinsel Çeviri Tuzağı: Biliyoruz Ama Konuşamıyoruz',
     excerpt: 'Zihinsel çeviri alışkanlığının akıcılığı nasıl sabote ettiğini ve hedef dilde düşünme geçişini adım adım keşfedin.',
-    image: mentalTranslationCollapseImage,
+    image: CEVIRI_HASTALIGI_IMAGE,
     readTime: '8 dk', author: 'Teachera Uzman Ekibi', date: '27 Şub 2026',
   },
 ];

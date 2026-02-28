@@ -28,6 +28,9 @@ interface Article {
   trending?: boolean;
 }
 
+const CEVIRI_HASTALIGI_IMAGE =
+  'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
+
 const articles: Article[] = [
   {
     id: 3,
@@ -68,7 +71,7 @@ const articles: Article[] = [
     category: 'genel',
     title: 'Zihinsel Çeviri Tuzağı: Biliyoruz Ama Konuşamıyoruz',
     excerpt: 'Zihinsel çeviri alışkanlığının konuşma akıcılığını nasıl sabote ettiğini, neden kronik kaygı ürettiğini ve hedef dilde düşünme stratejileriyle nasıl kırılacağını öğrenin.',
-    image: mentalTranslationCollapseImage,
+    image: CEVIRI_HASTALIGI_IMAGE,
     readTime: '8 dk',
     author: 'Teachera Uzman Ekibi',
     date: '27 Şub 2026',
