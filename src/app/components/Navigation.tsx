@@ -69,10 +69,10 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
           : 'bg-transparent'
       }`}
     >
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
+      <div className="max-w-[1440px] mx-auto px-5 sm:px-6 lg:px-12">
         <div
           className={`flex items-center justify-between transition-all duration-700 ease-out ${
-            scrolled ? 'h-16 md:h-18' : 'h-20 md:h-28'
+            scrolled ? 'h-[72px] md:h-[76px]' : 'h-[92px] md:h-[112px]'
           }`}
         >
           {/* ═══ Logo ═══ */}
@@ -85,7 +85,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
           >
             <div
               className={`transition-all duration-700 ease-out ${
-                scrolled ? 'w-[85px] sm:w-[100px] md:w-[115px]' : 'w-[95px] sm:w-[115px] md:w-[146px]'
+                scrolled ? 'w-[100px] sm:w-[118px] md:w-[128px]' : 'w-[112px] sm:w-[130px] md:w-[146px]'
               } aspect-[146/29]`}
             >
               <TeacheraLogo />
@@ -127,7 +127,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
           </motion.div>
 
           {/* ═══ Right: CTAs + Menu ═══ */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-3 sm:gap-3.5">
 
             {/* ── SpeakUP page: "Hemen Başvur" red CTA ── */}
             {isSpeakUpPage ? (
@@ -152,10 +152,10 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={scrollToSpeakUpForm}
-                  className="md:hidden flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[8px] sm:text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.1em] sm:tracking-[0.12em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-lg shadow-[#E70000]/20"
+                  className="md:hidden flex items-center gap-1.5 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[11px] sm:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-lg shadow-[#E70000]/20"
                 >
                   BASVUR
-                  <ArrowUpRight size={10} />
+                  <ArrowUpRight size={12} />
                 </motion.button>
               </>
             ) : (
@@ -192,7 +192,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={() => openFreeTrial('navigation_mobile_free_trial')}
-                  className="md:hidden px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 text-[8px] sm:text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.1em] sm:tracking-[0.12em] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
+                  className="md:hidden px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 text-[11px] sm:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
                 >
                   Ücretsiz Seans
                 </motion.button>
@@ -200,7 +200,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
             )}
 
             {/* Divider */}
-            <div className="w-px h-5 bg-white/[0.08]" />
+            <div className="w-px h-6 bg-white/[0.08]" />
 
             {/* ═══ Menu Pill ═══ */}
             <motion.button
@@ -215,13 +215,13 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
               }`}
               aria-label="Toggle menu"
             >
-              <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu">
-                <span className="hidden sm:inline font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.2em] uppercase text-white/50 group-hover/menu:text-white/80 transition-colors duration-300">
+              <div className="flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-2.5 sm:py-2.5 rounded-full border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu">
+                <span className="inline font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.16em] uppercase text-white/55 group-hover/menu:text-white/82 transition-colors duration-300">
                   Menü
                 </span>
                 <div className="flex flex-col items-end gap-[4px]">
-                  <span className="block w-[16px] sm:w-[18px] h-[1.5px] bg-white/60 rounded-full group-hover/menu:w-5 group-hover/menu:bg-white transition-all duration-300" />
-                  <span className="block w-[11px] sm:w-[13px] h-[1.5px] bg-white/40 rounded-full group-hover/menu:w-5 group-hover/menu:bg-white transition-all duration-300" />
+                  <span className="block w-[18px] sm:w-[20px] h-[1.5px] bg-white/60 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
+                  <span className="block w-[13px] sm:w-[15px] h-[1.5px] bg-white/40 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
                 </div>
               </div>
             </motion.button>

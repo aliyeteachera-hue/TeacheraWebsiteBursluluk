@@ -284,3 +284,45 @@ html.teachera-reduce-motion [class*='backdrop-blur'] {
 html.teachera-reduce-motion [class*='blur-'] {
   filter: none !important;
 }
+
+/* Mobile readability pass */
+@media (max-width: 767px) {
+  :root {
+    --font-size: 17px;
+  }
+
+  body {
+    line-height: 1.55;
+  }
+
+  /* Lift very small utility text sizes for touch-first readability */
+  .text-\[8px\] {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+  }
+
+  .text-\[9px\] {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+
+  .text-\[10px\] {
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+  }
+
+  .text-\[11px\] {
+    font-size: 14px !important;
+    line-height: 1.45 !important;
+  }
+
+  .text-\[12px\] {
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+
+  .text-xs {
+    font-size: 0.875rem !important;
+    line-height: 1.45 !important;
+  }
+}
