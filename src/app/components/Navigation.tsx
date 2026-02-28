@@ -23,6 +23,20 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
   const [scrolled, setScrolled] = useState(false);
   const isAcademyPage = location.pathname === '/academy';
   const isSpeakUpPage = location.pathname === '/speakup';
+  const navHeightClass = isSpeakUpPage
+    ? scrolled
+      ? 'h-[64px] md:h-[74px]'
+      : 'h-[82px] md:h-[108px]'
+    : scrolled
+      ? 'h-[72px] md:h-[76px]'
+      : 'h-[92px] md:h-[112px]';
+  const logoSizeClass = isSpeakUpPage
+    ? scrolled
+      ? 'w-[92px] sm:w-[108px] md:w-[122px]'
+      : 'w-[102px] sm:w-[120px] md:w-[142px]'
+    : scrolled
+      ? 'w-[100px] sm:w-[118px] md:w-[128px]'
+      : 'w-[112px] sm:w-[130px] md:w-[146px]';
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const next = latest > 40;
@@ -70,11 +84,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
       }`}
     >
       <div className="max-w-[1440px] mx-auto px-5 sm:px-6 lg:px-12">
-        <div
-          className={`flex items-center justify-between transition-all duration-700 ease-out ${
-            scrolled ? 'h-[72px] md:h-[76px]' : 'h-[92px] md:h-[112px]'
-          }`}
-        >
+        <div className={`flex items-center justify-between transition-all duration-700 ease-out ${navHeightClass}`}>
           {/* ═══ Logo ═══ */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -84,9 +94,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
             onClick={goHome}
           >
             <div
-              className={`transition-all duration-700 ease-out ${
-                scrolled ? 'w-[100px] sm:w-[118px] md:w-[128px]' : 'w-[112px] sm:w-[130px] md:w-[146px]'
-              } aspect-[146/29]`}
+              className={`transition-all duration-700 ease-out ${logoSizeClass} aspect-[146/29]`}
             >
               <TeacheraLogo />
             </div>
@@ -112,22 +120,22 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex items-center gap-2.5 md:gap-3.5"
+                className="flex items-center gap-1.5 sm:gap-2.5 md:gap-3.5"
               >
-                <span className={`text-white/25 font-['Neutraface_2_Text:Book',sans-serif] transition-all duration-700 ${scrolled ? 'text-[14px] md:text-[16px]' : 'text-[16px] md:text-[20px]'}`}>
+                <span className={`hidden sm:inline text-white/25 font-['Neutraface_2_Text:Book',sans-serif] transition-all duration-700 ${scrolled ? 'text-[12px] md:text-[16px]' : 'text-[14px] md:text-[20px]'}`}>
                   &amp;
                 </span>
                 <img
                   src={neuLogoImg}
                   alt="Necmettin Erbakan Üniversitesi"
-                  className={`object-contain transition-all duration-700 opacity-70 ${scrolled ? 'h-[18px] sm:h-[22px] md:h-[26px]' : 'h-[22px] sm:h-[26px] md:h-[32px]'}`}
+                  className={`object-contain transition-all duration-700 opacity-70 ${scrolled ? 'h-[15px] sm:h-[19px] md:h-[26px]' : 'h-[18px] sm:h-[23px] md:h-[32px]'}`}
                 />
               </motion.div>
             )}
           </motion.div>
 
           {/* ═══ Right: CTAs + Menu ═══ */}
-          <div className="flex items-center gap-3 sm:gap-3.5">
+          <div className={`flex items-center ${isSpeakUpPage ? 'gap-2 sm:gap-2.5' : 'gap-3 sm:gap-3.5'}`}>
 
             {/* ── SpeakUP page: "Hemen Başvur" red CTA ── */}
             {isSpeakUpPage ? (
@@ -152,10 +160,10 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={scrollToSpeakUpForm}
-                  className="md:hidden flex items-center gap-1.5 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[11px] sm:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-lg shadow-[#E70000]/20"
+                  className="md:hidden flex items-center gap-1.5 px-3 sm:px-4.5 py-1.5 sm:py-2 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[10px] sm:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-lg shadow-[#E70000]/20"
                 >
                   BASVUR
-                  <ArrowUpRight size={12} />
+                  <ArrowUpRight size={11} />
                 </motion.button>
               </>
             ) : (
@@ -200,7 +208,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
             )}
 
             {/* Divider */}
-            <div className="w-px h-6 bg-white/[0.08]" />
+            <div className={`w-px bg-white/[0.08] ${isSpeakUpPage ? 'h-5' : 'h-6'}`} />
 
             {/* ═══ Menu Pill ═══ */}
             <motion.button
@@ -215,8 +223,8 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
               }`}
               aria-label="Toggle menu"
             >
-              <div className="flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-2.5 sm:py-2.5 rounded-full border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu">
-                <span className="inline font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.16em] uppercase text-white/55 group-hover/menu:text-white/82 transition-colors duration-300">
+              <div className={`flex items-center gap-2.5 sm:gap-3 rounded-full border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu ${isSpeakUpPage ? 'px-3.5 sm:px-5 py-2 sm:py-2.5' : 'px-4 sm:px-5 py-2.5 sm:py-2.5'}`}>
+                <span className={`${isSpeakUpPage ? 'hidden sm:inline' : 'inline'} font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.16em] uppercase text-white/55 group-hover/menu:text-white/82 transition-colors duration-300`}>
                   Menü
                 </span>
                 <div className="flex flex-col items-end gap-[4px]">
