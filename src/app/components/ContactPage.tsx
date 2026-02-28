@@ -95,6 +95,7 @@ export default function ContactPage() {
           >
             <CallUsCard />
             <InfoCard />
+            <MobileWorkingHoursCard />
           </motion.div>
         </div>
       </div>
@@ -410,8 +411,8 @@ function CallUsCard() {
           Müşteri temsilcimiz <span className="text-white/60">Muazzez</span> · Sadece yazılı iletişim
         </p>
 
-        {/* Çalışma saatleri */}
-        <div className="mt-5 pt-5 border-t border-white/10">
+        {/* Çalışma saatleri (desktop/tablet) */}
+        <div className="mt-5 pt-5 border-t border-white/10 hidden md:block">
           <div className="flex items-center gap-2 mb-2">
             <Clock size={12} className="text-white/50" />
             <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-kicker md:text-[11px] text-white/50 tracking-wide uppercase">
@@ -427,6 +428,32 @@ function CallUsCard() {
               <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] text-white/70">Pazar</span>
               <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-meta md:text-[13px] text-white/50">Kapalı</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileWorkingHoursCard() {
+  return (
+    <div className="md:hidden relative bg-[rgba(50,77,71,0.35)] backdrop-blur-xl rounded-[30px] border border-white/15 shadow-xl shadow-black/10 overflow-hidden">
+      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none" />
+      <div className="relative z-10 p-7">
+        <div className="flex items-center gap-2 mb-3">
+          <Clock size={13} className="text-white/60" />
+          <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-kicker text-white/60 tracking-wide uppercase">
+            Çalışma Saatleri
+          </span>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between">
+            <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta text-white/70">Pazartesi – Cumartesi</span>
+            <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-meta text-white">09:00 – 21:00</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta text-white/70">Pazar</span>
+            <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-meta text-white/50">Kapalı</span>
           </div>
         </div>
       </div>
