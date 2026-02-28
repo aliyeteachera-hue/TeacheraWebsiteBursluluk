@@ -16,7 +16,7 @@ const SPEAKUP_VIDEO_INLINE_BASE =
 const SPEAKUP_VIDEO_FULLSCREEN_BASE =
   'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-fullscreen&app_id=58479';
 const SPEAKUP_VIDEO_INLINE_SRC =
-  `${SPEAKUP_VIDEO_INLINE_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&muted=1`;
+  `${SPEAKUP_VIDEO_INLINE_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&muted=0`;
 const SPEAKUP_VIDEO_FULLSCREEN_SRC =
   `${SPEAKUP_VIDEO_FULLSCREEN_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&muted=1`;
 
@@ -341,10 +341,19 @@ export default function SpeakUpPage() {
   };
 
   const handleInlineIframeLoad = () => {
-    window.setTimeout(() => {
+    const syncPlayback = () => {
       postToPlayer(inlineIframeRef.current, 'play');
       syncIframeVolume(inlineIframeRef.current, isMuted);
-    }, 350);
+    };
+
+    window.setTimeout(() => {
+      syncPlayback();
+    }, 260);
+
+    // Vimeo player initializes asynchronously on iOS; double-sync improves unmute reliability.
+    window.setTimeout(() => {
+      syncPlayback();
+    }, 780);
   };
 
   const handleFullscreenIframeLoad = () => {
@@ -657,17 +666,6 @@ export default function SpeakUpPage() {
                   )}
                 </div>
               </div>
-
-              {!isInlineVideoStarted && (
-                <motion.p
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: [0.45, 0.9, 0.45], y: [0, -3, 0] }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                  className="mt-4 text-center text-white/70 text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.14em] uppercase"
-                >
-                  Önce Bilgilendirme Videosunu İzle
-                </motion.p>
-              )}
 
               {/* Floating glow behind video */}
               <div className="absolute -inset-10 bg-[#E70000] rounded-full filter blur-[120px] opacity-[0.06] -z-10 pointer-events-none" />
