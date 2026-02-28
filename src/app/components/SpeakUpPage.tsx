@@ -323,7 +323,20 @@ export default function SpeakUpPage() {
   const startInlineVideo = (event?: { stopPropagation?: () => void }) => {
     event?.stopPropagation?.();
     setIsInlineVideoStarted(true);
+    setIsMuted(true);
+  };
+
+  const enableInlineSound = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.();
     setIsMuted(false);
+    postToPlayer(inlineIframeRef.current, 'setMuted', false);
+    postToPlayer(inlineIframeRef.current, 'setVolume', 1);
+    postToPlayer(inlineIframeRef.current, 'play');
+    window.setTimeout(() => {
+      postToPlayer(inlineIframeRef.current, 'setMuted', false);
+      postToPlayer(inlineIframeRef.current, 'setVolume', 1);
+      postToPlayer(inlineIframeRef.current, 'play');
+    }, 220);
   };
 
   const enableFullscreenSound = (event?: { stopPropagation?: () => void }) => {
@@ -633,6 +646,16 @@ export default function SpeakUpPage() {
                         <Maximize2 size={12} />
                         TAM EKRAN
                       </button>
+                      {isMuted && (
+                        <button
+                          onClick={enableInlineSound}
+                          className="absolute inset-0 flex items-center justify-center bg-[#00000B]/15 cursor-pointer"
+                        >
+                          <span className="px-5 py-3 rounded-full bg-[#324D47]/92 border border-white/20 text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.08em] uppercase">
+                            Ekrana Dokun: Sesi Aç
+                          </span>
+                        </button>
+                      )}
                     </>
                   ) : (
                     <>
