@@ -359,9 +359,7 @@ export default function PlacementExamPage() {
     if (remainingSeconds <= 0) {
       if (!timerSubmissionTriggeredRef.current) {
         timerSubmissionTriggeredRef.current = true;
-        const completionStatus: SubmissionStatus =
-          snapshotRef.current.metrics.unansweredCount === 0 ? 'completed' : 'time_limit_reached';
-        void sendExamResult(completionStatus);
+        void sendExamResult('time_limit_reached');
       }
       return;
     }
@@ -614,8 +612,8 @@ export default function PlacementExamPage() {
 
                     {currentIndex === questions.length - 1 && (
                       <button
-                        onClick={() => void sendExamResult(remainingSeconds === 0 ? 'completed' : 'time_limit_reached')}
-                        disabled={remainingSeconds > 0 || isSendingResult}
+                        onClick={() => void sendExamResult('completed')}
+                        disabled={isSendingResult}
                         className="h-[42px] px-5 rounded-full bg-[#E70000] hover:bg-[#c40000] text-white text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
                       >
                         SINAVI BİTİR
