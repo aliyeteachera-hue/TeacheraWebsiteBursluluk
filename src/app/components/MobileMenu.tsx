@@ -234,12 +234,12 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                <div className="lg:col-span-8 flex flex-col h-full min-h-0 lg:justify-start lg:pl-12 lg:pt-2 overflow-hidden">
                   
                   {/* Mobile Branding (Visible only on mobile) */}
-                  <div className="lg:hidden mb-2">
+                  <div className="lg:hidden mb-3">
                      <motion.p 
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 }}
-                       className="text-[#E70000] opacity-75 text-[8px] sm:text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.12em] uppercase mb-0"
+                       className="text-[#E70000] opacity-60 text-[10px] sm:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] uppercase mb-0.5"
                      >
                        Premium Education
                      </motion.p>
@@ -247,7 +247,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.3 }}
-                       className="text-[1.36rem] sm:text-[1.44rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white/95 leading-none tracking-[-0.01em]"
+                       className="text-[1.5rem] sm:text-[1.6rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white/95 leading-[1.05] tracking-[-0.005em]"
                      >
                        Menü
                      </motion.h3>
@@ -262,17 +262,17 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                            animate={{ opacity: 1, x: 0 }}
                            transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 + (index * 0.05), ease: "easeOut" }}
                            onClick={() => handleLinkClick(item)}
-                           className="group relative flex flex-1 lg:flex-none min-h-[44px] items-center justify-between py-1.5 lg:py-1.5 transition-all duration-500 min-w-0 text-left"
+                           className="group relative flex flex-1 lg:flex-none min-h-[52px] items-center justify-between py-2 lg:py-1.5 transition-all duration-500 min-w-0 text-left"
                         >
                            <div className="flex items-center gap-2 lg:gap-3 min-w-0">
                               <span className={`
-                                 text-[11px] sm:text-[12px] lg:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/25 w-5 lg:w-5 group-hover:text-[#324D47] transition-colors
+                                 text-[12px] sm:text-[13px] lg:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/32 w-5 lg:w-5 group-hover:text-[#324D47] transition-colors
                               `}>
                                  0{index + 1}
                               </span>
                               
                               <span className={`
-                                 text-[1.24rem] sm:text-[1.32rem] lg:text-[1.42rem] xl:text-[1.58rem] font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.06] break-words min-w-0
+                                 text-[1.34rem] sm:text-[1.44rem] lg:text-[1.42rem] xl:text-[1.58rem] font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.12] break-words min-w-0
                                  ${item.highlight ? 'text-[#E70000]' : 'text-[#ffffff]/80 group-hover:text-white group-hover:translate-x-2'}
                               `}>
                                  {item.label}
@@ -289,7 +289,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                   </nav>
 
                   {/* Mobile Footer & Actions */}
-                  <div className="lg:hidden mt-2 border-t border-[#ffffff]/10 pt-2 shrink-0">
+                  <div className="lg:hidden mt-2 border-t border-[#ffffff]/10 pt-3 shrink-0">
                      <motion.button
                         initial={disableMenuAnimations ? false : { opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -298,7 +298,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                           onClose();
                           openLevelAssessment('mobile_menu_level_assessment');
                         }}
-                        className="w-full flex items-center justify-center gap-2 px-5 py-2 mb-2 bg-[#324D47] hover:bg-[#3d5e56] text-white border border-[#324D47] rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] transition-all duration-300"
+                        className="w-full flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#324D47] hover:bg-[#3d5e56] text-white border border-[#324D47] rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] transition-all duration-300"
                      >
                         <span>SEVİYE TESPİT</span>
                      </motion.button>
@@ -307,7 +307,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                         animate={{ opacity: 1, y: 0 }}
                         transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.55 }}
                         onClick={handleLogin}
-                        className="w-full flex items-center justify-center gap-2 px-5 py-2 mb-2 bg-[#ffffff]/5 hover:bg-[#324D47] text-white border border-[#ffffff]/10 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] transition-all duration-300 group"
+                        className="w-full flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#ffffff]/5 hover:bg-[#324D47] text-white border border-[#ffffff]/10 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] transition-all duration-300 group"
                      >
                         <User size={16} className="text-[#324D47] group-hover:text-white transition-colors" />
                         <span>GİRİŞ YAP</span>

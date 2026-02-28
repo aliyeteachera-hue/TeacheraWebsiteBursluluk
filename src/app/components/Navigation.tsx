@@ -25,18 +25,18 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
   const isSpeakUpPage = location.pathname === '/speakup';
   const navHeightClass = isSpeakUpPage
     ? scrolled
-      ? 'h-[62px] md:h-[74px]'
-      : 'h-[80px] md:h-[108px]'
+      ? 'h-[66px] md:h-[74px]'
+      : 'h-[84px] md:h-[108px]'
     : scrolled
-      ? 'h-[68px] md:h-[76px]'
-      : 'h-[88px] md:h-[112px]';
+      ? 'h-[72px] md:h-[76px]'
+      : 'h-[92px] md:h-[112px]';
   const logoSizeClass = isSpeakUpPage
     ? scrolled
-      ? 'w-[96px] sm:w-[108px] md:w-[122px]'
-      : 'w-[108px] sm:w-[120px] md:w-[142px]'
+      ? 'w-[102px] sm:w-[108px] md:w-[122px]'
+      : 'w-[116px] sm:w-[124px] md:w-[142px]'
     : scrolled
-      ? 'w-[106px] sm:w-[118px] md:w-[128px]'
-      : 'w-[118px] sm:w-[130px] md:w-[146px]';
+      ? 'w-[114px] sm:w-[122px] md:w-[128px]'
+      : 'w-[130px] sm:w-[138px] md:w-[146px]';
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const next = latest > 40;
@@ -135,7 +135,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
           </motion.div>
 
           {/* ═══ Right: CTAs + Menu ═══ */}
-          <div className={`flex items-center ${isSpeakUpPage ? 'gap-1.5 sm:gap-2.5' : 'gap-2 sm:gap-3.5'}`}>
+          <div className={`flex items-center ${isSpeakUpPage ? 'gap-2 sm:gap-2.5' : 'gap-2.5 sm:gap-3.5'}`}>
 
             {/* ── SpeakUP page: "Hemen Başvur" red CTA ── */}
             {isSpeakUpPage ? (
@@ -160,7 +160,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={scrollToSpeakUpForm}
-                  className="md:hidden mobile-speakup-cta-text flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[10px] sm:text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.03em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-md shadow-[#E70000]/15"
+                  className="md:hidden mobile-speakup-cta-text flex items-center gap-1 px-3 sm:px-4 py-2 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[11px] sm:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.03em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-md shadow-[#E70000]/15"
                 >
                   BAŞVUR
                   <ArrowUpRight size={10} />
@@ -200,7 +200,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={() => openFreeTrial('navigation_mobile_free_trial')}
-                  className="md:hidden mobile-nav-cta-text px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 text-[10px] sm:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
+                  className="md:hidden mobile-nav-cta-text px-3.5 sm:px-5 py-2 sm:py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 text-[11px] sm:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
                 >
                   Ücretsiz Seans
                 </motion.button>
@@ -208,7 +208,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
             )}
 
             {/* Divider */}
-            <div className={`w-px bg-white/[0.08] ${isSpeakUpPage ? 'h-5' : 'h-6'}`} />
+            <div className={`w-px bg-white/[0.08] ${isSpeakUpPage ? 'h-6' : 'h-7'}`} />
 
             {/* ═══ Menu Pill ═══ */}
             <motion.button
@@ -223,13 +223,13 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
               }`}
               aria-label="Toggle menu"
             >
-              <div className={`flex items-center gap-2 sm:gap-3 rounded-full border border-white/[0.12] sm:border-white/[0.1] bg-transparent sm:bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu ${isSpeakUpPage ? 'px-2.5 sm:px-5 py-1.5 sm:py-2.5' : 'px-3 sm:px-5 py-1.5 sm:py-2.5'}`}>
-                <span className={`${isSpeakUpPage ? 'hidden sm:inline' : 'inline'} font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.16em] uppercase text-white/55 group-hover/menu:text-white/82 transition-colors duration-300`}>
+              <div className={`flex items-center gap-2.5 sm:gap-3 rounded-full border border-white/[0.12] sm:border-white/[0.1] bg-transparent sm:bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu ${isSpeakUpPage ? 'px-3 sm:px-5 py-2 sm:py-2.5' : 'px-3.5 sm:px-5 py-2 sm:py-2.5'}`}>
+                <span className="inline font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.12em] uppercase text-white/62 group-hover/menu:text-white/85 transition-colors duration-300">
                   Menü
                 </span>
                 <div className="flex flex-col items-end gap-[3px]">
-                  <span className="block w-[17px] sm:w-[20px] h-[1.5px] bg-white/60 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
-                  <span className="block w-[12px] sm:w-[15px] h-[1.5px] bg-white/40 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
+                  <span className="block w-[18px] sm:w-[20px] h-[1.5px] bg-white/62 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
+                  <span className="block w-[13px] sm:w-[15px] h-[1.5px] bg-white/45 rounded-full group-hover/menu:w-[22px] group-hover/menu:bg-white transition-all duration-300" />
                 </div>
               </div>
             </motion.button>

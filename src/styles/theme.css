@@ -288,11 +288,11 @@ html.teachera-reduce-motion [class*='blur-'] {
 /* Mobile readability pass */
 @media (max-width: 767px) {
   :root {
-    --font-size: 17px;
+    --font-size: 17.5px;
   }
 
   body {
-    line-height: 1.55;
+    line-height: 1.58;
   }
 
   /* Lift very small utility text sizes for touch-first readability */
@@ -307,13 +307,13 @@ html.teachera-reduce-motion [class*='blur-'] {
   }
 
   .text-\[10px\] {
-    font-size: 13px !important;
+    font-size: 13.5px !important;
     line-height: 1.45 !important;
   }
 
   .text-\[11px\] {
     font-size: 14px !important;
-    line-height: 1.45 !important;
+    line-height: 1.5 !important;
   }
 
   .text-\[12px\] {
@@ -321,22 +321,50 @@ html.teachera-reduce-motion [class*='blur-'] {
     line-height: 1.5 !important;
   }
 
+  .text-\[13px\] {
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+  }
+
+  .text-\[14px\] {
+    font-size: 16px !important;
+    line-height: 1.55 !important;
+  }
+
   .text-xs {
-    font-size: 0.875rem !important;
-    line-height: 1.45 !important;
+    font-size: 0.9375rem !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Reduce excessive letter-spacing on small screens for better word recognition */
+  .tracking-\[0\.5em\],
+  .tracking-\[0\.4em\],
+  .tracking-\[0\.35em\],
+  .tracking-\[0\.3em\] {
+    letter-spacing: 0.14em !important;
+  }
+
+  .tracking-\[0\.25em\],
+  .tracking-\[0\.2em\] {
+    letter-spacing: 0.1em !important;
+  }
+
+  .tracking-\[0\.16em\],
+  .tracking-\[0\.15em\] {
+    letter-spacing: 0.08em !important;
   }
 
   /* Keep top navbar free-trial CTA balanced after global text scaling */
   .mobile-nav-cta-text {
-    font-size: 12px !important;
-    line-height: 1.25 !important;
-    letter-spacing: 0.06em !important;
+    font-size: 13px !important;
+    line-height: 1.28 !important;
+    letter-spacing: 0.05em !important;
   }
 
   /* SpeakUP navbar apply CTA balance */
   .mobile-speakup-cta-text {
-    font-size: 11px !important;
-    line-height: 1.2 !important;
-    letter-spacing: 0.04em !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+    letter-spacing: 0.035em !important;
   }
 }

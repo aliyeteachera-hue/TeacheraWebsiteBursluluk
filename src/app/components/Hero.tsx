@@ -230,7 +230,7 @@ export default function Hero() {
             className="max-w-2xl mx-auto mb-5 sm:mb-8 md:mb-12 text-center"
           >
             {/* Top line */}
-            <p className="text-[#EEEBF5]/80 text-[11px] sm:text-sm md:text-base lg:text-lg mb-2 sm:mb-3 md:mb-4 font-['Neutraface_2_Text:Book',sans-serif]">
+            <p className="text-[#EEEBF5]/82 text-[12px] sm:text-sm md:text-base lg:text-lg mb-2 sm:mb-3 md:mb-4 font-['Neutraface_2_Text:Book',sans-serif]">
               Yabancı eğitmenler ve özelleştirilmiş metodolojimizle
             </p>
 
@@ -242,7 +242,7 @@ export default function Hero() {
                   initial={{ opacity: 0, scale: 0.7, y: 12 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 1.1 + i * 0.1, type: 'spring', bounce: 0.35 }}
-                  className="inline-flex items-center px-2 py-px sm:px-2.5 sm:py-0.5 md:px-3 md:py-1 rounded-full border border-[#ffffff]/25 bg-[#ffffff]/8 backdrop-blur-sm text-[#ffffff]/80 text-[10px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/12 hover:border-[#ffffff]/40 hover:text-[#ffffff] transition-all cursor-default"
+                  className="inline-flex items-center px-2.5 py-0.5 sm:px-2.5 sm:py-0.5 md:px-3 md:py-1 rounded-full border border-[#ffffff]/25 bg-[#ffffff]/8 backdrop-blur-sm text-[#ffffff]/82 text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/12 hover:border-[#ffffff]/40 hover:text-[#ffffff] transition-all cursor-default"
                   whileHover={{ scale: 1.07, y: -2 }}
                 >
                   {lang}
@@ -257,7 +257,7 @@ export default function Hero() {
               transition={{ duration: 0.6, delay: 1.75 }}
               className="inline-flex flex-col items-center gap-1"
             >
-              <p className="text-[#EEEBF5]/80 text-[11px] sm:text-sm md:text-base lg:text-lg font-['Neutraface_2_Text:Book',sans-serif]">
+              <p className="text-[#EEEBF5]/82 text-[12px] sm:text-sm md:text-base lg:text-lg font-['Neutraface_2_Text:Book',sans-serif]">
                 dillerini{' '}
                 <span className="relative inline-block text-[#ffffff] font-['Neutraface_2_Text:Demi',sans-serif]">
                   konuşarak öğren
@@ -290,7 +290,7 @@ export default function Hero() {
               arcDuration={8}
               arcColor="#324D47"
               disableAnimation={!enableHeroMotion}
-              className="group px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 border border-[#324D47]/60 backdrop-blur-sm text-[#ffffff] rounded-full text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/20 hover:border-[#324D47] transition-all flex items-center gap-2"
+              className="group px-4 sm:px-5 md:px-6 py-2 sm:py-2 md:py-2.5 border border-[#324D47]/60 backdrop-blur-sm text-[#ffffff] rounded-full text-[12px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/20 hover:border-[#324D47] transition-all flex items-center gap-2"
               onClick={() => openFreeTrial('hero_free_trial')}
             >
               Ücretsiz Deneme Seansı
@@ -301,7 +301,7 @@ export default function Hero() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="group px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 border border-[#ffffff]/40 backdrop-blur-sm text-[#ffffff] rounded-full text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/5 hover:border-[#ffffff]/60 transition-all"
+              className="group px-4 sm:px-5 md:px-6 py-2 sm:py-2 md:py-2.5 border border-[#ffffff]/40 backdrop-blur-sm text-[#ffffff] rounded-full text-[12px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/5 hover:border-[#ffffff]/60 transition-all"
               onClick={() => openLevelAssessment('hero_level_assessment')}
             >
               Seviyeni Öğren
