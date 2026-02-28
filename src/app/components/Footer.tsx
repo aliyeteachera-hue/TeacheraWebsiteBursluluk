@@ -90,7 +90,7 @@ export default function Footer() {
                 </p>
 
                 {/* Working Hours */}
-                <div className="flex items-start gap-3 bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+                <div className="hidden md:flex items-start gap-3 bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
                    <Clock size={15} className="text-[#4A7067] mt-0.5 shrink-0" />
                    <div className="flex-1">
                       <h4 className="text-[11px] text-[#4A7067] font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.15em] mb-1.5">Çalışma Saatleri</h4>
@@ -292,6 +292,17 @@ export default function Footer() {
                    <div>
                       <h4 className="text-[13px] text-white/50 mb-1">Ortaklıklar için</h4>
                       <a href="mailto:partners@teachera.com.tr" className="text-[17px] text-white hover:text-[#6A9B8F] transition-colors block">partners@teachera.com.tr</a>
+                   </div>
+                </div>
+
+                {/* Mobile Working Hours (shown under contact on phones) */}
+                <div className="md:hidden flex items-start gap-3 bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+                   <Clock size={15} className="text-[#4A7067] mt-0.5 shrink-0" />
+                   <div className="flex-1">
+                      <h4 className="text-[11px] text-[#4A7067] font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.15em] mb-1.5">Çalışma Saatleri</h4>
+                      <p className="text-[13px] text-white/90 font-['Neutraface_2_Text:Demi',sans-serif]">
+                        Her Gün <span className="text-white/40 mx-1">·</span> 09:00 – 21:30
+                      </p>
                    </div>
                 </div>
              </div>
