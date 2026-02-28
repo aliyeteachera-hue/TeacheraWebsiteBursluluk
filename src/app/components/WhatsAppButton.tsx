@@ -241,10 +241,22 @@ export function WhatsAppButton() {
         </div>
       </motion.button>
 
+      {!isExpanded && (
+        <motion.div
+          className="md:hidden pointer-events-none absolute right-full mr-2.5 top-1/2 -translate-y-1/2 bg-[#00000B]/88 backdrop-blur-[2px] text-[#ffffff] px-2.5 py-1 rounded-lg whitespace-nowrap border border-white/10"
+          initial={{ opacity: 0, x: 6, scale: 0.98 }}
+          animate={{ opacity: 0.95, x: 0, scale: 1 }}
+          transition={{ duration: 0.28, ease: 'easeOut' }}
+        >
+          <p className="text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.03em] text-white/90">Muazzez'e yaz</p>
+          <div className="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-4 border-l-[#00000B]" />
+        </motion.div>
+      )}
+
       <AnimatePresence>
         {(isHovered || showSoftPrompt) && !isExpanded && (
           <motion.div
-            className="hidden md:block absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-[#00000B]/88 backdrop-blur-[2px] text-[#ffffff] px-3.5 py-1.5 rounded-lg whitespace-nowrap border border-white/10"
+            className="hidden md:block pointer-events-none absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-[#00000B]/88 backdrop-blur-[2px] text-[#ffffff] px-3.5 py-1.5 rounded-lg whitespace-nowrap border border-white/10"
             initial={{ opacity: 0, x: 8, scale: 0.98 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 8, scale: 0.98 }}
