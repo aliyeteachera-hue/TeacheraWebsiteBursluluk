@@ -141,7 +141,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
           </div>
 
           {/* CONTENT CONTAINER */}
-          <div className="relative z-10 w-full h-full min-h-0 max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col pt-24 lg:pt-0">
+          <div className="relative z-10 w-full h-full min-h-0 max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col pt-20 lg:pt-0">
             
             {/* Close Button - Always visible on top */}
             <motion.button
@@ -237,7 +237,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                <div className="lg:col-span-8 flex flex-col h-full min-h-0 lg:justify-start lg:pl-12 lg:pt-2 overflow-hidden">
                   
                   {/* Mobile Branding (Visible only on mobile) */}
-                  <div className="lg:hidden mb-3">
+                  <div className="lg:hidden mb-2">
                      <motion.p 
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
@@ -250,14 +250,14 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.3 }}
-                       className="text-[1.35rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-tight"
+                       className="text-[1.25rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-tight"
                      >
                        Menü
                      </motion.h3>
                   </div>
 
                   {/* Navigation Links */}
-                  <nav className="grid grid-cols-2 lg:grid-cols-2 gap-x-4 lg:gap-x-8 gap-y-1.5 lg:gap-y-2 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1 content-start">
+                  <nav className="flex flex-col gap-1 lg:gap-1.5 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1">
                      {menuItems.map((item, index) => (
                         <motion.button
                            key={item.id}
@@ -265,17 +265,17 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                            animate={{ opacity: 1, x: 0 }}
                            transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 + (index * 0.05), ease: "easeOut" }}
                            onClick={() => handleLinkClick(item)}
-                           className="group relative flex items-center justify-between py-1.5 lg:py-2 transition-all duration-500 min-w-0 text-left"
+                           className="group relative flex items-center justify-between py-1 lg:py-1.5 transition-all duration-500 min-w-0 text-left"
                         >
-                           <div className="flex items-center gap-2.5 lg:gap-4 min-w-0">
+                           <div className="flex items-center gap-2 lg:gap-3 min-w-0">
                               <span className={`
-                                 text-[10px] lg:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/20 w-4 lg:w-5 group-hover:text-[#324D47] transition-colors
+                                 text-[10px] lg:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/20 w-4 lg:w-5 group-hover:text-[#324D47] transition-colors
                               `}>
                                  0{index + 1}
                               </span>
                               
                               <span className={`
-                                 text-[1.03rem] sm:text-[1.08rem] lg:text-[1.7rem] xl:text-[2rem] font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.08] break-words min-w-0
+                                 text-[1.02rem] sm:text-[1.07rem] lg:text-[1.42rem] xl:text-[1.58rem] font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.08] break-words min-w-0
                                  ${item.highlight ? 'text-[#E70000]' : 'text-[#ffffff]/80 group-hover:text-white group-hover:translate-x-2'}
                               `}>
                                  {item.label}
@@ -283,7 +283,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                            </div>
 
                            <div className={`
-                              hidden lg:flex w-10 h-10 rounded-full border border-[#ffffff]/10 items-center justify-center opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 group-hover:border-[#324D47]
+                              hidden lg:flex w-9 h-9 rounded-full border border-[#ffffff]/10 items-center justify-center opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 group-hover:border-[#324D47]
                            `}>
                               <ArrowRight size={16} className="text-[#324D47]" />
                            </div>
@@ -292,7 +292,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                   </nav>
 
                   {/* Mobile Footer & Actions */}
-                  <div className="lg:hidden mt-3 border-t border-[#ffffff]/10 pt-3 shrink-0">
+                  <div className="lg:hidden mt-2 border-t border-[#ffffff]/10 pt-2 shrink-0">
                      <motion.button
                         initial={disableMenuAnimations ? false : { opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -301,7 +301,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                           onClose();
                           openLevelAssessment('mobile_menu_level_assessment');
                         }}
-                        className="w-full flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#324D47] hover:bg-[#3d5e56] text-white border border-[#324D47] rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] transition-all duration-300"
+                        className="w-full flex items-center justify-center gap-2 px-5 py-2 mb-2 bg-[#324D47] hover:bg-[#3d5e56] text-white border border-[#324D47] rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] transition-all duration-300"
                      >
                         <span>SEVİYE TESPİT</span>
                      </motion.button>
@@ -310,7 +310,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                         animate={{ opacity: 1, y: 0 }}
                         transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.55 }}
                         onClick={handleLogin}
-                        className="w-full flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#ffffff]/5 hover:bg-[#324D47] text-white border border-[#ffffff]/10 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] transition-all duration-300 group"
+                        className="w-full flex items-center justify-center gap-2 px-5 py-2 mb-2 bg-[#ffffff]/5 hover:bg-[#324D47] text-white border border-[#ffffff]/10 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] transition-all duration-300 group"
                      >
                         <User size={16} className="text-[#324D47] group-hover:text-white transition-colors" />
                         <span>GİRİŞ YAP</span>
