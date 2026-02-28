@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { Outlet, useLocation } from 'react-router';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import Navigation from './Navigation';
 import MobileMenu from './MobileMenu';
 import Footer from './Footer';
@@ -237,6 +238,8 @@ export default function RootLayout() {
               <CookieConsent />
             </Suspense>
           )}
+
+          <SpeedInsights sampleRate={0.5} />
         </motion.div>
       </LevelAssessmentProvider>
     </FreeTrialProvider>
