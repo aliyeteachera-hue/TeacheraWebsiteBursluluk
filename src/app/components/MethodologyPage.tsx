@@ -1,9 +1,10 @@
-import { motion, useInView, useScroll, useTransform } from 'motion/react';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
 import { RotateCcw, ArrowRight, Play, MessageCircle, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
+import methodologyHeroVideo from '../../assets/video/methodology-hero.mp4';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
 import Group1000004255 from '../../imports/Group1000004255';
 import TeachingMethod from './TeachingMethod';
@@ -77,19 +78,45 @@ function HeroSection() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const shouldReduceMotion = useReducedMotion();
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setShouldLoadVideo(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setShouldLoadVideo(true), 220);
+    return () => window.clearTimeout(timer);
+  }, [shouldReduceMotion]);
 
   return (
     <section ref={ref} className="relative h-auto min-h-[80vh] md:min-h-[88vh] overflow-hidden">
       {/* Video background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#00000B]/75 via-[#00000B]/45 to-[#00000B]/90 z-10" />
-        <iframe
-          src="https://player.vimeo.com/video/1168523589?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1&background=1"
-          allow="autoplay; fullscreen; picture-in-picture"
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full object-cover"
-          style={{ border: 'none' }}
-          title="Teachera Teaching Method"
-        />
+        {shouldLoadVideo ? (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+          >
+            <source src={methodologyHeroVideo} type="video/mp4" />
+          </video>
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(70% 60% at 50% 40%, rgba(50,77,71,0.45) 0%, rgba(0,0,11,0.85) 68%, rgba(0,0,11,1) 100%)',
+            }}
+          />
+        )}
       </div>
 
       {/* Content */}

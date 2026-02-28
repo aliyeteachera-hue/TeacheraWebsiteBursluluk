@@ -2,6 +2,7 @@ import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react'
 import { useRef, useEffect, useState, type ReactNode } from 'react';
 import { ChevronDown, Play } from 'lucide-react';
 import Group1000004255 from '../../imports/Group1000004255';
+import homeHeroVideo from '../../assets/video/home-hero.mp4';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
 
@@ -168,14 +169,17 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-br from-[#00000B]/70 via-[#324D47]/50 to-[#00000B]/70 z-10" />
         {shouldLoadVideo ? (
           <div className="absolute inset-0 w-full h-full pointer-events-none">
-            <iframe 
-              src="https://player.vimeo.com/video/1167812393?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1&background=1&playsinline=1&dnt=1&quality=540p" 
-              frameBorder="0" 
-              allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
-              className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 w-[177.77vh] h-[56.25vw] object-cover"
-              loading="lazy"
-              title="Teachera Hero Video"
-            />
+            <video
+              className="absolute inset-0 w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-hidden="true"
+            >
+              <source src={homeHeroVideo} type="video/mp4" />
+            </video>
           </div>
         ) : (
           <div
