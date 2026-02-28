@@ -122,18 +122,18 @@ export default function Academy() {
             className="w-full group cursor-pointer"
             onClick={goToFeatured}
           >
-            <div className="relative h-[220px] sm:h-[300px] md:h-[380px] rounded-[24px] overflow-hidden bg-[#0a0a10] shadow-lg shadow-[#324D47]/10 hover:shadow-xl hover:shadow-[#324D47]/15 transition-shadow duration-500">
-              <ImageWithFallback
-                src={featured.image}
-                alt={featured.title}
-                className="w-full h-full object-contain sm:object-cover object-center opacity-85 transition-transform duration-[2s] ease-out sm:group-hover:scale-[1.04]"
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#00000B] via-[#00000B]/30 to-transparent" />
+            <div className="relative rounded-[24px] overflow-hidden bg-[#0a0a10] shadow-lg shadow-[#324D47]/10 hover:shadow-xl hover:shadow-[#324D47]/15 transition-shadow duration-500">
+              <div className="relative h-[260px] sm:h-[320px] md:h-[380px]">
+                <ImageWithFallback
+                  src={featured.image}
+                  alt={featured.title}
+                  className="w-full h-full object-cover object-center opacity-90 transition-transform duration-[2s] ease-out md:group-hover:scale-[1.04]"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#00000B]/80 via-[#00000B]/25 to-transparent md:from-[#00000B] md:via-[#00000B]/30 md:to-transparent" />
 
-              <div className="absolute bottom-0 left-0 p-6 md:p-9 w-full md:w-3/4 flex flex-col items-start gap-2.5">
-                <div className="flex items-center gap-2">
+                <div className="absolute top-4 left-4 flex items-center gap-2">
                   <span className="px-2.5 py-0.5 bg-[#E70000] text-white text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] uppercase rounded-md">
                     Editörün Seçimi
                   </span>
@@ -141,22 +141,39 @@ export default function Academy() {
                     {featured.categoryLabel}
                   </span>
                 </div>
-                <h2 className="text-2xl md:text-4xl font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-[1.1]">
-                  {featured.title}
-                </h2>
-                <p className="text-white/60 text-sm md:text-base line-clamp-2 max-w-lg font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed">
-                  {featured.excerpt}
-                </p>
-                <div className="flex items-center gap-5 text-white/40 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.12em] mt-1">
-                  <span className="flex items-center gap-1.5"><User size={11} /> {featured.author}</span>
-                  <span className="flex items-center gap-1.5"><Calendar size={11} /> {featured.date}</span>
-                  <span className="flex items-center gap-1.5"><Clock size={11} /> {featured.readTime}</span>
+
+                <div className="hidden md:flex absolute bottom-0 left-0 p-6 md:p-9 w-full md:w-3/4 flex-col items-start gap-2.5">
+                  <h2 className="text-2xl md:text-4xl font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-[1.1]">
+                    {featured.title}
+                  </h2>
+                  <p className="text-white/60 text-sm md:text-base line-clamp-2 max-w-lg font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed">
+                    {featured.excerpt}
+                  </p>
+                  <div className="flex items-center gap-5 text-white/40 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.12em] mt-1">
+                    <span className="flex items-center gap-1.5"><User size={11} /> {featured.author}</span>
+                    <span className="flex items-center gap-1.5"><Calendar size={11} /> {featured.date}</span>
+                    <span className="flex items-center gap-1.5"><Clock size={11} /> {featured.readTime}</span>
+                  </div>
+                </div>
+
+                <div className="absolute top-5 right-5 hidden md:flex">
+                  <div className="w-11 h-11 rounded-full bg-white/[0.06] backdrop-blur-md border border-white/10 flex items-center justify-center text-white/50 group-hover:bg-[#E70000] group-hover:border-[#E70000] group-hover:text-white group-hover:rotate-45 transition-all duration-300">
+                    <ArrowUpRight size={18} />
+                  </div>
                 </div>
               </div>
 
-              <div className="absolute top-5 right-5 hidden md:flex">
-                <div className="w-11 h-11 rounded-full bg-white/[0.06] backdrop-blur-md border border-white/10 flex items-center justify-center text-white/50 group-hover:bg-[#E70000] group-hover:border-[#E70000] group-hover:text-white group-hover:rotate-45 transition-all duration-300">
-                  <ArrowUpRight size={18} />
+              <div className="md:hidden p-5">
+                <h2 className="text-[1.15rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-[1.2] mb-2">
+                  {featured.title}
+                </h2>
+                <p className="text-white/62 text-[13px] line-clamp-3 font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed mb-3">
+                  {featured.excerpt}
+                </p>
+                <div className="flex items-center gap-3 text-white/45 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.1em]">
+                  <span className="flex items-center gap-1"><Calendar size={10} /> {featured.date}</span>
+                  <span className="w-[3px] h-[3px] rounded-full bg-white/30" />
+                  <span className="flex items-center gap-1"><Clock size={10} /> {featured.readTime}</span>
                 </div>
               </div>
             </div>
@@ -178,7 +195,7 @@ export default function Academy() {
                   <ImageWithFallback
                     src={article.image}
                     alt={article.title}
-                    className="w-full h-full object-contain sm:object-cover object-center transition-transform duration-700 ease-out sm:group-hover:scale-[1.06]"
+                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out md:group-hover:scale-[1.06]"
                     loading="lazy"
                     decoding="async"
                   />
