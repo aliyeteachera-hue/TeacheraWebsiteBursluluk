@@ -120,7 +120,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex items-center gap-1.5 sm:gap-2.5 md:gap-3.5"
+                className="flex items-center gap-2 sm:gap-3 md:gap-3.5"
               >
                 <span className={`hidden sm:inline text-white/25 font-['Neutraface_2_Text:Book',sans-serif] transition-all duration-700 ${scrolled ? 'text-[12px] md:text-[16px]' : 'text-[14px] md:text-[20px]'}`}>
                   &amp;
@@ -128,7 +128,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                 <img
                   src={neuLogoImg}
                   alt="Necmettin Erbakan Üniversitesi"
-                  className={`object-contain transition-all duration-700 opacity-70 ${scrolled ? 'h-[15px] sm:h-[19px] md:h-[26px]' : 'h-[18px] sm:h-[23px] md:h-[32px]'}`}
+                  className={`object-contain transition-all duration-700 opacity-85 ${scrolled ? 'h-[17px] sm:h-[22px] md:h-[26px]' : 'h-[21px] sm:h-[27px] md:h-[32px]'}`}
                 />
               </motion.div>
             )}
@@ -160,10 +160,10 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={scrollToSpeakUpForm}
-                  className="md:hidden flex items-center gap-1.5 px-3 sm:px-4.5 py-1.5 sm:py-2 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[10px] sm:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-lg shadow-[#E70000]/20"
+                  className="md:hidden mobile-speakup-cta-text flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[10px] sm:text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.04em] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-md shadow-[#E70000]/15"
                 >
                   BASVUR
-                  <ArrowUpRight size={11} />
+                  <ArrowUpRight size={10} />
                 </motion.button>
               </>
             ) : (

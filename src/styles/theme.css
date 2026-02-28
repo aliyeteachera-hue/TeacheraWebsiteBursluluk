@@ -332,4 +332,11 @@ html.teachera-reduce-motion [class*='blur-'] {
     line-height: 1.25 !important;
     letter-spacing: 0.06em !important;
   }
+
+  /* SpeakUP navbar apply CTA balance */
+  .mobile-speakup-cta-text {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.04em !important;
+  }
 }
