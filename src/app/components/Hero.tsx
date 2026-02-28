@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { useRef, useEffect, useState, type ReactNode } from 'react';
 import { ChevronDown, Play } from 'lucide-react';
 import Group1000004255 from '../../imports/Group1000004255';
@@ -12,14 +12,17 @@ function OrbitingArcButton({
   onClick,
   arcDuration = 8,
   arcColor = '#E70000',
+  disableAnimation = false,
 }: {
   children: ReactNode;
   className?: string;
   onClick?: () => void;
   arcDuration?: number;
   arcColor?: string;
+  disableAnimation?: boolean;
 }) {
   const btnRef = useRef<HTMLButtonElement>(null);
+  const shouldReduceMotion = useReducedMotion();
   const [dims, setDims] = useState({ w: 210, h: 44 });
 
   useEffect(() => {
@@ -74,6 +77,12 @@ function OrbitingArcButton({
           {layers.map((layer, i) => {
             const arcLen = perimeter * layer.lengthRatio;
             const gap = perimeter - arcLen;
+            const animationProps = shouldReduceMotion || disableAnimation
+              ? {}
+              : {
+                  animate: { strokeDashoffset: [0, -perimeter] },
+                  transition: { duration: arcDuration, repeat: Infinity, ease: 'linear' },
+                };
             return (
               <motion.rect
                 key={i}
@@ -87,8 +96,7 @@ function OrbitingArcButton({
                 strokeLinecap="round"
                 strokeDasharray={`${arcLen} ${gap}`}
                 style={{ opacity: layer.opacity }}
-                animate={{ strokeDashoffset: [0, -perimeter] }}
-                transition={{ duration: arcDuration, repeat: Infinity, ease: 'linear' }}
+                {...animationProps}
               />
             );
           })}
@@ -107,8 +115,43 @@ export default function Hero() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const shouldReduceMotion = useReducedMotion();
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const [enableDesktopEffects, setEnableDesktopEffects] = useState(false);
   const { open: openLevelAssessment } = useLevelAssessment();
   const { open: openFreeTrial } = useFreeTrial();
+
+  useEffect(() => {
+    let timer = 0;
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+
+    const updateVideoState = () => {
+      window.clearTimeout(timer);
+      const shouldEnableDesktopEffects = !shouldReduceMotion && mediaQuery.matches;
+      setEnableDesktopEffects(shouldEnableDesktopEffects);
+
+      if (!shouldEnableDesktopEffects) {
+        setShouldLoadVideo(false);
+        return;
+      }
+      timer = window.setTimeout(() => setShouldLoadVideo(true), 320);
+    };
+
+    updateVideoState();
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', updateVideoState);
+      return () => {
+        window.clearTimeout(timer);
+        mediaQuery.removeEventListener('change', updateVideoState);
+      };
+    }
+
+    mediaQuery.addListener(updateVideoState);
+    return () => {
+      window.clearTimeout(timer);
+      mediaQuery.removeListener(updateVideoState);
+    };
+  }, [shouldReduceMotion]);
 
   const scrollToNext = () => {
     const element = document.getElementById('how-it-works');
@@ -118,17 +161,28 @@ export default function Hero() {
   return (
     <section id="home" className="relative h-[100svh] overflow-hidden bg-[#00000B]">
       {/* Background Video with Parallax */}
-      <motion.div style={{ y }} className="absolute inset-0">
+      <motion.div style={enableDesktopEffects ? { y } : undefined} className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-[#00000B]/70 via-[#324D47]/50 to-[#00000B]/70 z-10" />
-        <div className="absolute inset-0 w-full h-full pointer-events-none">
-          <iframe 
-            src="https://player.vimeo.com/video/1167812393?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1&background=1" 
-            frameBorder="0" 
-            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 w-[177.77vh] h-[56.25vw] object-cover"
-            title="Hero Section Ders"
+        {shouldLoadVideo ? (
+          <div className="absolute inset-0 w-full h-full pointer-events-none">
+            <iframe 
+              src="https://player.vimeo.com/video/1167812393?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1&background=1&dnt=1&quality=540p" 
+              frameBorder="0" 
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
+              className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 w-[177.77vh] h-[56.25vw] object-cover"
+              loading="lazy"
+              title="Teachera Hero Video"
+            />
+          </div>
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(70% 60% at 50% 40%, rgba(50,77,71,0.55) 0%, rgba(0,0,11,0.9) 70%, rgba(0,0,11,1) 100%)',
+            }}
           />
-        </div>
+        )}
       </motion.div>
 
       {/* Content */}
@@ -223,8 +277,9 @@ export default function Hero() {
             <OrbitingArcButton
               arcDuration={8}
               arcColor="#324D47"
+              disableAnimation={!enableDesktopEffects}
               className="group px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 border border-[#324D47]/60 backdrop-blur-sm text-[#ffffff] rounded-full text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/20 hover:border-[#324D47] transition-all flex items-center gap-2"
-              onClick={openFreeTrial}
+              onClick={() => openFreeTrial('hero_free_trial')}
             >
               Ücretsiz Deneme Seansı
               <Play size={14} className="group-hover:translate-x-0.5 transition-transform sm:w-4 sm:h-4" />
@@ -235,7 +290,7 @@ export default function Hero() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="group px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 border border-[#ffffff]/40 backdrop-blur-sm text-[#ffffff] rounded-full text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/5 hover:border-[#ffffff]/60 transition-all"
-              onClick={openLevelAssessment}
+              onClick={() => openLevelAssessment('hero_level_assessment')}
             >
               Seviyeni Öğren
             </motion.button>
@@ -244,7 +299,7 @@ export default function Hero() {
 
         {/* Scroll Indicator — absolute, safe bottom zone */}
         <motion.div
-          style={{ opacity }}
+          style={enableDesktopEffects ? { opacity } : undefined}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4 }}
@@ -252,8 +307,8 @@ export default function Hero() {
         >
           <motion.button
             onClick={scrollToNext}
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            animate={enableDesktopEffects ? { y: [0, 6, 0] } : undefined}
+            transition={enableDesktopEffects ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : undefined}
             className="flex flex-col items-center gap-1 sm:gap-1.5 md:gap-2 text-[#ffffff]/60 hover:text-[#ffffff] transition-colors group"
           >
             {/* Text — hidden on small screens */}
@@ -263,8 +318,8 @@ export default function Hero() {
             {/* Mouse icon — hidden on small screens */}
             <div className="hidden sm:flex w-5 h-8 md:w-6 md:h-10 border-2 border-[#ffffff]/30 rounded-full items-start justify-center p-1.5 md:p-2 group-hover:border-[#ffffff]/60 transition-colors">
               <motion.div
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                animate={enableDesktopEffects ? { y: [0, 8, 0] } : undefined}
+                transition={enableDesktopEffects ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } : undefined}
                 className="w-1 h-1 md:w-1.5 md:h-1.5 bg-[#ffffff]/60 rounded-full"
               />
             </div>

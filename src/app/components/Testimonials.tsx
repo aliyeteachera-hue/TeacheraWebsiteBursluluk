@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import EraSlogan from './EraSlogan';
 import architechtLogo from '../../assets/partners/architecht.png';
@@ -11,6 +11,7 @@ import mebLogo from '../../assets/partners/meb-white.png';
 import unileverLogo from '../../assets/partners/unilever-white.png';
 
 const AUTOPLAY_MS = 6000;
+const AUTOPLAY_TICK_MS = 120;
 
 const testimonials = [
   {
@@ -68,6 +69,8 @@ const partners = [
 export default function Testimonials() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+  const [liteMotionMode, setLiteMotionMode] = useState(false);
   /* progress counts 0 → 100 for the active dot bar */
   const [progress, setProgress] = useState(0);
 
@@ -82,10 +85,29 @@ export default function Testimonials() {
     [current, goTo],
   );
 
-  /* Autoplay tick — 60 fps progress + slide advance */
   useEffect(() => {
-    if (paused) return;
-    const step = 100 / (AUTOPLAY_MS / 16); // ≈ 0.27 per frame
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const updateLiteMode = () => {
+      const lowCoreDevice = typeof navigator.hardwareConcurrency === 'number'
+        ? navigator.hardwareConcurrency <= 4
+        : false;
+      setLiteMotionMode(mediaQuery.matches || lowCoreDevice);
+    };
+
+    updateLiteMode();
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', updateLiteMode);
+      return () => mediaQuery.removeEventListener('change', updateLiteMode);
+    }
+
+    mediaQuery.addListener(updateLiteMode);
+    return () => mediaQuery.removeListener(updateLiteMode);
+  }, []);
+
+  /* Autoplay tick — low-frequency progress + slide advance */
+  useEffect(() => {
+    if (paused || shouldReduceMotion || liteMotionMode) return;
+    const step = 100 / (AUTOPLAY_MS / AUTOPLAY_TICK_MS);
     const id = setInterval(() => {
       setProgress((p) => {
         if (p + step >= 100) {
@@ -94,11 +116,13 @@ export default function Testimonials() {
         }
         return p + step;
       });
-    }, 16);
+    }, AUTOPLAY_TICK_MS);
     return () => clearInterval(id);
-  }, [paused, next]);
+  }, [paused, next, shouldReduceMotion, liteMotionMode]);
 
   const t = testimonials[current];
+  const shouldAnimatePartnerMarquee = !shouldReduceMotion && !liteMotionMode;
+  const marqueePartners = shouldAnimatePartnerMarquee ? [...partners, ...partners] : partners;
 
   return (
     <section
@@ -229,10 +253,14 @@ export default function Testimonials() {
           <div className="flex whitespace-nowrap overflow-hidden">
             <motion.div
               className="flex items-center gap-14 min-w-max"
-              animate={{ x: ['0%', '-50%'] }}
-              transition={{ repeat: Infinity, ease: 'linear', duration: 42 }}
+              animate={shouldAnimatePartnerMarquee ? { x: ['0%', '-50%'] } : undefined}
+              transition={
+                shouldAnimatePartnerMarquee
+                  ? { repeat: Infinity, ease: 'linear', duration: 42 }
+                  : undefined
+              }
             >
-              {[...partners, ...partners].map((p, idx) => (
+              {marqueePartners.map((p, idx) => (
                 <div
                   key={`${p.name}-${idx}`}
                   className={`flex-shrink-0 ${p.frameClass} opacity-[0.22] hover:opacity-50 transition-opacity duration-500 flex items-center justify-center`}

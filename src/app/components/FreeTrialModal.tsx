@@ -66,6 +66,7 @@ export default function FreeTrialModal() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [kvkkConsent, setKvkkConsent] = useState(false);
+  const [contactConsent, setContactConsent] = useState(false);
 
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -100,6 +101,7 @@ export default function FreeTrialModal() {
         setSelectedDate(null);
         setSelectedTime('');
         setKvkkConsent(false);
+        setContactConsent(false);
         setSubmitted(false);
         setLangOpen(false);
         setAgeOpen(false);

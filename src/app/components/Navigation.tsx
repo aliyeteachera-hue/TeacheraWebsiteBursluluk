@@ -25,7 +25,8 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
   const isSpeakUpPage = location.pathname === '/speakup';
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
-    setScrolled(latest > 40);
+    const next = latest > 40;
+    setScrolled((prev) => (prev === next ? prev : next));
   });
 
   const scrollToSection = (sectionId: string) => {

@@ -1,21 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { Outlet, useLocation } from 'react-router';
 import Navigation from './Navigation';
 import MobileMenu from './MobileMenu';
 import Footer from './Footer';
-import { WhatsAppButton } from './WhatsAppButton';
-import CookieConsent from './CookieConsent';
-import LevelAssessmentModal from './LevelAssessment';
 import { LevelAssessmentProvider } from './LevelAssessmentContext';
-import FreeTrialModal from './FreeTrialModal';
 import { FreeTrialProvider } from './FreeTrialContext';
 import SeoManager from './SeoManager';
+import LevelAssessmentModal from './LevelAssessment';
+import FreeTrialModal from './FreeTrialModal';
 import { initTracking, trackPageView } from '../lib/analytics';
+
+const WhatsAppButton = lazy(() =>
+  import('./WhatsAppButton').then((module) => ({ default: module.WhatsAppButton })),
+);
+const CookieConsent = lazy(() => import('./CookieConsent'));
 
 export default function RootLayout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState('home');
+  const [showDeferredUi, setShowDeferredUi] = useState(false);
+  const [forceReducedMotion, setForceReducedMotion] = useState(false);
+  const currentSectionRef = useRef('home');
   const location = useLocation();
 
   useEffect(() => {
@@ -26,6 +32,37 @@ export default function RootLayout() {
   useEffect(() => {
     return initTracking();
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setShowDeferredUi(true);
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const setByDevice = () => {
+      const lowCoreDevice = typeof navigator.hardwareConcurrency === 'number'
+        ? navigator.hardwareConcurrency <= 4
+        : false;
+      setForceReducedMotion(mediaQuery.matches || lowCoreDevice);
+    };
+
+    setByDevice();
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', setByDevice);
+      return () => mediaQuery.removeEventListener('change', setByDevice);
+    }
+
+    mediaQuery.addListener(setByDevice);
+    return () => mediaQuery.removeListener(setByDevice);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('teachera-reduce-motion', forceReducedMotion);
+    return () => document.documentElement.classList.remove('teachera-reduce-motion');
+  }, [forceReducedMotion]);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -45,27 +82,61 @@ export default function RootLayout() {
   }, [location.pathname, location.search]);
 
   useEffect(() => {
+    if (location.pathname !== '/') {
+      setCurrentSection('home');
+      currentSectionRef.current = 'home';
+      return;
+    }
+
+    const shouldTrackScrollSections = window.matchMedia('(min-width: 1024px)').matches;
+    if (!shouldTrackScrollSections) {
+      setCurrentSection('home');
+      currentSectionRef.current = 'home';
+      return;
+    }
+
+    let rafId = 0;
     const handleScroll = () => {
-      const sections = ['home', 'how-it-works', 'delivery-options', 'programs', 'faq'];
-      const scrollPosition = window.scrollY + 100;
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
 
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const offsetTop = element.offsetTop;
-          const offsetBottom = offsetTop + element.offsetHeight;
+        const sections = ['home', 'how-it-works', 'delivery-options', 'programs', 'faq'];
+        const scrollPosition = window.scrollY + 100;
+        let nextSection = currentSectionRef.current;
 
-          if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
-            setCurrentSection(section);
-            break;
+        for (const section of sections) {
+          const element = document.getElementById(section);
+          if (element) {
+            const offsetTop = element.offsetTop;
+            const offsetBottom = offsetTop + element.offsetHeight;
+
+            if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+              nextSection = section;
+              break;
+            }
           }
         }
-      }
+
+        if (nextSection !== currentSectionRef.current) {
+          currentSectionRef.current = nextSection;
+          setCurrentSection(nextSection);
+        }
+      });
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [location.pathname]);
+
+  useEffect(() => {
+    currentSectionRef.current = currentSection;
+  }, [currentSection]);
 
   const isAuthPage = location.pathname === '/giris';
 
@@ -97,10 +168,15 @@ export default function RootLayout() {
 
           {!isAuthPage && <Footer />}
 
-          <WhatsAppButton />
-          <CookieConsent />
           <LevelAssessmentModal />
           <FreeTrialModal />
+
+          {showDeferredUi && (
+            <Suspense fallback={null}>
+              <WhatsAppButton />
+              <CookieConsent />
+            </Suspense>
+          )}
         </motion.div>
       </LevelAssessmentProvider>
     </FreeTrialProvider>

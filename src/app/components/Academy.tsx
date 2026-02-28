@@ -47,7 +47,7 @@ const pickedArticles: Article[] = [
     slug: 'ceviri-hastaligi', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
     title: 'Zihinsel Çeviri Tuzağı: Biliyoruz Ama Konuşamıyoruz',
     excerpt: 'Zihinsel çeviri alışkanlığının akıcılığı nasıl sabote ettiğini ve hedef dilde düşünme geçişini adım adım keşfedin.',
-    image: 'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
+    image: mentalTranslationCollapseImage,
     readTime: '8 dk', author: 'Teachera Uzman Ekibi', date: '27 Şub 2026',
   },
 ];
@@ -122,11 +122,13 @@ export default function Academy() {
             className="w-full group cursor-pointer"
             onClick={goToFeatured}
           >
-            <div className="relative h-[300px] md:h-[380px] rounded-[24px] overflow-hidden bg-[#0a0a10] shadow-lg shadow-[#324D47]/10 hover:shadow-xl hover:shadow-[#324D47]/15 transition-shadow duration-500">
+            <div className="relative h-[220px] sm:h-[300px] md:h-[380px] rounded-[24px] overflow-hidden bg-[#0a0a10] shadow-lg shadow-[#324D47]/10 hover:shadow-xl hover:shadow-[#324D47]/15 transition-shadow duration-500">
               <ImageWithFallback
                 src={featured.image}
                 alt={featured.title}
-                className="w-full h-full object-cover opacity-85 transition-transform duration-[2s] ease-out group-hover:scale-[1.04]"
+                className="w-full h-full object-contain sm:object-cover object-center opacity-85 transition-transform duration-[2s] ease-out sm:group-hover:scale-[1.04]"
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#00000B] via-[#00000B]/30 to-transparent" />
 
@@ -172,11 +174,13 @@ export default function Academy() {
                 className="group flex flex-col bg-white rounded-[20px] overflow-hidden shadow-[0_4px_24px_-6px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.08)] transition-all duration-300 border border-[#324D47]/[0.04] hover:-translate-y-1 cursor-pointer h-full"
                 onClick={() => navigate(`/academy/${article.slug}`)}
               >
-                <div className="h-40 overflow-hidden relative">
+                <div className="h-[190px] sm:h-40 overflow-hidden relative bg-[#0a0a10]">
                   <ImageWithFallback
                     src={article.image}
                     alt={article.title}
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                    className="w-full h-full object-contain sm:object-cover object-center transition-transform duration-700 ease-out sm:group-hover:scale-[1.06]"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute top-3 left-3">
