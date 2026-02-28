@@ -17,8 +17,10 @@ interface ProgramCategory {
   subPrograms?: SubProgram[];
 }
 
+export type LanguageId = 'en' | 'es' | 'it' | 'de' | 'fr' | 'ru' | 'ar';
+
 interface Language {
-  id: string;
+  id: LanguageId;
   name: string;
   nativeName: string;
   image: string;
@@ -175,7 +177,7 @@ export const languages: Language[] = [
   }
 ];
 
-const LANGUAGE_LANDING_SLUGS: Record<string, string> = {
+export const LANGUAGE_GROUP_PROGRAM_SLUGS: Record<LanguageId, string> = {
   en: 'ingilizce/grup-programi',
   es: 'ispanyolca/grup-programi',
   it: 'italyanca/grup-programi',
@@ -319,7 +321,7 @@ export default function Programs() {
 
                       {/* Action Button */}
                       <button
-                        onClick={() => navigate(`/egitimlerimiz/${LANGUAGE_LANDING_SLUGS[lang.id] || 'ingilizce/grup-programi'}`)}
+                        onClick={() => navigate(`/egitimlerimiz/${LANGUAGE_GROUP_PROGRAM_SLUGS[lang.id]}`)}
                         className="group flex items-center gap-3 px-8 py-4 bg-[rgba(255,255,255,1)] text-[rgba(0,0,0,1)] rounded-full font-['Neutraface_2_Text:Bold',sans-serif] hover:bg-[#f0f0f0] transition-all"
                       >
                         <span>Programı Keşfet</span>
@@ -378,7 +380,7 @@ export default function Programs() {
                   </div>
 
                   <button
-                    onClick={() => navigate(`/egitimlerimiz/${LANGUAGE_LANDING_SLUGS[lang.id] || 'ingilizce/grup-programi'}`)}
+                    onClick={() => navigate(`/egitimlerimiz/${LANGUAGE_GROUP_PROGRAM_SLUGS[lang.id]}`)}
                     className="group flex items-center gap-2 self-start px-6 py-3 bg-white text-black rounded-full text-sm font-['Neutraface_2_Text:Bold',sans-serif]"
                   >
                     <span>Keşfet</span>
