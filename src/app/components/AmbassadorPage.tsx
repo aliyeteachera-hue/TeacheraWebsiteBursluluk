@@ -1,12 +1,110 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Megaphone, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, Megaphone, Mail } from 'lucide-react';
+import { openMailDraft } from './formMailto';
+import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+
+interface AmbassadorApplicationForm {
+  fullName: string;
+  phone: string;
+  email: string;
+  birthDate: string;
+  profileType: string;
+  country: string;
+  city: string;
+  nationality: string;
+  educationLevel: string;
+  educationSummary: string;
+  experienceSummary: string;
+  referralPlan: string;
+  audienceSize: string;
+  socialLinks: string;
+  note: string;
+}
+
+const INITIAL_FORM: AmbassadorApplicationForm = {
+  fullName: '',
+  phone: '',
+  email: '',
+  birthDate: '',
+  profileType: '',
+  country: '',
+  city: '',
+  nationality: '',
+  educationLevel: '',
+  educationSummary: '',
+  experienceSummary: '',
+  referralPlan: '',
+  audienceSize: '',
+  socialLinks: '',
+  note: '',
+};
+
+const inputBase =
+  "w-full h-[44px] bg-white rounded-[16px] px-4 text-[14px] font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F] placeholder:text-[#686767] outline-none border border-[#09090F]/10 focus:border-[#324D47]/50 focus:ring-2 focus:ring-[#324D47]/15 transition-all";
+
+const textareaBase =
+  "w-full min-h-[112px] bg-white rounded-[16px] px-4 py-3 text-[14px] font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F] placeholder:text-[#686767] outline-none border border-[#09090F]/10 focus:border-[#324D47]/50 focus:ring-2 focus:ring-[#324D47]/15 transition-all resize-y";
 
 export default function AmbassadorPage() {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState<AmbassadorApplicationForm>(INITIAL_FORM);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const isPhoneValid = isValidTrMobilePhone(formData.phone);
+
+  const handleField = <K extends keyof AmbassadorApplicationForm>(key: K, value: AmbassadorApplicationForm[K]) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, phone: normalizeTrMobileInput(value) }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+    if (!isPhoneValid) return;
+
+    setIsSubmitting(true);
+    setFeedback(null);
+
+    const sent = await openMailDraft({
+      to: 'ambassador@teachera.com.tr',
+      subject: 'Teachera Elci Programi Basvurusu',
+      lines: [
+        `Ad Soyad: ${formData.fullName}`,
+        `Telefon: +90 ${formData.phone}`,
+        `E-posta: ${formData.email || '-'}`,
+        `Dogum Tarihi: ${formData.birthDate}`,
+        `Profil Tipi: ${formData.profileType}`,
+        `Yasanan Ulke: ${formData.country}`,
+        `Sehir: ${formData.city}`,
+        `Milliyet: ${formData.nationality}`,
+        `Egitim Durumu: ${formData.educationLevel}`,
+        `Egitim Ozeti: ${formData.educationSummary}`,
+        `Tecrube Ozeti: ${formData.experienceSummary}`,
+        `Teachera Refere Plani: ${formData.referralPlan}`,
+        `Ulasilan Kitle Buyuklugu: ${formData.audienceSize}`,
+        `Sosyal Medya/Topluluk Linkleri: ${formData.socialLinks || '-'}`,
+        `Ek Not: ${formData.note || '-'}`,
+        'Kaynak: Elci Ol Basvuru Formu',
+      ],
+    });
+
+    if (sent) {
+      setFeedback({ type: 'success', text: 'Başvurunuz alındı. Uygunluk değerlendirmesi sonrası sizinle iletişime geçeceğiz.' });
+      setFormData(INITIAL_FORM);
+    } else {
+      setFeedback({ type: 'error', text: 'Başvuru gönderilemedi. Lütfen tekrar deneyin.' });
+    }
+
+    setIsSubmitting(false);
+  };
 
   return (
     <div className="min-h-screen bg-[#FAFAF8] px-6 py-16 md:py-20">
-      <div className="max-w-[920px] mx-auto">
+      <div className="max-w-[980px] mx-auto">
         <button
           onClick={() => navigate(-1)}
           className="inline-flex items-center gap-2 text-[#324D47] hover:text-[#3d5e56] transition-colors mb-10 font-['Neutraface_2_Text:Demi',sans-serif]"
@@ -26,21 +124,180 @@ export default function AmbassadorPage() {
           </h1>
 
           <p className="text-[#09090F]/70 text-[15px] md:text-[17px] leading-relaxed font-['Neutraface_2_Text:Book',sans-serif] mb-8">
-            Teachera elçilik programı; kampüs, topluluk ve sosyal çevrelerde markamızı temsil etmek isteyen paydaşlar için
-            tasarlanmıştır. Program detayları ve başvuru kriterleri kısa süre içinde yayınlanacaktır.
+            Teachera’yı yabancı dil eğitimi almak isteyen kişilere referans eden elçiler, doğrulanan yönlendirmeleri için ödeme alabilir.
+            Başvuruları durumunuza göre değerlendirip uygun adaylarla iletişime geçiyoruz.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <InfoCard label="Elçilik Başvuru E-posta" value="data@teachera.com.tr" href="mailto:data@teachera.com.tr?subject=Elcilik%20Programi%20Basvuru%20-%20Teachera" icon={<Mail size={14} />} />
-            <InfoCard label="İletişim Telefon" value="0332 236 80 66" href="tel:03322368066" icon={<Phone size={14} />} />
+            <InfoCard
+              label="Elçilik Başvuru E-posta"
+              value="ambassador@teachera.com.tr"
+              href="mailto:ambassador@teachera.com.tr?subject=Teachera%20Elci%20Programi%20Basvurusu"
+              icon={<Mail size={14} />}
+            />
           </div>
 
-          <button
-            onClick={() => navigate('/iletisim')}
-            className="h-[46px] px-7 rounded-full bg-[#324D47] text-white hover:bg-[#3d5e56] transition-colors font-['Neutraface_2_Text:Demi',sans-serif]"
-          >
-            İletişim Formuna Git
-          </button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                required
+                placeholder="İsim Soyisim"
+                value={formData.fullName}
+                onChange={(e) => handleField('fullName', e.target.value)}
+                className={inputBase}
+              />
+              <input
+                type="tel"
+                required
+                placeholder="Telefon (5XX XXX XX XX)"
+                value={formData.phone}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                pattern={TR_MOBILE_PATTERN}
+                title={TR_MOBILE_TITLE}
+                inputMode="numeric"
+                className={`${inputBase} ${!isPhoneValid && formData.phone ? 'border-[#E70000]/60 focus:border-[#E70000]/60 focus:ring-[#E70000]/15' : ''}`}
+              />
+              <input
+                type="email"
+                placeholder="E-posta"
+                value={formData.email}
+                onChange={(e) => handleField('email', e.target.value)}
+                className={inputBase}
+              />
+              <input
+                type="date"
+                required
+                value={formData.birthDate}
+                onChange={(e) => handleField('birthDate', e.target.value)}
+                className={inputBase}
+              />
+              <select
+                required
+                value={formData.profileType}
+                onChange={(e) => handleField('profileType', e.target.value)}
+                className={inputBase}
+              >
+                <option value="">Başvuru Profili Seçiniz</option>
+                <option value="Okul Aile Birligi Uyesi">Okul Aile Birliği Üyesi</option>
+                <option value="Influencer / Icerik Ureticisi">Influencer / İçerik Üreticisi</option>
+                <option value="Topluluk Lideri">Topluluk Lideri</option>
+                <option value="Kampus / Ogrenci Kulubu">Kampüs / Öğrenci Kulübü</option>
+                <option value="Ogretmen / Egitimci">Öğretmen / Eğitimci</option>
+                <option value="Diger">Diğer</option>
+              </select>
+              <input
+                type="text"
+                required
+                placeholder="Yaşadığı Ülke"
+                value={formData.country}
+                onChange={(e) => handleField('country', e.target.value)}
+                className={inputBase}
+              />
+              <input
+                type="text"
+                required
+                placeholder="Şehir"
+                value={formData.city}
+                onChange={(e) => handleField('city', e.target.value)}
+                className={inputBase}
+              />
+              <input
+                type="text"
+                required
+                placeholder="Milliyet"
+                value={formData.nationality}
+                onChange={(e) => handleField('nationality', e.target.value)}
+                className={inputBase}
+              />
+              <select
+                required
+                value={formData.educationLevel}
+                onChange={(e) => handleField('educationLevel', e.target.value)}
+                className={inputBase}
+              >
+                <option value="">Eğitim Durumu Seçiniz</option>
+                <option value="Lise">Lise</option>
+                <option value="Ön Lisans">Ön Lisans</option>
+                <option value="Lisans">Lisans</option>
+                <option value="Yüksek Lisans">Yüksek Lisans</option>
+                <option value="Doktora">Doktora</option>
+                <option value="Diğer">Diğer</option>
+              </select>
+              <input
+                type="text"
+                required
+                placeholder="Ulaşabildiğiniz Tahmini Kitle (örn. 500+ kişi)"
+                value={formData.audienceSize}
+                onChange={(e) => handleField('audienceSize', e.target.value)}
+                className={inputBase}
+              />
+              <input
+                type="url"
+                placeholder="Sosyal Medya / Topluluk Linkleri (Opsiyonel)"
+                value={formData.socialLinks}
+                onChange={(e) => handleField('socialLinks', e.target.value)}
+                className={inputBase}
+              />
+            </div>
+
+            {!isPhoneValid && formData.phone && (
+              <p className="text-[12px] text-[#9C2735] font-['Neutraface_2_Text:Book',sans-serif]">
+                Telefon numarası 5XX XXX XX XX formatında olmalıdır.
+              </p>
+            )}
+
+            <textarea
+              required
+              placeholder="Kısaca eğitim durumunun özeti"
+              value={formData.educationSummary}
+              onChange={(e) => handleField('educationSummary', e.target.value)}
+              className={textareaBase}
+            />
+
+            <textarea
+              required
+              placeholder="Tecrübe özeti (referans, topluluk veya satış/yönlendirme deneyimi)"
+              value={formData.experienceSummary}
+              onChange={(e) => handleField('experienceSummary', e.target.value)}
+              className={textareaBase}
+            />
+
+            <textarea
+              required
+              placeholder="Teachera’yı nerede ve nasıl referans edeceğinizi kısaca açıklayınız"
+              value={formData.referralPlan}
+              onChange={(e) => handleField('referralPlan', e.target.value)}
+              className={textareaBase}
+            />
+
+            <textarea
+              placeholder="Eklemek istediğiniz not"
+              value={formData.note}
+              onChange={(e) => handleField('note', e.target.value)}
+              className={textareaBase}
+            />
+
+            {feedback && (
+              <p
+                className={`rounded-xl px-4 py-3 text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] ${
+                  feedback.type === 'success'
+                    ? 'bg-[#324D47]/10 text-[#324D47] border border-[#324D47]/25'
+                    : 'bg-[#FFF3F1] text-[#68232E] border border-[#E70000]/25'
+                }`}
+              >
+                {feedback.text}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting || !isPhoneValid}
+              className="h-[46px] px-7 rounded-full bg-[#324D47] text-white hover:bg-[#3d5e56] transition-colors font-['Neutraface_2_Text:Demi',sans-serif] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? 'Gönderiliyor...' : 'Başvuruyu Gönder'}
+            </button>
+          </form>
         </div>
       </div>
     </div>

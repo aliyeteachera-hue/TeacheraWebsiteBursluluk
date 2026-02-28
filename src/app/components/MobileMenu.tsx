@@ -298,7 +298,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                         transition={{ delay: 0.5 }}
                         onClick={() => {
                           onClose();
-                          openLevelAssessment();
+                          openLevelAssessment('mobile_menu_level_assessment');
                         }}
                         className="w-full flex items-center justify-center gap-2 px-6 py-4 mb-3 bg-[#324D47] hover:bg-[#3d5e56] text-white border border-[#324D47] rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-sm transition-all duration-300"
                      >

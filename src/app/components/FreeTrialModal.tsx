@@ -123,14 +123,14 @@ export default function FreeTrialModal() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!kvkkConsent || !formData.fullName || !formData.email || !formData.age || !formData.language || !isPhoneValid) return;
+    if (!kvkkConsent || !formData.fullName || !formData.age || !formData.language || !isPhoneValid) return;
 
     const sent = await openMailDraft({
       subject: 'Ucretsiz Deneme Seansi Talebi',
       lines: [
         `Ad Soyad: ${formData.fullName}`,
         `Telefon: +90 ${formData.phone}`,
-        `E-posta: ${formData.email}`,
+        `E-posta: ${formData.email || '-'}`,
         `Yas Araligi: ${ageRanges.find((age) => age.id === formData.age)?.label || formData.age}`,
         `Dil: ${getLanguagesForAge(formData.age).find((language) => language.id === formData.language)?.name || formData.language}`,
         `Seans Tarihi: ${selectedDate ? formatDate(selectedDate) : '-'}`,
@@ -283,7 +283,6 @@ export default function FreeTrialModal() {
                       <FieldWrap icon={<Mail size={14} />} label="E-posta Adresiniz">
                         <input
                           type="email"
-                          required
                           placeholder="ornek@email.com"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}

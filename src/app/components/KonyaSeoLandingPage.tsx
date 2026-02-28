@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { ArrowRight, CheckCircle2, MapPin, MonitorSmartphone, Users } from 'lucide-react';
+import { trackSeoLandingCta } from '../lib/analytics';
 
 type LandingContent = {
   title: string;
@@ -233,6 +234,15 @@ export default function KonyaSeoLandingPage() {
     };
   }, [content, isTurkeyPage, location.pathname]);
 
+  const navigateFromLanding = (href: string, ctaId: string, position: 'hero' | 'related_links') => {
+    trackSeoLandingCta({
+      ctaId,
+      destination: href,
+      position,
+    });
+    navigate(href);
+  };
+
   return (
     <div className="min-h-screen bg-[#F4EBD1]">
       <section className="relative bg-[#324D47] overflow-hidden">
@@ -250,14 +260,14 @@ export default function KonyaSeoLandingPage() {
           </p>
           <div className="flex flex-wrap gap-3 mt-9">
             <button
-              onClick={() => navigate(content.primaryHref)}
+              onClick={() => navigateFromLanding(content.primaryHref, 'primary', 'hero')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-[#324D47] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.1em] hover:bg-[#e7e1cc] transition-colors cursor-pointer"
             >
               {content.primaryLabel}
               <ArrowRight size={14} />
             </button>
             <button
-              onClick={() => navigate(content.secondaryHref)}
+              onClick={() => navigateFromLanding(content.secondaryHref, 'secondary', 'hero')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/25 text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.1em] hover:bg-white/10 transition-colors cursor-pointer"
             >
               {content.secondaryLabel}
@@ -321,7 +331,7 @@ export default function KonyaSeoLandingPage() {
             {SEO_LINKS.map((item) => (
               <button
                 key={item.href}
-                onClick={() => navigate(item.href)}
+                onClick={() => navigateFromLanding(item.href, item.href.replace(/\//g, '_').slice(1), 'related_links')}
                 className={`px-4 py-2 rounded-full text-[12px] border transition-colors cursor-pointer ${
                   location.pathname === item.href
                     ? 'bg-[#324D47] border-[#324D47] text-white'

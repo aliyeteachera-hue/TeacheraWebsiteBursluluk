@@ -3,7 +3,9 @@ import { motion, useScroll, useSpring, useInView } from 'motion/react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { EDITORIAL_SEEDS } from './articleEditorialSeeds';
+import mentalTranslationCollapseImage from '../../assets/blog/mental-translation-collapse.webp';
+import targetLanguageThinkingImage from '../../assets/blog/target-language-thinking-techniques.webp';
+import grammarTranslationFossilizationImage from '../../assets/blog/gramer-ceviri-fosillesme-dongusu.webp';
 
 const DEFAULT_OG_IMAGE = 'https://teachera.com.tr/favicon-32x32.png';
 
@@ -47,387 +49,308 @@ const ARTICLES: Record<string, FullArticle> = {
     slug: 'ceviri-hastaligi',
     category: 'genel',
     categoryLabel: 'DİL ÖĞRENİMİ',
-    title: 'Çeviri Hastalığı:\nBiliyorum Ama\nKonuşamıyorum',
-    subtitle: 'Dil öğreniminde en yaygın tuzak, bilgiyi pratiğe dönüştürememektir. Bu yazıda "çeviri hastalığı" kavramını nörobilimsel ve metodolojik perspektiften çözümlüyoruz.',
-    epigraph: 'Bir dili bilmek ile bir dili konuşmak arasındaki mesafe, bir kitabı okumak ile bir bisiklete binmek arasındaki mesafeye eşittir.',
+    title: 'Zihinsel Çeviri Tuzağı:\nBiliyoruz Ama\nKonuşamıyoruz',
+    subtitle: 'Dil öğrenme yolculuğunda masum görünen zihinsel çeviri alışkanlığı, konuşma akıcılığını sabote eden en büyük bilişsel bariyere dönüşebilir.',
+    epigraph: 'Akıcılık, doğru kelimeyi bulmaktan önce düşünceyi hedef dilde akıta bilmektir.',
     heroImage: 'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
     author: 'Teachera Uzman Ekibi',
     authorRole: 'Dil Eğitimi Araştırma Birimi',
-    date: '12 Ekim 2025',
-    readTime: '5 dk',
+    date: '27 Şubat 2026',
+    readTime: '8 dk',
     sections: [
       {
         number: '01',
-        title: 'Çeviri Hastalığı Nedir?',
+        title: 'Masum Başlangıç, Kronik Sorun',
         content: [
-          'Bir cümle duydunuz. İngilizce. Kelime kelime anladınız. Hatta gramer yapısını bile çözümlediniz. Ama karşınızdaki kişi sizi yanıt beklercesine izlerken, beyniniz dondu. Dilediğiniz cümle dudaklarınıza ulaşamadı. "Biliyorum ama konuşamıyorum" — milyonlarca dil öğrencisinin ortak itirafı.',
-          '"Çeviri hastalığı" kavramı, dil öğreniminde karşılaşılan en yaygın ve en yıkıcı engellerden birini tanımlar: Hedef dilde düşünmek yerine, anadilden kelime kelime çeviri yaparak konuşmaya çalışmak. Bu süreç bilinçli, yavaş ve yorucudur. Doğal konuşma hızına asla yetişemez.',
-          'Sorun bilgi eksikliği değildir. Sorun, bilginin beyinde yanlış bölgede depolanmasıdır.',
+          'Dil öğrenme sürecinde hepimizin yaptığı, ilk başta masum görünen ama zamanla en büyük düşmanımıza dönüşen bir hata vardır: zihinsel çeviri. Bu alışkanlık, Türkiye\'deki dil öğrenme tecrübesinin kronik klişesi olan "biliyoruz ama konuşamıyoruz" durumunun en önemli nedenlerinden biridir.',
+          'Konuşma anında düşünceyi önce anadilde kurup sonra hedef dile aktarmaya çalışmak, beyninizde bir trafik sıkışıklığı yaratır. Siz daha cümleyi hazırlarken konuşma akışı çoktan kaçmış olur.',
+          'Sorun kelime veya kural bilmemek değildir. Sorun, bilginin gerçek zamanlı iletişimde kullanılamaması ve çeviri basamağının akıcılığı sürekli kesmesidir.',
         ],
-        pullQuote: 'Bilgiyi bilmek ile bilgiyi kullanmak arasındaki uçurum, dil öğreniminin en karanlık vadisidir.',
+        pullQuote: 'Zihinsel çeviri, bilgiyi konuşmaya dönüştüren köprünün tam ortasına kurulan görünmez bir bariyerdir.',
       },
       {
         number: '02',
-        title: 'Deklaratif ve Prosedürel Bellek',
+        title: 'Beyninizi Yormayın: Çevirinin Nörolojik Maliyeti',
         content: [
-          'Nörobilim, insan belleğini iki temel kategoriye ayırır. Deklaratif bellek — "bildiğimiz şeyler" — bilinçli olarak erişebildiğimiz olgusal bilgileri depolar. Fransa\'nın başkentinin Paris olduğunu bilmek, İngilizce\'de "go" fiilinin geçmiş zamanda "went" olduğunu hatırlamak; bunlar deklaratif belleğin işidir.',
-          'Prosedürel bellek ise bambaşka bir mekanizmadır. Bisiklete binmek, piyano çalmak, araba sürmek — bunlar bir kez öğrenildiğinde bilinçli düşünmeden, refleksif olarak icra edilir. Dil konuşmak da doğası gereği prosedürel bir beceridir.',
-          'Geleneksel dil eğitiminin temel hatası burada yatar: Prosedürel bir beceriyi, deklaratif yöntemlerle — gramer kuralları ezberleyerek, kelime listeleri yaparak, çeviri alıştırmaları çözerek — öğretmeye çalışmak. Bu, bisiklete binmeyi kitaptan okuyarak öğrenmeye benzer.',
+          'Zihinsel çeviri sırasında beyin aynı anda iki işi yapar: önce L1\'de düşünür, sonra L2\'ye aktarır. Bu çift işlem, konuşma anında bilişsel yükü gereksiz biçimde artırır.',
+          'Aşırı Yorgunluk (Brain Fatigue): Çeviri odaklı işlemleme, beynin enerji kaynaklarını hızlı tüketir. Sonuç; kısa sürede zihinsel yorgunluk, odak kaybı ve konuşma isteğinde düşüştür.',
+          'Milisaniyelik Gecikmeler: Her kelimede L1-L2 eşlemesi için harcanan çok küçük gecikmeler, cümle boyunca birikerek "ölümcül sessizlikler" üretir. Akıcılık hissi tam da bu noktada dağılır.',
         ],
         image: 'https://images.unsplash.com/photo-1649937801620-d31db7fb3ab3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-        imageCaption: 'Dil edinimi, beynin prosedürel bellek alanlarında gerçekleşen bir süreçtir.',
+        imageCaption: 'Konuşma anındaki bilişsel yük, çeviri basamağı eklendiğinde katlanarak artar.',
       },
       {
         number: '03',
-        title: 'Geleneksel Eğitimin Yapısal Çıkmazı',
+        title: 'Dilin Ruhunu Öldürmek: Doğallığı Neden Kaybediyoruz?',
         content: [
-          'Türkiye\'de ortalama bir öğrenci lise sonuna kadar yaklaşık 1.000 saat İngilizce eğitimi alır. Üniversite hazırlık sınıflarını eklediğimizde bu rakam 1.500 saati aşar. Ancak EF English Proficiency Index verilerine göre Türkiye, 113 ülke arasında 70\'lerin altında yer almaktadır.',
-          'Bunun sebebi öğretmenler, öğrenciler veya müfredat değildir. Sebebi, paradigmanın kendisidir. Gramer-çeviri yöntemi (Grammar-Translation Method), 19. yüzyılda Latince ve Antik Yunanca gibi ölü dilleri okumak için tasarlanmış bir sistemdir. Bu yöntemle canlı bir dili konuşmak, ilk tasarım amacının tamamen dışındadır.',
-          'Bir dili konuşabilmek için beyninizin o dili "motor beceri" olarak kodlaması gerekir. Bu da ancak ve ancak konuşarak, dinleyerek ve hedef dilde düşünerek gerçekleşir.',
+          'Dil sadece kelime listesi değildir; doğal eşdizimler, kalıplar ve kültürel kodlarla anlam kazanır. Zihinsel çeviri ise bu yapıları bozarak "doğru ama doğal olmayan" cümleler üretir.',
+          'Yanlış Eşdizimler (Collocation Errors): Kelimeyi sözlük karşılığıyla taşımak, hedef dildeki gerçek kullanım kalıplarını kaçırmanıza neden olur. Bu da "anlaşılan ama yapay" konuşma üretir.',
+          'Fosilleşme (Fossilization): L1 kurallarını sürekli L2\'ye kopyalamak, hataların kalıcı alışkanlığa dönüşmesine yol açar. Bir süre sonra bu hataları düzeltmek çok daha maliyetli hale gelir.',
         ],
-        pullQuote: 'Gramer kuralını bilmek sizi dilci yapar, konuşma pratiği sizi konuşmacı yapar. İkisi arasındaki fark, teori ile refleks arasındaki farktır.',
+        pullQuote: 'Doğru kelimeyi bilmek yetmez; o kelimenin hedef dilde kimlerle "yan yana yürüdüğünü" de bilmek gerekir.',
       },
       {
         number: '04',
-        title: 'Motor Beceri Olarak Dil Edinimi',
+        title: 'Psikolojik Yan Etki: Sahte Güvenlikten Kronik Kaygıya',
         content: [
-          'Stephen Krashen\'ın "Input Hypothesis" teorisi ve daha güncel nörobilimsel araştırmalar, dil ediniminin bilinçli öğrenme ile değil, anlamlı girdi ve tekrarlayan pratik ile gerçekleştiğini göstermektedir. Beyin, yeterli miktarda anlaşılabilir girdi aldığında ve bu girdiyi üretimle — yani konuşma ve yazma ile — pekiştirdiğinde, dili prosedürel belleğe kaydeder.',
-          'Bu süreçte "hata" bir düşman değil, öğrenmenin motorudur. Her hatalı cümle, beynin doğru yapıyı keşfetmesine bir adım daha yaklaştırır. Ancak geleneksel sistemde hata cezalandırılır, öğrenci susturulur ve "önce kuralı öğren, sonra konuş" dayatması yapılır.',
-          'Teachera Teaching Method, bu paradigmayı tersine çevirir: Önce konuş, pratikte öğren, hataları doğal süreçte düzelt. Derslerin %85\'inin konuşma pratiğiyle geçmesinin ardında bu nörobilimsel gerçeklik yatar.',
+          'Zihinsel çeviri, kısa vadede güvenli bir dayanak gibi görünür. Çünkü anadile tutunmak, belirsizlik anında öğrenciyi geçici olarak rahatlatır.',
+          'Kaygı Paradoksu: Gerçek hayatta hızlı cevap gerektiğinde bu destek çalışmaz. "Çevirmeden konuşamam" inancı, iletişim anında kaygıyı katlayarak kronikleştirir.',
+          'İletişim İsteksizliği (WTC): Sürekli duran, yorulan ve kendini yetersiz hisseden öğrenci zamanla konuşmaktan kaçınır. Dil, iletişim aracı olmaktan çıkıp çözülmesi gereken bir probleme dönüşür.',
         ],
         image: 'https://images.unsplash.com/photo-1626447269096-f8665509589c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-        imageCaption: 'Konuşma pratiği, dilin prosedürel belleğe yerleşmesinin tek yoludur.',
+        imageCaption: 'Akıcılık kaybı yalnızca teknik değil, motivasyon ve kaygı yönetimi problemidir.',
       },
       {
         number: '05',
-        title: 'Çeviri Hastalığından Kurtulmanın Yolu',
+        title: 'Kurtulma Rehberi: Hedef Dilde Düşünme Stratejileri',
         content: [
-          'Çeviri hastalığının çözümü, anadili devredışı bırakarak hedef dilde düşünmeye başlamaktır. Bu kulağa imkansız gelebilir, ancak doğru ortam ve doğru metodoloji ile şaşırtıcı derecede hızlı gerçekleşir.',
-          'Birinci adım, "anadilsiz" bir öğrenme ortamı yaratmaktır. Derslerin tamamen hedef dilde, beden dili, görsel materyaller ve bağlam ipuçları ile yürütülmesi, beyni çeviri yerine doğrudan anlama moduna geçirir. İlk birkaç ders zorlayıcı olabilir, ancak beyin bu yeni modele şaşırtıcı bir hızla adapte olur.',
-          'İkinci adım, günlük hayatta mikro pratikler oluşturmaktır. İç sesinizle hedef dilde konuşmak, gördüğünüz nesneleri hedef dilde adlandırmak, hatta rüyalarınızda bile hedef dili kullanmaya başladığınızda — çeviri hastalığı geride kalmaya başlar.',
-          'Üçüncü adım ise tutarlılık ve sabırdır. Beyin yeni sinaptik bağlantılar kurmak için zamana ihtiyaç duyar. Haftada bir kez yoğun çalışma yerine, her gün kısa ama düzenli pratik çok daha etkilidir.',
+          '1) İfade Kalıpları (Lexical Chunks): Tek kelime ezberi yerine "From my perspective..." gibi bloklar öğrenin. Kalıplar, çeviri basamağını kısaltır ve otomatik üretimi güçlendirir.',
+          '2) Circumlocution (Etrafından Dolaşma): Bilinmeyen kelimede L1\'e dönmek yerine tarif edin. "Matkap" akla gelmiyorsa "a tool you use to make holes in the wall" diyebilmek akışı korur.',
+          '3) Meaningful Fillers (Anlamlı Dolgular): "Iıı..." yerine "Well, let me think..." gibi profesyonel köprü ifadeleri kullanın. Bu, düşünmek için süre kazandırırken akıcılığı da korur.',
+          '4) Massive Input (Yoğun ve Hızlı Girdi): Biraz hızlı içerik dinleyerek beyni doğrudan anlamlandırmaya zorlayın. Çeviriye zaman kalmadığında kavramsal aracılık gelişir.',
+          '5) Günlük Sınırlandırılmış Çıktı: Her gün 5-10 dakika basit eylemleri hedef dilde seslendirin. Küçük ama düzenli tekrar, yeni nöral yolların kalıcılaşmasını sağlar.',
         ],
-        pullQuote: 'Beyniniz hedef dilde rüya görmeye başladığında, çeviri hastalığının son kalıntıları da silinir.',
+        pullQuote: 'Akıcı konuşma, hatasızlık değil; tıkanma anını hedef dilde yönetebilme becerisidir.',
       },
     ],
     conclusion: [
-      '"Biliyorum ama konuşamıyorum" cümlesi bir kader değil, yanlış yöntemin doğal sonucudur. Dil, bir bilgi deposu değil, bir motor beceridir. Konuşarak, yaşayarak ve hedef dilde düşünerek edinilir.',
-      'Geleneksel yöntemlerle yıllarca ilerleme kaydedemeyen binlerce öğrenci, doğru metodoloji ile aylar içinde konuşma düzeyine ulaşmaktadır. Mesele yeteneğiniz değil, sisteminizdir.',
+      'Zihinsel çeviri alışkanlığından çıkış, pasif bir "bırakma" değil aktif bir "yeniden inşa" sürecidir. Amaç, L1 arayüzünü devreden çıkarıp düşünceden hedef dile doğrudan geçiş yapabilmektir.',
+      '"Biliyoruz ama konuşamıyoruz" kader değildir. Doğru girdi, doğru çıktı ve doğru strateji ile beyin yeni konuşma yollarını üretir.',
     ],
-    closingLine: 'Çeviri hastalığı tedavi edilebilir. İlk adım, eski alışkanlıkları bırakmak ve konuşmaya cesaret etmektir.',
-    relatedSlugs: [],
-    tags: ['Çeviri Hastalığı', 'Konuşma Pratiği', 'Nörobilim', 'Dil Edinimi', 'Motor Beceri', 'Teachera Method'],
-    ctaTitle: 'Çeviri hastalığını birlikte tedavi edelim',
-    ctaSubtitle: '%85 konuşma pratiğiyle dil öğrenmenin nasıl bir şey olduğunu ücretsiz deneme dersinde keşfedin.',
-    metaDescription: 'Çeviri hastalığı nedir? Biliyorum ama konuşamıyorum sorununu nörobilim temelli yöntemler ve pratik konuşma stratejileriyle çözün.',
+    closingLine: 'Zihinsel çeviriyi bıraktığınız gün, konuşma akıcılığınızın gerçekten başladığı gündür.',
+    relatedSlugs: ['konusma-akiciliginin-fiziksel-ve-isitsel-cokusu'],
+    tags: ['Zihinsel Çeviri', 'Konuşma Akıcılığı', 'Brain Fatigue', 'WTC', 'Dil Psikolojisi', 'Teachera Academy'],
+    ctaTitle: 'Zihinsel çeviri tuzağından çıkış planını başlatalım',
+    ctaSubtitle: 'Konuşma odaklı yaklaşım ve kişiselleştirilmiş pratikle hedef dilde düşünmeyi birlikte inşa edelim.',
+    metaDescription: 'Zihinsel çeviri konuşma akıcılığını nasıl sabote eder? Nörobilişsel etkiler, psikolojik sonuçlar ve hedef dilde düşünme stratejileri.',
   },
-};
-
-interface FallbackArticleMeta {
-  id: number;
-  slug: string;
-  category: string;
-  title: string;
-  excerpt: string;
-  image: string;
-  readTime: string;
-  author: string;
-  date: string;
-}
-
-const CATEGORY_LABELS: Record<string, string> = {
-  genel: 'DİL ÖĞRENİMİ',
-  ingilizce: 'İNGİLİZCE',
-  almanca: 'ALMANCA',
-  ispanyolca: 'İSPANYOLCA',
-  fransizca: 'FRANSIZCA',
-  italyanca: 'İTALYANCA',
-  rusca: 'RUSÇA',
-};
-
-const FALLBACK_ARTICLES: FallbackArticleMeta[] = [
-  {
-    id: 1,
-    slug: 'ceviri-hastaligi',
+  'konusma-akiciliginin-fiziksel-ve-isitsel-cokusu': {
+    slug: 'konusma-akiciliginin-fiziksel-ve-isitsel-cokusu',
     category: 'genel',
-    title: 'Çeviri Hastalığı: Biliyorum Ama Konuşamıyorum',
-    excerpt: 'Dil öğrenme sürecinde, teknik ve gramer bilgisine hakim olsanız bile anlama ve konuşma becerilerinizi geliştiremeyişinizi anlamlandıramıyor olabilirsiniz. Bu yazıda "çeviri hastalığı" kavramını çözüyoruz.',
-    image: 'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'Teachera Uzman Ekibi',
-    date: '12 Eki 2025',
-  },
-  {
-    id: 2,
-    slug: 'motor-beceri-mi-mantiksal-bilgi-mi',
-    category: 'genel',
-    title: 'Motor Beceri mi? Mantıksal Bilgi Edinimi mi?',
-    excerpt: 'Dil öğrenmenin temel amacı iletişim kurabilmektir. Ancak çoğu sistem dili bir "matematik problemi" gibi öğretir. Beyin bilimi bu konuda ne söylüyor?',
-    image: 'https://images.unsplash.com/photo-1725399633872-32ba508b0607?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '7 dk',
-    author: 'Dr. Elena Rossi',
-    date: '10 Eki 2025',
-  },
-  {
-    id: 3,
-    slug: 'business-english-kuresel-pazar',
-    category: 'ingilizce',
-    title: 'Business English: Küresel Pazarda Yerinizi Alın',
-    excerpt: 'Profesyonel hayatta İngilizce sadece bir dil değil, bir yetkinliktir. Toplantılarda, sunumlarda ve müzakerelerde kullanabileceğiniz kilit stratejiler.',
-    image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'James Wilson',
-    date: '15 Eki 2025',
-  },
-  {
-    id: 4,
-    slug: 'ielts-toefl-sinav-stratejileri',
-    category: 'ingilizce',
-    title: 'IELTS & TOEFL Sınav Stratejileri',
-    excerpt: 'Akademik sınavlara hazırlanırken yapılan en yaygın hatalar ve yüksek skor için "Time Management" taktikleri.',
-    image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '6 dk',
-    author: 'Sarah Jenkins',
-    date: '14 Eki 2025',
-  },
-  {
-    id: 5,
-    slug: 'alman-muhendisligi-ve-dilin-yapisi',
-    category: 'almanca',
-    title: 'Alman Mühendisliği ve Dilin Yapısı',
-    excerpt: 'Almanca, kuralların ve netliğin dilidir. Mühendislik ve teknik alanlarda kariyer hedefleyenler için temel terminoloji rehberi.',
-    image: 'https://images.unsplash.com/photo-1517457210348-703079e57d4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'Hans Müller',
-    date: '13 Eki 2025',
-  },
-  {
-    id: 6,
-    slug: 'hizli-ispanyolca-konusma-rehberi',
-    category: 'ispanyolca',
-    title: 'Ritmi Yakalayın: Hızlı İspanyolca Konuşma Rehberi',
-    excerpt: 'İspanyolca, dünyanın en hızlı konuşulan dillerinden biridir. Duyduğunu anlama ve bu hıza ayak uydurma egzersizleri.',
-    image: 'https://images.unsplash.com/photo-1547990196-80517909c0aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'Maria Garcia',
-    date: '09 Eki 2025',
-  },
-  {
-    id: 7,
-    slug: 'sanatin-dili-paris-sokaklari',
-    category: 'fransizca',
-    title: 'Sanatın Dili: Paris Sokaklarında Bir Gezinti',
-    excerpt: 'Fransızca telaffuzunun incelikleri ve günlük hayatta kullanılan, ders kitaplarında bulamayacağınız deyimler.',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'Sophie Martin',
-    date: '07 Eki 2025',
-  },
-  {
-    id: 8,
-    slug: 'la-dolce-vita-jestler-ve-mimikler',
-    category: 'italyanca',
-    title: 'La Dolce Vita: Jestler, Mimikler ve Sözsüz İletişim',
-    excerpt: 'İtalyanca konuşurken ellerinizi nasıl kullanmalısınız? Sözsüz iletişimin İtalyan kültüründeki hayati önemi.',
-    image: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'Marco Rossi',
-    date: '06 Eki 2025',
-  },
-  {
-    id: 9,
-    slug: 'kiril-alfabesi-2-saatte',
-    category: 'rusca',
-    title: 'Kiril Alfabesi: Korkulan Engeli 2 Saatte Aşmak',
-    excerpt: 'Rusça öğrenmeye başlarken gözünüzü korkutan alfabe aslında en kolay kısımdır. Bilimsel temelli hızlı okuma tekniği.',
-    image: 'https://images.unsplash.com/photo-1513326738677-b964603b136d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '6 dk',
-    author: 'Ivan Petrov',
-    date: '05 Eki 2025',
-  },
-  {
-    id: 10,
-    slug: 'dil-ogreniminde-yapay-zeka-devrimi',
-    category: 'genel',
-    title: 'Dil Öğreniminde Yapay Zeka Devrimi',
-    excerpt: 'Yapay zeka araçları dil öğrenimini nasıl kişiselleştiriyor ve hızlandırıyor? ChatGPT\'den Duolingo AI\'a, yeni nesil öğrenme araçlarını keşfedin.',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'Teknoloji Ekibi',
-    date: '08 Eki 2025',
-  },
-  {
-    id: 11,
-    slug: 'ingilizce-deyimler-ve-atasozleri',
-    category: 'ingilizce',
-    title: 'İngilizce Deyimler ve Atasözleri: Native Gibi Konuşun',
-    excerpt: 'Native speaker gibi konuşmak için bilmeniz gereken en popüler 50 İngilizce deyim ve kullanım alanları.',
-    image: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'John Smith',
-    date: '11 Eki 2025',
-  },
-  {
-    id: 12,
-    slug: 'cocuklarda-erken-yasta-dil-ogrenimi',
-    category: 'genel',
-    title: 'Çocuklarda Erken Yaşta Dil Öğrenimi: Neden 7 Yaş Kritik?',
-    excerpt: 'Nörobilim araştırmaları, çocukların dil öğrenme kapasitesinin 7 yaşında zirve yaptığını gösteriyor. Ebeveynler için pratik bir rehber.',
-    image: 'https://images.unsplash.com/photo-1544776193-352d25ca82cd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '6 dk',
-    author: 'Pedagoji Ekibi',
-    date: '02 Eki 2025',
-  },
-  {
-    id: 13,
-    slug: 'yurtdisinda-yasam-ilk-90-gun',
-    category: 'genel',
-    title: 'Yurtdışında Yaşam: Dil Bariyerini Kırmak İçin İlk 90 Gün',
-    excerpt: 'Yeni bir ülkeye taşındığınızda dil bariyeri en büyük stres kaynağı olabilir. İlk 90 günde uygulamanız gereken 7 altın kural.',
-    image: 'https://images.unsplash.com/photo-1561558471-ea8ebc7c9ae5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'Teachera Uzman Ekibi',
-    date: '28 Eyl 2025',
-  },
-  {
-    id: 14,
-    slug: 'polyglot-olmanin-sirlari',
-    category: 'genel',
-    title: 'Polyglot Olmanın Sırları: 3\'ten Fazla Dil Nasıl Öğrenilir?',
-    excerpt: 'Dünyada 50\'den fazla dil konuşan insanlar var. Polyglot\'ların ortak kullandığı teknikleri ve beyin stratejilerini inceliyoruz.',
-    image: 'https://images.unsplash.com/photo-1743565900437-f232da3a22c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '8 dk',
-    author: 'Dr. Elena Rossi',
-    date: '22 Eyl 2025',
-  },
-  {
-    id: 15,
-    slug: 'netflix-ile-dil-ogrenmek',
-    category: 'genel',
-    title: 'Netflix ile Dil Öğrenmek: Eğlenceli Ama Gerçekten Etkili mi?',
-    excerpt: 'Dizi ve film izleyerek dil öğrenme trendi giderek büyüyor. Altyazı stratejileri, en iyi içerik önerileri ve bilimsel veriler bu yazıda.',
-    image: 'https://images.unsplash.com/photo-1608737739007-f0019bc67f59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'Kültür Ekibi',
-    date: '18 Eyl 2025',
-  },
-];
-
-const FALLBACK_ARTICLE_MAP: Record<string, FallbackArticleMeta> = Object.fromEntries(
-  FALLBACK_ARTICLES.map((article) => [article.slug, article]),
-);
-
-const DEFAULT_TAGS = ['Teachera Academy', 'Dil Öğrenimi', 'Konuşma Pratiği'];
-const DEFAULT_CTA_TITLE = 'Öğrenme planını şimdi kişiselleştir';
-const DEFAULT_CTA_SUBTITLE = 'Hedefine uygun programla düzenli pratik yap, daha hızlı sonuç al.';
-const DEFAULT_META_DESCRIPTION = 'Teachera Academy içerikleriyle dil öğreniminde pratik odaklı, uygulanabilir yöntemleri keşfedin.';
-
-function formatSectionNumber(index: number): string {
-  return String(index + 1).padStart(2, '0');
-}
-
-function buildFallbackArticle(article: FallbackArticleMeta): FullArticle {
-  const editorialSeed = EDITORIAL_SEEDS[article.slug];
-
-  if (editorialSeed) {
-    return {
-      slug: article.slug,
-      category: article.category,
-      categoryLabel: CATEGORY_LABELS[article.category] || 'DİL ÖĞRENİMİ',
-      title: article.title,
-      subtitle: article.excerpt,
-      epigraph: editorialSeed.epigraph,
-      heroImage: article.image,
-      author: article.author,
-      authorRole: 'Teachera Academy',
-      date: article.date,
-      readTime: article.readTime,
-      sections: editorialSeed.sections.map((section, index) => ({
-        number: formatSectionNumber(index),
-        title: section.title,
-        content: section.paragraphs,
-        pullQuote: section.pullQuote,
-      })),
-      conclusion: editorialSeed.conclusion,
-      closingLine: editorialSeed.closingLine,
-      relatedSlugs: [],
-      tags: editorialSeed.tags,
-      ctaTitle: editorialSeed.ctaTitle,
-      ctaSubtitle: editorialSeed.ctaSubtitle,
-      metaDescription: editorialSeed.metaDescription,
-    };
-  }
-
-  return {
-    slug: article.slug,
-    category: article.category,
-    categoryLabel: CATEGORY_LABELS[article.category] || 'DİL ÖĞRENİMİ',
-    title: article.title,
-    subtitle: article.excerpt,
-    epigraph: 'Dil öğrenimi, doğru yöntem ve düzenli pratikle kalıcı bir alışkanlığa dönüşür.',
-    heroImage: article.image,
-    author: article.author,
-    authorRole: 'Teachera Academy',
-    date: article.date,
-    readTime: article.readTime,
+    categoryLabel: 'DİL ÖĞRENİMİ',
+    title: 'Konuşma Akıcılığının\nFiziksel ve İşitsel\nÇöküşü',
+    subtitle: 'Zihinsel çeviri, bilişsel yükü kritik eşiğin üzerine taşıyarak sadece kelimeleri değil, sesi, ritmi ve beden dilini de kilitleyen bir iletişim çöküşü üretir.',
+    epigraph: 'Akıcılık önce zihinde kırılır, sonra seste ve bedende görünür hale gelir.',
+    heroImage: mentalTranslationCollapseImage,
+    author: 'Teachera Akademik İçerik Ekibi',
+    authorRole: 'Psikodilbilim ve Öğrenme Bilimleri',
+    date: '28 Şubat 2026',
+    readTime: '12 dk',
     sections: [
       {
         number: '01',
-        title: 'Konuya Giriş',
+        title: 'Bilişsel Yükün Dışavurumu: Akıcılık Neden Çöker?',
         content: [
-          article.excerpt,
-          'Bu içerik, Academy içerisinde ilgili başlığın temel çerçevesini hızlıca anlamanızı sağlayacak şekilde hazırlanmıştır.',
+          'Zihinsel çeviri sırasında çalışan bellek aynı anda dört işi yapmaya zorlanır: anadilde taslak kurma, L2 karşılıklarını arama, dilbilgisel denetim ve artikülasyon planlama. Bilişsel Yük Teorisi açısından bu, sistemin doğal kapasitesini aşan bir yüklenmedir.',
+          'Bu nedenle konuşmadaki akıcılık bozuklukları rastlantı değildir; doğrudan bilişsel darboğazın dışavurumudur. Anadilde veya doğrudan L2 üretimde düşük olan duraksama oranı, çeviri baskısı altında dramatik biçimde yükselir.',
+          'Akıcılık düşüşü "az pratik" problemi gibi görünse de, özünde işlemleme mimarisinin yanlış kurulması problemidir: düşünce ile ifade arasına zorunlu bir çeviri katmanı yerleştirmek.',
         ],
+        pullQuote: 'Çeviri alışkanlığı, konuşmayı bilgi testine değil gerçek zamanlı bir işlemleme krizine dönüştürür.',
       },
       {
         number: '02',
-        title: 'Pratik Uygulama',
+        title: 'Üç Şemsiye Fenomen: Disfluency Nasıl Duyulur?',
         content: [
-          'Konuyu kalıcı hale getirmenin en etkili yolu, düzenli tekrar ve gerçek senaryo pratiğidir.',
-          'Kısa, sürdürülebilir çalışma blokları ve konuşma odaklı egzersizlerle ilerleme ölçülebilir hale gelir.',
+          'Zihinsel çeviri baskısı altındaki konuşmada akıcılık bozuklukları üç ana fenomen altında toplanır.',
+          '1) Sessizlikler (Unfilled Pauses): Kelime geri çağırma ve cümle kurulumunda sistem aniden durur. Dinleyici bunu çoğu zaman güvensizlik veya konuya hakim olmama sinyali olarak algılar.',
+          '2) Dolgu Sesleri (Filled Pauses): "Iıı", "öhm", "um", "uh" gibi anlamsız sesler, konuşma sırasını tutmak için kullanılan zaman kazanma araçlarına dönüşür; aşırı kullanım dinleyiciyi yorar.',
+          '3) Ses Uzatmaları (Hesitation Lengthening): Kelime sonlarının istemsiz uzatılması, artikülasyonun durup fonasyonun sürmesiyle ortaya çıkar; bilişsel yük yükseldikçe belirginleşir.',
         ],
+        pullQuote: 'Konuşmadaki sessizlik, dolgu sesi ve uzatma; çoğu zaman yetersizlik değil, aşırı yüklenmiş bir işlemleme sisteminin yardım çağrısıdır.',
       },
       {
         number: '03',
-        title: 'Sonuç ve Yol Haritası',
+        title: 'Jestsel Duraksamalar: Beden de Aynı Anda Kilitlenir',
         content: [
-          'Hedef odaklı bir plan, doğru kaynak seçimi ve istikrarlı geri bildirim mekanizması başarıyı hızlandırır.',
-          'Bir sonraki adımda bu konuyu kendi seviyenize ve hedefinize göre kişiselleştirerek uygulamaya geçebilirsiniz.',
+          'Zihinsel çeviri yalnızca sözel akışı bozmaz; bedensel iletişimi de eşzamanlı olarak dondurur. Sözel duraksama anlarında jestlerin, el hareketlerinin ve mimiklerin bir pozisyonda asılı kalması sık görülür.',
+          'Bu "gestural hold" durumu, bilişsel tıkanıklığın fiziksel yansımasıdır. Konuşma akışının kırıldığı noktada beden de doğal ritmini kaybeder ve iletişimin bütünsel etkisi düşer.',
+          'Sonuç olarak dinleyici sadece ne söylediğinizi değil, nasıl söylediğinizi de zor işler. Zihinsel çeviri, mesajın içeriği kadar iletim biçimini de zayıflatır.',
         ],
+        image: mentalTranslationCollapseImage,
+        imageCaption: 'Zihinsel çeviri baskısı, ses akışı ve beden ritminde eşzamanlı kırılmalar üretir.',
+      },
+      {
+        number: '04',
+        title: 'Dilbilimsel Tahribat: Ara Dil Felci ve Fosilleşme',
+        content: [
+          'Ara Dil (Interlanguage) normalde geçirgen ve gelişen bir sistemdir. Ancak L2 üretimi sürekli zihinsel çeviri ile yapıldığında bu sistem donarak fosilleşmeye girer; hatalar kalıcılaşır.',
+          'Negatif Aktarım (Negative Transfer) bu süreci hızlandırır: öğrenici, anadilin sözdizimini ve kelime örgüsünü hedef dile şablon gibi taşır. Sıfat-isim sıralaması, edat seçimi ve cümle dizilimleri bu yüzden sistematik biçimde bozulur.',
+          'En kritik risk şudur: tekrar eden çeviri kaynaklı yapılar, örtük alışkanlığa dönüşür. Öğrenci hata yaptığını fark etmese bile aynı bozuk kalıpları otomatik olarak üretmeye devam eder.',
+        ],
+        pullQuote: 'Fosilleşme, yanlış bilmekten çok yanlışı otomatikleştirmektir.',
+      },
+      {
+        number: '05',
+        title: 'Eşdizimlilik Kaybı: Doğallık Neden Dağılır?',
+        content: [
+          'Kelimesi kelimesine çeviri, dilin estetik ve pragmatik dokusunu parçalar. Çünkü her dilde kelimeler yalnızca anlam taşımaz; hangi kelimeyle birlikte kullanılacağını da belirler.',
+          '1) Birisine söz vermek -> Give a promise -> Make/Set a promise: Fiil-isim uyumsuzluğu oluşur; sözlük karşılığı doğru görünse bile ifade doğal değildir.',
+          '2) Yüksek dağ -> Tall/Long mountain -> High mountain: Sıfat seçimi anadile göre taşınınca hedef dilde yapay bir kullanım ortaya çıkar.',
+          '3) Ağır fakirlik -> Hard/Strong poverty -> Abject poverty: Mecaz yoğunluğu hedef dilin yerleşik eşdizimi yerine sözlük düzeyinde kalır.',
+          '4) Beyin göçü -> Brain migration -> Brain drain: Sabit bir terimin mekanik çevrimi, ifadenin profesyonel bağlam değerini düşürür.',
+          '5) Topu ateşlemek -> Hit the cannon -> Fire the cannon: Çok anlamlı fiillerde yanlış seçim, cümlenin anlamını ve tonunu bozabilir.',
+        ],
+        pullQuote: 'Doğal konuşma, doğru kelimeleri değil doğru kelime ortaklıklarını kurabilme becerisidir.',
       },
     ],
     conclusion: [
-      'Bu başlık, dil öğreniminde sürdürülebilir gelişim için temel bir yapı sunar.',
-      'Düzenli uygulama ve kişiselleştirilmiş planla kısa sürede somut ilerleme görmek mümkündür.',
+      'Zihinsel çevirinin uzun vadeli etkisi yalnızca yavaş konuşma değildir; ses akışının bozulması, beden dilinin kilitlenmesi ve dilsel doğallığın fosilleşmesiyle çok katmanlı bir iletişim kaybıdır.',
+      'Çözüm, çeviri refleksini "yasaklamak" değil; hedef dilde doğrudan kavramsallaştırmayı sistemli biçimde inşa etmektir. Akıcılık, bu yeniden yapılanmanın doğal sonucudur.',
     ],
-    closingLine: 'Hedefinizi netleştirin, küçük ama tutarlı adımlarla ilerleyin.',
-    relatedSlugs: [],
-    tags: DEFAULT_TAGS,
-    ctaTitle: DEFAULT_CTA_TITLE,
-    ctaSubtitle: DEFAULT_CTA_SUBTITLE,
-    metaDescription: article.excerpt || DEFAULT_META_DESCRIPTION,
-  };
-}
+    closingLine: 'Akıcılığın gerçek düşmanı hata yapmak değil, her cümleyi zihninizde tercüme etmek zorunda kalmaktır.',
+    relatedSlugs: ['ceviri-hastaligi'],
+    tags: ['Disfluency', 'Cognitive Load', 'Fossilization', 'Collocation', 'Interlanguage', 'Zihinsel Çeviri'],
+    ctaTitle: 'Konuşma akışını yeniden kurmak için birlikte başlayalım',
+    ctaSubtitle: 'Bilişsel yükü azaltan, doğrudan hedef dil üretimini güçlendiren çalışma planını seviyene göre tasarlayalım.',
+    metaDescription: 'Zihinsel çeviri konuşma akıcılığını nasıl fiziksel ve işitsel olarak çökertir? Disfluency, fosilleşme ve eşdizimlilik kaybı üzerinden detaylı analiz.',
+  },
+  'hedef-dilde-dusunmeyi-saglayacak-teknikler': {
+    slug: 'hedef-dilde-dusunmeyi-saglayacak-teknikler',
+    category: 'genel',
+    categoryLabel: 'DİL ÖĞRENİMİ',
+    title: 'Hedef Dilde Düşünmeyi\nSağlayacak\nTeknikler',
+    subtitle: 'Hedef dilde düşünmek sihir değil; kısıtlanmış girdi-çıktı stratejileriyle beynin sinaptik ağlarını yeniden şekillendiren planlı bir süreçtir.',
+    epigraph: 'Akıcılık, çeviri refleksi azaldıkça değil; doğrudan hedef dil üretimi otomatikleştikçe başlar.',
+    heroImage: targetLanguageThinkingImage,
+    author: 'Teachera Akademik İçerik Ekibi',
+    authorRole: 'Uygulamalı Psikodilbilim',
+    date: '28 Şubat 2026',
+    readTime: '10 dk',
+    sections: [
+      {
+        number: '01',
+        title: 'Nöroplastisite Perspektifi: Hedef Dilde Düşünme Nasıl Oluşur?',
+        content: [
+          'Hedef dilde düşünme, uykudan uyanınca aniden ortaya çıkan bir yetenek değildir; tekrar eden doğru görevlerle beynin bağlantı haritasını yeniden kurma sürecidir.',
+          'Çeviri refleksi güçlü olduğunda beyin, L1 basamağını güvenli yol olarak kullanır. Bu da hızlı iletişimde işlemleme gecikmesine ve akıcılık kaybına neden olur.',
+          'Amaç, L1 üzerinden dolaylı üretimi azaltıp kavramdan hedef dile doğrudan geçişi güçlendirmektir. Bu geçiş ancak düzenli, yapılandırılmış ve ölçülebilir pratikle kalıcı hale gelir.',
+        ],
+        pullQuote: 'Hedef dilde düşünme bir karar değil, tekrar edilen doğru işlemleme alışkanlıklarının nörobiyolojik sonucudur.',
+      },
+      {
+        number: '02',
+        title: 'Lexical Chunks ve Direct Association',
+        content: [
+          'İzole kelime ezberi, çeviri alışkanlığının ana yakıtıdır. Bunun yerine dil birimleri bloklar halinde öğrenilmelidir: "From my perspective..." gibi açılış kalıpları tek bir kavramsal birim olarak otomatikleştirilmelidir.',
+          'Doğrudan ilişkilendirme stratejisinde yeni kelime, anadil karşılığıyla değil görsel/nesne/his ile eşleştirilir. Böylece beyin L1 köprüsünü atlayarak kavram-L2 hattını güçlendirir.',
+          'Evde etiketleme, kelimeyi nesneyle eşzamanlı görme ve tek dilli sözlük kullanımı; bu doğrudan hattı destekleyen düşük maliyetli ama yüksek etkili araçlardır.',
+        ],
+        image: targetLanguageThinkingImage,
+        imageCaption: 'Kavram ile hedef dil arasında doğrudan bağ kurmak, çeviri basamağını zayıflatır.',
+      },
+      {
+        number: '03',
+        title: 'Massive Input ve Continuous Learning',
+        content: [
+          'Beynin çeviri yapabilmesi için zamana ihtiyacı vardır. Bu yüzden kontrollü biçimde hızlı ve yoğun işitsel girdi, çeviri için ayrılan zamanı daraltır.',
+          'Öğrenci, "Bu hızda çeviremiyorum; doğrudan anlamam lazım" eşiğine geldiğinde kavramsal aracılık devreye girer. Bu, hedef dilde düşünmenin kritik kırılma noktasıdır.',
+          'Süreklilik burada belirleyicidir: yoğun girdi dönemsel değil, küçük dozlarla her gün uygulanmalıdır. Aksi halde beyin eski çeviri rutinine hızla geri döner.',
+        ],
+        pullQuote: 'Yeterince hızlı ve anlamlı girdi, beyni çeviriden çok doğrudan kavrayışa zorlar.',
+      },
+      {
+        number: '04',
+        title: 'Tıkanma Anı Yönetimi: Circumlocution ve Shadowing',
+        content: [
+          'Kelime unutulduğunda anadile dönmek yerine hedef dilde tarif etmek (circumlocution), akışı koruyan en kritik iletişim becerisidir.',
+          'Örnek: "matkap" akla gelmediğinde konuşmayı durdurmak yerine "It is a tool you use to make holes in the wall" diyebilmek, çeviri refleksini kırar. Gerekirse "Let me rephrase that..." gibi onarım kalıplarıyla akış onarılır.',
+          'Shadowing tekniği ise duyulan cümleyi eşzamanlı tekrar ederek bilişsel kapasiteyi tamamen dinleme-artikülasyon döngüsüne ayırır; çeviriye boşluk bırakmaz ve doğal ritmi güçlendirir.',
+        ],
+        pullQuote: 'Akıcılık, kelimeyi hiç unutmamak değil; unuttuğunuz anda konuşmayı hedef dilde sürdürebilmektir.',
+      },
+      {
+        number: '05',
+        title: 'Günlük Sınırlandırılmış Çıktı Planı',
+        content: [
+          '1) 5-10 Dakika Mikro Üretim: Her gün kısa oturumlarda yalnızca hedef dilde basit eylemleri seslendirin (ör. kahve hazırlama adımları).',
+          '2) Çevresel Tasarım: Çalışma ve yaşam alanında hedef dil etiketleri ve tek dilli kaynaklar kullanarak L1 tetikleyicilerini azaltın.',
+          '3) Düşük Karmaşıklık, Yüksek Tutarlılık: Karmaşık cümle hedeflemek yerine her gün sürdürülebilir ve tekrarlanabilir basit üretim döngüsü kurun.',
+          '4) Çeviri Yasağı Pencereleri: Gün içinde belirli zaman bloklarında L1 karşılık aramayı bilinçli biçimde kapatın; gerekirse sadece tarif ederek ilerleyin.',
+          '5) Haftalık Geri Bildirim: Üretim kayıtlarını dinleyip sessizlik, dolgu sesi ve uzatma anlarını izleyin; bir sonraki hafta için tek bir odak hedef belirleyin.',
+          '6) Shadowing Döngüsü: Kısa bir ses kaydını önce dinle, sonra eşzamanlı tekrar et, sonra gecikmeli tekrar et; ritim ve vurgu gelişimini kaydet.',
+        ],
+        pullQuote: 'Düzenli mikro pratik, düzensiz yoğun çalışmadan çok daha güçlü bir nöral yeniden yapılanma üretir.',
+      },
+    ],
+    conclusion: [
+      'Hedef dilde düşünme, "çeviri bölgesini" bir anda kapatmak değil; onu işlevsiz bırakacak kadar güçlü doğrudan üretim yolları inşa etmektir.',
+      'İfade kalıpları, yoğun girdi, çevresel tasarım, circumlocution ve shadowing birlikte uygulandığında çeviri refleksi zayıflar; konuşma akışı daha doğal, sürdürülebilir ve özgüvenli hale gelir.',
+    ],
+    closingLine: 'Çeviriyi azaltmak için daha fazla düşünmek değil, hedef dilde daha sık ve daha stratejik üretmek gerekir.',
+    relatedSlugs: ['ceviri-hastaligi', 'konusma-akiciliginin-fiziksel-ve-isitsel-cokusu'],
+    tags: ['Hedef Dilde Düşünme', 'Lexical Chunks', 'Circumlocution', 'Shadowing', 'Massive Input', 'Nöroplastisite'],
+    ctaTitle: 'Hedef dilde düşünme planını birlikte kuralım',
+    ctaSubtitle: 'Seviyene uygun mikro rutinlerle çeviri refleksini azaltan günlük çalışma sistemini hemen başlatalım.',
+    metaDescription: 'Hedef dilde düşünmeyi sağlayan teknikler: lexical chunks, massive input, direct association, circumlocution, constrained output ve shadowing.',
+  },
+  'iletisimsel-felc-gramer-ceviri-fosillesme-dongusu': {
+    slug: 'iletisimsel-felc-gramer-ceviri-fosillesme-dongusu',
+    category: 'genel',
+    categoryLabel: 'DİL ÖĞRENİMİ',
+    title: 'Yabancı Dil Ediniminde\nİletişimsel Felç',
+    subtitle: 'Gramer-çeviri yöntemiyle başlayan yanlış işlemleme zinciri, zihinsel çeviriye ve sonunda fosilleşmeye dönüşerek akıcılığı kalıcı biçimde kilitleyebilir.',
+    epigraph: 'Dil kuralla değil, gerçek zamanlı üretimle otomatikleşir.',
+    heroImage: grammarTranslationFossilizationImage,
+    author: 'Teachera Akademik İçerik Ekibi',
+    authorRole: 'Dil Edinimi ve Bilişsel Bilimler',
+    date: '28 Şubat 2026',
+    readTime: '11 dk',
+    sections: [
+      {
+        number: '01',
+        title: 'Gramer-Çeviri Yöntemi ve Bilişsel Yanılgı',
+        content: [
+          '19. yüzyılda ölü klasik diller için geliştirilen gramer-çeviri modeli, modern iletişim odaklı dil edinimi için yapısal olarak yetersizdir. Çünkü hedefi spontane iletişim değil, kural çözümleme ve metin çevirisidir.',
+          'Bu yaklaşım, dili yaşayan bir üretim sistemi yerine matematiksel bir problem gibi öğretir. Sonuçta öğrenci kuralı bilir ama konuşma anında bu bilgiyi otomatik üretime aktaramaz.',
+          'Nörobilişsel açıdan fark kritiktir: bildirimsel bilgi (kuralı açıklayabilme) ile işlemsel bilgi (anlık ve akıcı üretim) farklı sistemlerdir. Gramer-çeviri, ikinci sistemi geliştirmeden birincisini şişirir.',
+        ],
+        pullQuote: 'Kuralı bilmek, konuşmayı otomatikleştirmek değildir.',
+      },
+      {
+        number: '02',
+        title: 'Çeviri Hastalığı: Konuşma Anındaki Nörolojik Darboğaz',
+        content: [
+          'Gramer-çeviriyle yetişen zihin, düşünceyi hedef dilde kurmak yerine önce anadilde tasarlar, sonra çevirir. Bu refleks iletişim hızında ciddi işlemleme gecikmesi üretir.',
+          'Bilişsel yük arttıkça konuşmada sessizlikler, dolgu sesleri ve cümle ortasında donmalar artar. Bu belirtiler çoğu zaman özgüven sorunu değil, arka planda çalışan çeviri mekanizmasının metabolik maliyetidir.',
+          'Ek olarak dilin doğal eşdizim yapısı bozulur: kelime kelime aktarım, hedef dilde doğru görünen ama doğal olmayan cümleler üretir. Uzun vadede bu durum konuşma isteğini de zayıflatır.',
+        ],
+        image: grammarTranslationFossilizationImage,
+        imageCaption: 'Çeviri refleksi, akıcı iletişim hattında yapısal bir darboğaz oluşturur.',
+      },
+      {
+        number: '03',
+        title: 'Fosilleşme Döngüsü: Kalıcı Gelişim Duraksaması',
+        content: [
+          'Selinker\'in interlanguage çerçevesinde tanımlanan fosilleşme, öğrenicinin belirli hata kalıplarında kalıcı olarak takılmasıdır. Maruziyet artsa bile gelişim aynı hızda devam etmez.',
+          'Temel tetikleyici bilişsel yerleşmedir: anadil kalıpları hedef dile tekrar tekrar taşındığında beyin bu hatalı üretimi "varsayılan doğru yol" gibi otomatikleştirir.',
+          'Bu nedenle sorun yalnızca yanlış bilmek değil, yanlışı işlemsel belleğe kazımaktır. Dönüşüm için çeviri refleksini azaltan iletişimsel pratikler ve hedef dilde doğrudan kavramsallaştırma gerekir.',
+        ],
+        pullQuote: 'Fosilleşme, hatayı görmekten çok hatayı otomatik üretmeye başlamaktır.',
+      },
+    ],
+    conclusion: [
+      'Gramer-çeviri yöntemi beyni üretim yerine tercümeye hazırladığında, çeviri hastalığı konuşma akıcılığını yavaşlatır; süreç devam ettiğinde fosilleşme kalıcı bariyer haline gelir.',
+      'Bu döngüyü kırmanın yolu, kural odaklı pasif öğrenmeden iletişimsel ve üretim odaklı aktif modele geçmektir: kavramı anadil filtresinden geçirmeden hedef dilde işleyebilmek.',
+    ],
+    closingLine: 'Akıcılığa giden yol, cümleleri çevirmekten değil düşünceyi hedef dilde kurmaktan geçer.',
+    relatedSlugs: ['ceviri-hastaligi', 'hedef-dilde-dusunmeyi-saglayacak-teknikler'],
+    tags: ['Gramer-Çeviri Yöntemi', 'İletişimsel Felç', 'Çeviri Hastalığı', 'Fosilleşme', 'Interlanguage', 'Bilişsel Yük'],
+    ctaTitle: 'Çeviri refleksini kıran iletişimsel programa geçelim',
+    ctaSubtitle: 'Kural bilgisini konuşma otomasyonuna dönüştüren, seviyene göre yapılandırılmış pratik planını birlikte oluşturalım.',
+    metaDescription: 'Gramer-çeviri yöntemi, çeviri hastalığı ve fosilleşme döngüsü akıcılığı nasıl engeller? Nörobilişsel temelli açıklama ve çözüm yaklaşımı.',
+  },
+};
+
+const DEFAULT_META_DESCRIPTION = 'Teachera Academy içerikleriyle dil öğreniminde pratik odaklı, uygulanabilir yöntemleri keşfedin.';
 
 /* ═══════════════════════════════════════════════════════════════════════
    SLUG MAPPING — article id → slug
    ═══════════════════════════════════════════════════════════════════════ */
 export const ARTICLE_SLUG_MAP: Record<number, string> = {
   1: 'ceviri-hastaligi',
-  2: 'motor-beceri-mi-mantiksal-bilgi-mi',
-  3: 'business-english-kuresel-pazar',
-  4: 'ielts-toefl-sinav-stratejileri',
-  5: 'alman-muhendisligi-ve-dilin-yapisi',
-  6: 'hizli-ispanyolca-konusma-rehberi',
-  7: 'sanatin-dili-paris-sokaklari',
-  8: 'la-dolce-vita-jestler-ve-mimikler',
-  9: 'kiril-alfabesi-2-saatte',
-  10: 'dil-ogreniminde-yapay-zeka-devrimi',
-  11: 'ingilizce-deyimler-ve-atasozleri',
-  12: 'cocuklarda-erken-yasta-dil-ogrenimi',
-  13: 'yurtdisinda-yasam-ilk-90-gun',
-  14: 'polyglot-olmanin-sirlari',
-  15: 'netflix-ile-dil-ogrenmek',
+  2: 'konusma-akiciliginin-fiziksel-ve-isitsel-cokusu',
+  3: 'hedef-dilde-dusunmeyi-saglayacak-teknikler',
+  5: 'iletisimsel-felc-gramer-ceviri-fosillesme-dongusu',
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -552,9 +475,7 @@ export default function ArticleDetailPage() {
   const navigate = useNavigate();
   const article = useMemo(() => {
     if (!slug) return undefined;
-    if (ARTICLES[slug]) return ARTICLES[slug];
-    const fallback = FALLBACK_ARTICLE_MAP[slug];
-    return fallback ? buildFallbackArticle(fallback) : undefined;
+    return ARTICLES[slug];
   }, [slug]);
   const plainTitle = useMemo(() => (article ? normalizeArticleTitle(article.title) : ''), [article]);
 
@@ -672,14 +593,14 @@ export default function ArticleDetailPage() {
           {/* Atmospheric red glow — very subtle */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[#E70000] rounded-full filter blur-[300px] opacity-[0.04] pointer-events-none" />
 
-          <div className="max-w-[1100px] mx-auto px-6 lg:px-12 relative z-10 pt-32 md:pt-40 pb-24 md:pb-32">
+          <div className="max-w-[1100px] mx-auto px-6 lg:px-12 relative z-10 pt-24 md:pt-32 pb-16 md:pb-20">
 
             {/* Navigation row */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6 }}
-              className="flex items-center justify-between mb-16 md:mb-24"
+              className="flex items-center justify-between mb-10 md:mb-14"
             >
               <button
                 onClick={() => navigate('/academy')}
@@ -702,7 +623,7 @@ export default function ArticleDetailPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.5 }}
-              className="mb-10"
+              className="mb-6"
             >
               <span className="text-[#E70000] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.35em]">
                 {article.categoryLabel}
@@ -714,7 +635,7 @@ export default function ArticleDetailPage() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-              className="text-white leading-[0.95] mb-14 md:mb-18 whitespace-pre-line"
+              className="text-white leading-[0.95] mb-8 md:mb-12 whitespace-pre-line"
               style={{ fontSize: 'clamp(2.4rem, 7vw, 5.5rem)', fontFamily: "'Neutraface_2_Text:Bold', sans-serif", letterSpacing: '-0.02em' }}
             >
               {article.title}
@@ -725,7 +646,7 @@ export default function ArticleDetailPage() {
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="w-20 h-[2px] bg-[#E70000] origin-left mb-12"
+              className="w-20 h-[2px] bg-[#E70000] origin-left mb-8"
             />
 
             {/* Subtitle */}
@@ -733,7 +654,7 @@ export default function ArticleDetailPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.6 }}
-              className="text-white/35 text-[15px] md:text-[17px] font-['Neutraface_2_Text:Book',sans-serif] italic leading-[1.8] max-w-xl mb-14"
+              className="text-white/35 text-[15px] md:text-[17px] font-['Neutraface_2_Text:Book',sans-serif] italic leading-[1.65] max-w-xl mb-10"
             >
               {article.subtitle}
             </motion.p>
@@ -773,14 +694,14 @@ export default function ArticleDetailPage() {
         {/* ═══════════════════════════════════════════════════════
             EPIGRAPH
             ═══════════════════════════════════════════════════════ */}
-        <div className="max-w-[800px] mx-auto px-6 lg:px-12 pt-16 md:pt-24 pb-12 md:pb-20">
+        <div className="max-w-[800px] mx-auto px-6 lg:px-12 pt-10 md:pt-14 pb-8 md:pb-12">
           <Reveal>
             <div className="text-center">
               <div className="text-[#E70000]/25 text-[60px] md:text-[80px] leading-none font-['Neutraface_2_Text:Bold',sans-serif] select-none mb-2">"</div>
               <p className="text-[#324D47] text-[clamp(1.1rem,2.8vw,1.6rem)] font-['Neutraface_2_Text:Demi',sans-serif] italic leading-[1.7] max-w-[640px] mx-auto -mt-8 md:-mt-12">
                 {article.epigraph}
               </p>
-              <div className="w-8 h-[1px] bg-[#324D47]/15 mx-auto mt-10" />
+              <div className="w-8 h-[1px] bg-[#324D47]/15 mx-auto mt-7" />
             </div>
           </Reveal>
         </div>
@@ -788,14 +709,14 @@ export default function ArticleDetailPage() {
         {/* ═══════════════════════════════════════════════════════
             ARTICLE BODY
             ═══════════════════════════════════════════════════════ */}
-        <article className="max-w-[800px] mx-auto px-6 lg:px-12 pb-12">
+        <article className="max-w-[800px] mx-auto px-6 lg:px-12 pb-8">
 
           {article.sections.map((section, sIdx) => (
             <Reveal key={section.number} delay={sIdx === 0 ? 0 : 0.05}>
-              <section className={sIdx === 0 ? 'pt-4' : 'pt-20 md:pt-28'}>
+              <section className={sIdx === 0 ? 'pt-2' : 'pt-10 md:pt-12'}>
 
                 {/* ── Section Header ── */}
-                <div className="relative mb-10 md:mb-14">
+                <div className="relative mb-5 md:mb-6">
                   {/* Ghost number — positioned in margin on lg */}
                   <span
                     className="block lg:absolute lg:-left-24 lg:top-0 text-[#E70000]/[0.07] font-['Neutraface_2_Text:Bold',sans-serif] leading-none select-none mb-4 lg:mb-0"
@@ -812,35 +733,56 @@ export default function ArticleDetailPage() {
                 </div>
 
                 {/* ── Paragraphs ── */}
-                <div className="space-y-7">
+                <div className="space-y-3.5 md:space-y-4">
                   {section.content.map((paragraph, pIdx) => (
-                    <p
-                      key={pIdx}
-                      className="text-[#324D47]/70 font-['Neutraface_2_Text:Book',sans-serif] leading-[1.9]"
-                      style={{
-                        fontSize: 'clamp(1.05rem, 1.8vw, 1.15rem)',
-                        ...(sIdx === 0 && pIdx === 0 ? {} : {}),
-                      }}
-                    >
-                      {sIdx === 0 && pIdx === 0 ? (
-                        <>
-                          <span
-                            className="float-left text-[#324D47] font-['Neutraface_2_Text:Bold',sans-serif] leading-[0.75] mr-3 mt-2"
-                            style={{ fontSize: '4.2em' }}
+                    (() => {
+                      const isStrategyLine = /^\d\)\s/.test(paragraph);
+                      if (isStrategyLine) {
+                        const [heading, ...rest] = paragraph.split(':');
+                        const body = rest.join(':').trim();
+                        return (
+                          <div
+                            key={pIdx}
+                            className="border-l-2 border-[#E70000]/35 bg-[#324D47]/[0.03] px-5 py-2.5"
                           >
-                            {paragraph.charAt(0)}
-                          </span>
-                          {paragraph.slice(1)}
-                        </>
-                      ) : paragraph}
-                    </p>
+                            <p className="text-[#324D47]/80 font-['Neutraface_2_Text:Book',sans-serif] leading-[1.62]" style={{ fontSize: 'clamp(1rem, 1.65vw, 1.1rem)' }}>
+                              <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[#324D47]">{heading}:</span>{' '}
+                              {body}
+                            </p>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <p
+                          key={pIdx}
+                          className="text-[#324D47]/70 font-['Neutraface_2_Text:Book',sans-serif] leading-[1.66]"
+                          style={{
+                            fontSize: 'clamp(1.05rem, 1.8vw, 1.15rem)',
+                            ...(sIdx === 0 && pIdx === 0 ? {} : {}),
+                          }}
+                        >
+                          {sIdx === 0 && pIdx === 0 ? (
+                            <>
+                              <span
+                                className="float-left text-[#324D47] font-['Neutraface_2_Text:Bold',sans-serif] leading-[0.75] mr-3 mt-2"
+                                style={{ fontSize: '4.2em' }}
+                              >
+                                {paragraph.charAt(0)}
+                              </span>
+                              {paragraph.slice(1)}
+                            </>
+                          ) : paragraph}
+                        </p>
+                      );
+                    })()
                   ))}
                 </div>
 
                 {/* ── Pull Quote — Full-width, centered, dramatic ── */}
                 {section.pullQuote && (
                   <Reveal delay={0.1}>
-                    <div className="my-16 md:my-24 py-12 md:py-16 border-t border-b border-[#324D47]/[0.06] text-center relative">
+                    <div className="my-8 md:my-10 py-6 md:py-8 border-t border-b border-[#324D47]/[0.06] text-center relative">
                       {/* Large quotation mark */}
                       <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[#E70000]/10 font-['Neutraface_2_Text:Bold',sans-serif] select-none pointer-events-none" style={{ fontSize: '8rem', lineHeight: '1' }}>
                         "
@@ -858,7 +800,7 @@ export default function ArticleDetailPage() {
                 {/* ── Section Image — Edge-to-edge ── */}
                 {section.image && (
                   <Reveal delay={0.1}>
-                    <figure className="my-14 md:my-20 -mx-6 lg:-mx-24">
+                    <figure className="my-8 md:my-12 -mx-6 lg:-mx-24">
                       <div className="overflow-hidden">
                         <ImageWithFallback
                           src={section.image}
@@ -867,7 +809,7 @@ export default function ArticleDetailPage() {
                         />
                       </div>
                       {section.imageCaption && (
-                        <figcaption className="mt-5 px-6 lg:px-24 text-[#324D47]/30 text-[11px] font-['Neutraface_2_Text:Book',sans-serif] tracking-[0.05em]">
+                        <figcaption className="mt-3 px-6 lg:px-24 text-[#324D47]/30 text-[11px] font-['Neutraface_2_Text:Book',sans-serif] tracking-[0.05em]">
                           — {section.imageCaption}
                         </figcaption>
                       )}
@@ -882,15 +824,15 @@ export default function ArticleDetailPage() {
               CONCLUSION
               ═══════════════════════════════════════════════════════ */}
           <Reveal>
-            <section className="pt-20 md:pt-28">
+            <section className="pt-10 md:pt-12">
               {/* Heavy rule */}
-              <div className="w-full h-[2px] bg-[#324D47]/10 mb-14 md:mb-18" />
+              <div className="w-full h-[2px] bg-[#324D47]/10 mb-8 md:mb-10" />
 
-              <div className="space-y-7">
+              <div className="space-y-4">
                 {article.conclusion.map((paragraph, i) => (
                   <p
                     key={i}
-                    className="text-[#324D47]/70 font-['Neutraface_2_Text:Book',sans-serif] leading-[1.9]"
+                    className="text-[#324D47]/70 font-['Neutraface_2_Text:Book',sans-serif] leading-[1.66]"
                     style={{ fontSize: 'clamp(1.05rem, 1.8vw, 1.15rem)' }}
                   >
                     {paragraph}
@@ -900,14 +842,14 @@ export default function ArticleDetailPage() {
 
               {/* Closing line — standalone, bold */}
               <p
-                className="text-[#324D47] font-['Neutraface_2_Text:Bold',sans-serif] leading-[1.4] mt-12"
+                className="text-[#324D47] font-['Neutraface_2_Text:Bold',sans-serif] leading-[1.35] mt-8"
                 style={{ fontSize: 'clamp(1.2rem, 2.5vw, 1.5rem)' }}
               >
                 {article.closingLine}
               </p>
 
               {/* End mark */}
-              <div className="mt-14 flex items-center gap-4">
+              <div className="mt-8 flex items-center gap-4">
                 <div className="w-3 h-3 bg-[#E70000]" />
                 <div className="flex-1 h-[1px] bg-[#324D47]/[0.06]" />
               </div>
@@ -918,7 +860,7 @@ export default function ArticleDetailPage() {
               AUTHOR CARD
               ═══════════════════════════════════════════════════════ */}
           <Reveal>
-            <div className="mt-16 md:mt-20 py-10 flex items-start gap-6">
+            <div className="mt-10 md:mt-12 py-6 flex items-start gap-6">
               <div className="w-[3px] h-14 bg-[#E70000]/20 rounded-full shrink-0 mt-1" />
               <div>
                 <p className="text-[10px] text-[#324D47]/25 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.3em] mb-3">
@@ -938,7 +880,7 @@ export default function ArticleDetailPage() {
               TAGS
               ═══════════════════════════════════════════════════════ */}
           <Reveal>
-            <div className="mt-6 pt-8 border-t border-[#324D47]/[0.06] flex flex-wrap gap-2">
+            <div className="mt-4 pt-5 border-t border-[#324D47]/[0.06] flex flex-wrap gap-2">
               {article.tags.map((tag) => (
                 <span
                   key={tag}
@@ -955,22 +897,22 @@ export default function ArticleDetailPage() {
             BOTTOM CTA — Dark, authoritative
             ═══════════════════════════════════════════════════════ */}
         <Reveal>
-          <section className="bg-[#0a0a10] mt-20 md:mt-28 relative overflow-hidden">
+          <section className="bg-[#0a0a10] mt-14 md:mt-20 relative overflow-hidden">
             {/* Subtle red glow */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#E70000] rounded-full filter blur-[250px] opacity-[0.06] pointer-events-none" />
 
-            <div className="max-w-[800px] mx-auto px-6 lg:px-12 py-20 md:py-28 relative z-10">
+            <div className="max-w-[800px] mx-auto px-6 lg:px-12 py-14 md:py-16 relative z-10">
               <div className="text-center">
-                <span className="text-[#E70000] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.35em] block mb-8">
+                <span className="text-[#E70000] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.35em] block mb-5">
                   SONRAKİ ADIM
                 </span>
                 <h3
-                  className="text-white font-['Neutraface_2_Text:Bold',sans-serif] leading-[1.1] mb-6"
+                  className="text-white font-['Neutraface_2_Text:Bold',sans-serif] leading-[1.1] mb-4"
                   style={{ fontSize: 'clamp(1.6rem, 4vw, 2.8rem)' }}
                 >
                   {article.ctaTitle}
                 </h3>
-                <p className="text-white/30 text-[15px] font-['Neutraface_2_Text:Book',sans-serif] italic leading-relaxed max-w-md mx-auto mb-12">
+                <p className="text-white/30 text-[15px] font-['Neutraface_2_Text:Book',sans-serif] italic leading-relaxed max-w-md mx-auto mb-8">
                   {article.ctaSubtitle}
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

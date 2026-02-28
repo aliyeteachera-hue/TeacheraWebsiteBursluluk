@@ -7,6 +7,7 @@ import { ageRanges, getLanguagesForAge } from './ageLanguageMap';
 import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+import { savePlacementExamLead } from './exam/placementExamSession';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -82,6 +83,16 @@ export default function LevelAssessmentModal() {
       window.alert('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
       return;
     }
+
+    savePlacementExamLead({
+      fullName: formData.fullName,
+      phone: `+90 ${formData.phone}`,
+      email: formData.email,
+      age: formData.age,
+      language: formData.language,
+      source: 'level_assessment_modal',
+    });
+
     close();
     navigate(`/seviye-tespit-sinavi?age=${encodeURIComponent(formData.age)}&lang=${encodeURIComponent(formData.language)}`);
   };
@@ -218,7 +229,6 @@ export default function LevelAssessmentModal() {
                       <FieldWrap icon={<Mail size={14} />} label="E-posta Adresiniz">
                         <input
                           type="email"
-                          required
                           placeholder="ornek@email.com"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}

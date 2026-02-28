@@ -1,19 +1,47 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { ArrowLeft, ArrowRight, CheckCircle2, RotateCcw, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock3, RotateCcw, ShieldCheck } from 'lucide-react';
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { ageRanges, getLanguagesForAge } from './ageLanguageMap';
-import { getPlacementBank, type PlacementExamBank } from './exam/placementExamData';
+import {
+  getPlacementBandForScore,
+  getPlacementBank,
+  type PlacementExamBank,
+} from './exam/placementExamData';
+import { openMailDraft, openMailDraftOnUnload } from './formMailto';
+import { readPlacementExamLead, type PlacementExamLead } from './exam/placementExamSession';
 
 interface RenderQuestion {
   id: string;
   prompt: string;
   options: string[];
   answer: string;
+  wrongPenalty: number;
 }
 
-const QUESTION_COUNT = 24;
+type SubmissionStatus = 'completed' | 'time_limit_reached' | 'left_exam';
+
+interface ScoreMetrics {
+  score: number;
+  answeredCount: number;
+  correctCount: number;
+  wrongCount: number;
+  unansweredCount: number;
+  percentage: number;
+}
+
+interface ExamSnapshot {
+  questions: RenderQuestion[];
+  answers: Record<string, string>;
+  selectedAge: string;
+  selectedLanguage: string;
+  selectedLanguageLabel: string;
+  activeBank: PlacementExamBank | null;
+  remainingSeconds: number;
+  startedAt: number | null;
+  metrics: ScoreMetrics;
+}
 
 function shuffleArray<T>(values: T[]) {
   const clone = [...values];
@@ -24,19 +52,38 @@ function shuffleArray<T>(values: T[]) {
   return clone;
 }
 
-function buildQuestions(bank: PlacementExamBank, count: number): RenderQuestion[] {
-  const randomizedSource = shuffleArray(bank.questions);
-  const selectedSeeds = randomizedSource.slice(0, Math.min(count, randomizedSource.length));
+function getQuestionOrderValue(id: string): number {
+  const numericPart = Number(id.replace(/[^\d]/g, ''));
+  return Number.isFinite(numericPart) ? numericPart : Number.MAX_SAFE_INTEGER;
+}
+
+function buildQuestions(bank: PlacementExamBank): RenderQuestion[] {
+  const selectedSeeds = [...bank.questions].sort((left, right) => {
+    const leftOrder = getQuestionOrderValue(left.id);
+    const rightOrder = getQuestionOrderValue(right.id);
+    return leftOrder - rightOrder;
+  });
   const answerPool = Array.from(new Set(bank.questions.map((item) => item.answer.trim()).filter(Boolean)));
 
   return selectedSeeds.map((seed) => {
-    const isBoolean = /^(true|false)$/i.test(seed.answer);
+    const seedOptions = seed.options?.filter(Boolean) ?? [];
+    if (seedOptions.length >= 2) {
+      return {
+        id: seed.id,
+        prompt: seed.prompt,
+        answer: seed.answer,
+        wrongPenalty: typeof seed.wrongPenalty === 'number' ? seed.wrongPenalty : 0,
+        options: shuffleArray(seedOptions),
+      };
+    }
 
+    const isBoolean = /^(true|false)$/i.test(seed.answer);
     if (isBoolean) {
       return {
         id: seed.id,
         prompt: seed.prompt,
         answer: seed.answer,
+        wrongPenalty: typeof seed.wrongPenalty === 'number' ? seed.wrongPenalty : 0,
         options: shuffleArray(['True', 'False']),
       };
     }
@@ -48,9 +95,45 @@ function buildQuestions(bank: PlacementExamBank, count: number): RenderQuestion[
       id: seed.id,
       prompt: seed.prompt,
       answer: seed.answer,
+      wrongPenalty: typeof seed.wrongPenalty === 'number' ? seed.wrongPenalty : 0,
       options: shuffleArray(options),
     };
   });
+}
+
+function calculateMetrics(questions: RenderQuestion[], answers: Record<string, string>): ScoreMetrics {
+  let score = 0;
+  let answeredCount = 0;
+  let correctCount = 0;
+  let wrongCount = 0;
+
+  questions.forEach((question) => {
+    const selected = answers[question.id];
+    if (!selected) return;
+
+    answeredCount += 1;
+    if (selected === question.answer) {
+      correctCount += 1;
+      score += 1;
+      return;
+    }
+
+    wrongCount += 1;
+    score += question.wrongPenalty;
+  });
+
+  const unansweredCount = Math.max(0, questions.length - answeredCount);
+  const boundedScore = Math.max(0, score);
+  const percentage = questions.length > 0 ? Math.round((boundedScore / questions.length) * 100) : 0;
+
+  return {
+    score,
+    answeredCount,
+    correctCount,
+    wrongCount,
+    unansweredCount,
+    percentage,
+  };
 }
 
 function getEstimatedLevel(percentage: number) {
@@ -58,6 +141,80 @@ function getEstimatedLevel(percentage: number) {
   if (percentage >= 70) return 'B1 - B2';
   if (percentage >= 50) return 'A2 - B1';
   return 'A1 - A2';
+}
+
+function formatDuration(totalSeconds: number) {
+  const safeSeconds = Math.max(0, totalSeconds);
+  const minutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function getStatusLabel(status: SubmissionStatus) {
+  if (status === 'completed') return 'Tamamlandi';
+  if (status === 'time_limit_reached') return 'Sure Doldu';
+  return 'Sinavdan Ayrildi';
+}
+
+function getPlacementLabel(bank: PlacementExamBank | null, score: number, percentage: number) {
+  if (!bank) return getEstimatedLevel(percentage);
+  const band = getPlacementBandForScore(bank, score);
+  if (!band) return getEstimatedLevel(percentage);
+  return band.cefr ? `${band.label} (${band.cefr})` : band.label;
+}
+
+function getAudienceLabel(age: string) {
+  if (age === '7–12') return 'Çocuklar İçin';
+  if (age === '13–17') return 'Gençler İçin';
+  return 'Yetişkinler İçin';
+}
+
+function getExamDisplayTitle(age: string, languageLabel: string, fallbackTitle: string) {
+  if (!languageLabel) return fallbackTitle;
+  return `${getAudienceLabel(age)} ${languageLabel} Seviye Tespiti`;
+}
+
+function buildResultLines(snapshot: ExamSnapshot, lead: PlacementExamLead | null, status: SubmissionStatus, leaveReason?: string) {
+  const now = new Date().toISOString();
+  const startedAtIso = snapshot.startedAt ? new Date(snapshot.startedAt).toISOString() : '-';
+  const elapsedSeconds = snapshot.startedAt ? Math.max(0, Math.floor((Date.now() - snapshot.startedAt) / 1000)) : 0;
+  const placementLabel = getPlacementLabel(snapshot.activeBank, snapshot.metrics.score, snapshot.metrics.percentage);
+  const examDisplayTitle = getExamDisplayTitle(
+    snapshot.selectedAge,
+    snapshot.selectedLanguageLabel,
+    snapshot.activeBank?.title || '-',
+  );
+
+  const lines = [
+    `Ad Soyad: ${lead?.fullName || '-'}`,
+    `Telefon: ${lead?.phone || '-'}`,
+    `E-posta: ${lead?.email || '-'}`,
+    `Yas Araligi: ${snapshot.selectedAge || lead?.age || '-'}`,
+    `Dil: ${snapshot.selectedLanguageLabel || snapshot.selectedLanguage || lead?.language || '-'}`,
+    `Sinav: ${examDisplayTitle}`,
+    `Durum: ${getStatusLabel(status)}`,
+    `Toplam Soru: ${snapshot.questions.length}`,
+    `Cevaplanan: ${snapshot.metrics.answeredCount}`,
+    `Dogru: ${snapshot.metrics.correctCount}`,
+    `Yanlis: ${snapshot.metrics.wrongCount}`,
+    `Bos: ${snapshot.metrics.unansweredCount}`,
+    `Net Puan: ${snapshot.metrics.score}`,
+    `Maksimum Puan: ${snapshot.questions.length}`,
+    `Yuzde: %${snapshot.metrics.percentage}`,
+    `Yerlestirme: ${placementLabel}`,
+    `Baslangic: ${startedAtIso}`,
+    `Bitis: ${now}`,
+    `Gecen Sure (sn): ${elapsedSeconds}`,
+    `Kalan Sure (sn): ${snapshot.remainingSeconds}`,
+    `Lead Kaynagi: ${lead?.source || '-'}`,
+    'Kaynak: PlacementExamPage',
+  ];
+
+  if (leaveReason) {
+    lines.push(`Ayrilma Nedeni: ${leaveReason}`);
+  }
+
+  return lines;
 }
 
 export default function PlacementExamPage() {
@@ -71,23 +228,62 @@ export default function PlacementExamPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
+  const [activeBank, setActiveBank] = useState<PlacementExamBank | null>(null);
+  const [lead, setLead] = useState<PlacementExamLead | null>(null);
+  const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus | null>(null);
+  const [isSendingResult, setIsSendingResult] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
   const availableLanguages = useMemo(() => getLanguagesForAge(selectedAge), [selectedAge]);
-  const selectedLanguageLabel = availableLanguages.find((language) => language.id === selectedLanguage)?.name;
+  const selectedLanguageLabel =
+    availableLanguages.find((language) => language.id === selectedLanguage)?.name ?? selectedLanguage;
 
   const activeBankInfo = useMemo(() => {
     if (!selectedAge || !selectedLanguage) return null;
     return getPlacementBank(selectedAge, selectedLanguage);
   }, [selectedAge, selectedLanguage]);
+  const examDisplayTitle =
+    activeBankInfo?.available
+      ? getExamDisplayTitle(selectedAge, selectedLanguageLabel, activeBankInfo.bank.title)
+      : '';
 
   const currentQuestion = questions[currentIndex];
-  const answeredCount = Object.keys(answers).length;
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
-  const score = questions.reduce((total, question) => total + (answers[question.id] === question.answer ? 1 : 0), 0);
-  const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+  const isCurrentAnswered = currentQuestion ? Boolean(answers[currentQuestion.id]) : false;
+
+  const metrics = useMemo(() => calculateMetrics(questions, answers), [questions, answers]);
+
+  const reportSentRef = useRef(false);
+  const timerSubmissionTriggeredRef = useRef(false);
+  const startedAtRef = useRef<number | null>(null);
+  const snapshotRef = useRef<ExamSnapshot>({
+    questions: [],
+    answers: {},
+    selectedAge: '',
+    selectedLanguage: '',
+    selectedLanguageLabel: '',
+    activeBank: null,
+    remainingSeconds: 0,
+    startedAt: null,
+    metrics: calculateMetrics([], {}),
+  });
+
+  snapshotRef.current = {
+    questions,
+    answers,
+    selectedAge,
+    selectedLanguage,
+    selectedLanguageLabel,
+    activeBank,
+    remainingSeconds,
+    startedAt: startedAtRef.current,
+    metrics,
+  };
 
   useEffect(() => {
     document.title = 'Seviye Tespit Sınavı | Teachera';
+    setLead(readPlacementExamLead());
   }, []);
 
   useEffect(() => {
@@ -106,13 +302,93 @@ export default function PlacementExamPage() {
     }
   }, [availableLanguages, selectedLanguage]);
 
+  const sendExamResult = async (status: SubmissionStatus) => {
+    if (reportSentRef.current) {
+      setIsSubmitted(true);
+      return;
+    }
+
+    reportSentRef.current = true;
+    setSubmissionStatus(status);
+    setIsSendingResult(true);
+    setSendError(null);
+
+    const sent = await openMailDraft({
+      subject: 'Seviye Tespit Sınav Sonucu',
+      lines: buildResultLines(snapshotRef.current, lead, status),
+    });
+
+    if (!sent) {
+      setSendError('Sınav sonucu gönderilirken bir hata oluştu. Lütfen danışmanla iletişime geçin.');
+    }
+
+    setIsSendingResult(false);
+    setIsSubmitted(true);
+  };
+
+  const sendLeaveReportIfNeeded = (leaveReason: string) => {
+    if (!isStarted || isSubmitted || reportSentRef.current) return;
+
+    reportSentRef.current = true;
+    openMailDraftOnUnload({
+      subject: 'Seviye Tespit Sınav Ayrilma Bildirimi',
+      lines: buildResultLines(snapshotRef.current, lead, 'left_exam', leaveReason),
+    });
+  };
+
+  useEffect(() => {
+    if (!isStarted || isSubmitted) return;
+
+    const handlePageExit = () => {
+      sendLeaveReportIfNeeded('browser_exit');
+    };
+
+    window.addEventListener('pagehide', handlePageExit);
+    window.addEventListener('beforeunload', handlePageExit);
+
+    return () => {
+      window.removeEventListener('pagehide', handlePageExit);
+      window.removeEventListener('beforeunload', handlePageExit);
+      sendLeaveReportIfNeeded('route_change');
+    };
+  }, [isStarted, isSubmitted]);
+
+  useEffect(() => {
+    if (!isStarted || isSubmitted || questions.length === 0) return;
+
+    if (remainingSeconds <= 0) {
+      if (!timerSubmissionTriggeredRef.current) {
+        timerSubmissionTriggeredRef.current = true;
+        const completionStatus: SubmissionStatus =
+          snapshotRef.current.metrics.unansweredCount === 0 ? 'completed' : 'time_limit_reached';
+        void sendExamResult(completionStatus);
+      }
+      return;
+    }
+
+    const timerId = window.setInterval(() => {
+      setRemainingSeconds((previous) => Math.max(0, previous - 1));
+    }, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, [isStarted, isSubmitted, questions.length, remainingSeconds]);
+
   const startExam = () => {
     if (!activeBankInfo || !activeBankInfo.available) return;
-    setQuestions(buildQuestions(activeBankInfo.bank, QUESTION_COUNT));
+
+    const nextQuestions = buildQuestions(activeBankInfo.bank);
+    setQuestions(nextQuestions);
+    setActiveBank(activeBankInfo.bank);
     setAnswers({});
     setCurrentIndex(0);
+    setSubmissionStatus(null);
+    setSendError(null);
     setIsSubmitted(false);
     setIsStarted(true);
+    setRemainingSeconds(nextQuestions.length * 60);
+    reportSentRef.current = false;
+    timerSubmissionTriggeredRef.current = false;
+    startedAtRef.current = Date.now();
   };
 
   const restartExam = () => {
@@ -126,10 +402,9 @@ export default function PlacementExamPage() {
 
   const goToPrevious = () => setCurrentIndex((index) => Math.max(0, index - 1));
   const goToNext = () => setCurrentIndex((index) => Math.min(questions.length - 1, index + 1));
+  const skipQuestion = () => goToNext();
 
-  const submitExam = () => {
-    setIsSubmitted(true);
-  };
+  const placementLabel = getPlacementLabel(activeBank, metrics.score, metrics.percentage);
 
   return (
     <div className="min-h-screen bg-[#F4EBD1]">
@@ -212,12 +487,16 @@ export default function PlacementExamPage() {
             </div>
 
             {activeBankInfo && activeBankInfo.available && (
-              <div className="mt-5 p-4 rounded-2xl border border-[#324D47]/15 bg-[#F4EBD1]/70">
+              <div className="mt-5 p-4 rounded-2xl border border-[#324D47]/15 bg-[#F4EBD1]/70 space-y-2">
                 <p className="text-[#324D47]/80 text-[13px] leading-relaxed font-['Neutraface_2_Text:Book',sans-serif]">
                   <strong className="font-['Neutraface_2_Text:Demi',sans-serif] text-[#324D47]">
                     Açılacak sınav:
                   </strong>{' '}
-                  {activeBankInfo.bank.title} ({activeBankInfo.bank.questions.length} soru havuzu)
+                  {examDisplayTitle} ({activeBankInfo.bank.questions.length} soru)
+                </p>
+                <p className="text-[12px] text-[#324D47]/70 font-['Neutraface_2_Text:Book',sans-serif] inline-flex items-center gap-2">
+                  <Clock3 size={12} />
+                  Toplam süre: {activeBankInfo.bank.questions.length} dakika (soru başı 1 dakika)
                 </p>
               </div>
             )}
@@ -253,7 +532,7 @@ export default function PlacementExamPage() {
         {isStarted && questions.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
             {!isSubmitted && (
-              <div className="rounded-2xl border border-[#324D47]/15 bg-white/80 p-4 md:p-5">
+              <div className="rounded-2xl border border-[#324D47]/15 bg-white/80 p-4 md:p-5 space-y-3">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[13px] text-[#324D47]/75 font-['Neutraface_2_Text:Demi',sans-serif]">
                     {selectedLanguageLabel} · {selectedAge}
@@ -264,6 +543,15 @@ export default function PlacementExamPage() {
                 </div>
                 <div className="h-[6px] rounded-full bg-[#324D47]/10 overflow-hidden">
                   <div className="h-full bg-[#324D47] transition-all duration-300" style={{ width: `${progress}%` }} />
+                </div>
+                <div className="flex items-center justify-between gap-3 text-[12px] text-[#324D47]/75 font-['Neutraface_2_Text:Demi',sans-serif]">
+                  <span className="inline-flex items-center gap-2">
+                    <Clock3 size={12} />
+                    Kalan Süre: {formatDuration(remainingSeconds)}
+                  </span>
+                  <span>
+                    Cevaplanan: {metrics.answeredCount}/{questions.length}
+                  </span>
                 </div>
               </div>
             )}
@@ -303,19 +591,29 @@ export default function PlacementExamPage() {
                   </button>
 
                   {currentIndex < questions.length - 1 && (
-                    <button
-                      onClick={goToNext}
-                      className="h-[42px] px-5 rounded-full bg-[#00000B] hover:bg-[#68232E] text-white text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer"
-                    >
-                      Sonraki
-                      <ArrowRight size={14} />
-                    </button>
+                    <>
+                      <button
+                        onClick={skipQuestion}
+                        className="h-[42px] px-5 rounded-full border border-[#324D47]/25 text-[#324D47] hover:bg-[#324D47]/10 text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors inline-flex items-center cursor-pointer"
+                      >
+                        SORUYU ATLA
+                      </button>
+                      <button
+                        onClick={goToNext}
+                        disabled={!isCurrentAnswered}
+                        className="h-[42px] px-5 rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
+                      >
+                        Sonraki
+                        <ArrowRight size={14} />
+                      </button>
+                    </>
                   )}
 
                   {currentIndex === questions.length - 1 && (
                     <button
-                      onClick={submitExam}
-                      className="h-[42px] px-5 rounded-full bg-[#E70000] hover:bg-[#c40000] text-white text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer"
+                      onClick={() => void sendExamResult(remainingSeconds === 0 ? 'completed' : 'time_limit_reached')}
+                      disabled={remainingSeconds > 0 || isSendingResult}
+                      className="h-[42px] px-5 rounded-full bg-[#E70000] hover:bg-[#c40000] text-white text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
                     >
                       SINAVI BİTİR
                       <CheckCircle2 size={14} />
@@ -324,7 +622,7 @@ export default function PlacementExamPage() {
                 </div>
 
                 <p className="mt-5 text-[12px] text-[#324D47]/55 font-['Neutraface_2_Text:Book',sans-serif]">
-                  İşaretlenen soru: {answeredCount}/{questions.length}
+                  Süre dolduğunda sınav otomatik olarak gönderilir.
                 </p>
               </div>
             )}
@@ -335,21 +633,27 @@ export default function PlacementExamPage() {
                   Sınav Sonucu
                 </h3>
                 <p className="mt-3 text-[14px] text-[#324D47]/75 font-['Neutraface_2_Text:Book',sans-serif]">
-                  {score} / {questions.length} doğru · %{percentage} başarı
+                  Durum: {submissionStatus ? getStatusLabel(submissionStatus) : '-'}
+                </p>
+                <p className="mt-1 text-[14px] text-[#324D47]/75 font-['Neutraface_2_Text:Book',sans-serif]">
+                  {metrics.correctCount} doğru · {metrics.wrongCount} yanlış · {metrics.unansweredCount} boş
+                </p>
+                <p className="mt-1 text-[14px] text-[#324D47]/75 font-['Neutraface_2_Text:Book',sans-serif]">
+                  Net: {metrics.score} / {questions.length} · %{metrics.percentage}
                 </p>
 
                 <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="rounded-2xl border border-[#324D47]/15 bg-[#F4EBD1]/70 p-4">
                     <p className="text-[11px] uppercase tracking-[0.12em] text-[#324D47]/60 font-['Neutraface_2_Text:Demi',sans-serif]">
-                      Tahmini Seviye
+                      Yerleştirme
                     </p>
-                    <p className="mt-2 text-[28px] leading-none text-[#324D47] font-['Neutraface_2_Text:Bold',sans-serif]">
-                      {getEstimatedLevel(percentage)}
+                    <p className="mt-2 text-[24px] leading-none text-[#324D47] font-['Neutraface_2_Text:Bold',sans-serif]">
+                      {placementLabel}
                     </p>
                   </div>
                   <div className="rounded-2xl border border-[#324D47]/15 bg-[#F4EBD1]/70 p-4">
                     <p className="text-[11px] uppercase tracking-[0.12em] text-[#324D47]/60 font-['Neutraface_2_Text:Demi',sans-serif]">
-                      Not
+                      Bilgilendirme
                     </p>
                     <p className="mt-2 text-[13px] leading-relaxed text-[#324D47]/75 font-['Neutraface_2_Text:Book',sans-serif]">
                       Yazılı seviye tespit sonuçlarınız için, eğitim danışmanlarımız en kısa süre içerisinde sizleri
@@ -357,6 +661,12 @@ export default function PlacementExamPage() {
                     </p>
                   </div>
                 </div>
+
+                {sendError && (
+                  <p className="mt-5 text-[12px] rounded-xl border border-[#E70000]/25 bg-[#FFF3F1] text-[#68232E] px-3 py-2 font-['Neutraface_2_Text:Demi',sans-serif]">
+                    {sendError}
+                  </p>
+                )}
 
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <button
@@ -370,6 +680,8 @@ export default function PlacementExamPage() {
                     onClick={() => {
                       setIsStarted(false);
                       setIsSubmitted(false);
+                      setSubmissionStatus(null);
+                      setSendError(null);
                     }}
                     className="h-[42px] px-5 rounded-full border border-[#324D47]/25 text-[#324D47] hover:bg-[#324D47]/10 text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors inline-flex items-center"
                   >

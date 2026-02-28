@@ -1,3 +1,6 @@
+import { PDF_PLACEMENT_BANKS } from './placementPdfBanks';
+import { ENGLISH_DME_BANKS } from './placementEnglishDmeBanks';
+
 export type PlacementExamKey =
   | 'en-kids'
   | 'en-teens'
@@ -12,6 +15,15 @@ export interface PlacementQuestionSeed {
   id: string;
   prompt: string;
   answer: string;
+  options?: string[];
+  wrongPenalty?: number;
+}
+
+export interface PlacementBand {
+  min: number;
+  max: number;
+  label: string;
+  cefr?: string;
 }
 
 export interface PlacementExamBank {
@@ -20,10 +32,11 @@ export interface PlacementExamBank {
   languageId: string;
   ageScope: string;
   sourceFileName: string;
+  placementBands?: PlacementBand[];
   questions: PlacementQuestionSeed[];
 }
 
-export const PLACEMENT_EXAM_BANKS: Record<PlacementExamKey, PlacementExamBank> = {
+const BASE_PLACEMENT_EXAM_BANKS: Record<PlacementExamKey, PlacementExamBank> = {
   "en-kids": {
     "key": "en-kids",
     "title": "Kids English Placement Test",
@@ -3108,6 +3121,12 @@ export const PLACEMENT_EXAM_BANKS: Record<PlacementExamKey, PlacementExamBank> =
   }
 } as Record<PlacementExamKey, PlacementExamBank>;
 
+export const PLACEMENT_EXAM_BANKS: Record<PlacementExamKey, PlacementExamBank> = {
+  ...BASE_PLACEMENT_EXAM_BANKS,
+  ...PDF_PLACEMENT_BANKS,
+  ...ENGLISH_DME_BANKS,
+};
+
 const AGE_BASED_UNAVAILABLE_NOTE =
   'Bu yaş grubu için online seviye testimiz bulunmamaktadır. Eğitim danışmanlarımız sözlü seviye tespiti için en kısa süre içerisinde sizlerle iletişime geçecektir.';
 
@@ -3158,4 +3177,12 @@ export function getPlacementBank(age: string, languageId: string) {
     ...resolved,
     bank: PLACEMENT_EXAM_BANKS[resolved.key],
   };
+}
+
+export function getPlacementBandForScore(bank: PlacementExamBank, score: number) {
+  if (!bank.placementBands?.length) return null;
+  return (
+    bank.placementBands.find((band) => score >= band.min && score <= band.max) ??
+    null
+  );
 }

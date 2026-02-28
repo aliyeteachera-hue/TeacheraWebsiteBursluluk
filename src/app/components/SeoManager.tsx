@@ -13,8 +13,20 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/favicon-32x32.png`;
 const DEFAULT_ROBOTS = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
 
 const CORE_KEYWORDS = [
+  'konya dil kursu',
   'konya dil okulu',
   'konya ingilizce kursu',
+  'konya ispanyolca kursu',
+  'konya rusca kursu',
+  'konya arapca kursu',
+  'konya almanca kursu',
+  'konya goethe kursu',
+  'konya ielts kursu',
+  'konya toefl kursu',
+  'konya en iyi dil kursu',
+  'konya yabanci dil okulu',
+  'konya italyanca kursu',
+  'konya cocuklar icin ingilizce',
   'selçuklu dil kursu',
   'türkiye online dil kursu',
   'online ingilizce kursu türkiye',
@@ -58,7 +70,7 @@ const STATIC_ROUTE_META: Record<string, SeoMeta> = {
     title: 'Eğitim Programları | Teachera Konya',
     description:
       'Konya merkezli Teachera programları: çocuk, genç, yetişkin, sınav ve kariyer odaklı yabancı dil eğitimleri.',
-    keywords: [...CORE_KEYWORDS, 'konya dil kursu programları', 'yabancı dil eğitim programları'],
+    keywords: [...CORE_KEYWORDS, 'konya dil kursu programları', 'konya yabancı dil okulu programları', 'yabancı dil eğitim programları'],
   },
   '/academy': {
     title: 'Teachera Academy | Dil Öğrenme Rehberleri',

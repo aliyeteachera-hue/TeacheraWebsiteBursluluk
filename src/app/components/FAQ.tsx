@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { ageRanges, getLanguagesForAge } from './ageLanguageMap';
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+import { savePlacementExamLead } from './exam/placementExamSession';
 
 /* ═══════════════════════════════════════════════════════════════════════
    DATA
@@ -188,7 +189,7 @@ function InlineForm({ type, faqId }: { type: FAQActionType; faqId: number }) {
   const availableLanguages = formData.age ? getLanguagesForAge(formData.age) : [];
   const selectedLanguageLabel = availableLanguages.find((language) => language.id === formData.language)?.name || '';
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
-  const allFilled = formData.fullName && isPhoneValid && formData.email && formData.age && formData.language;
+  const allFilled = formData.fullName && isPhoneValid && formData.age && formData.language;
 
   const handleSubmit = async () => {
     if (!allFilled) return;
@@ -199,7 +200,7 @@ function InlineForm({ type, faqId }: { type: FAQActionType; faqId: number }) {
         lines: [
           `Ad Soyad: ${formData.fullName}`,
           `Telefon: +90 ${formData.phone}`,
-          `E-posta: ${formData.email}`,
+          `E-posta: ${formData.email || '-'}`,
           `Yas Araligi: ${formData.age}`,
           `Dil: ${selectedLanguageLabel || formData.language}`,
           `Kaynak: FAQ Inline Form #${faqId}`,
@@ -211,6 +212,15 @@ function InlineForm({ type, faqId }: { type: FAQActionType; faqId: number }) {
         return;
       }
 
+      savePlacementExamLead({
+        fullName: formData.fullName,
+        phone: `+90 ${formData.phone}`,
+        email: formData.email,
+        age: formData.age,
+        language: formData.language,
+        source: `faq_inline_form_${faqId}`,
+      });
+
       navigate(`/seviye-tespit-sinavi?age=${encodeURIComponent(formData.age)}&lang=${encodeURIComponent(formData.language)}`);
       return;
     }
@@ -220,7 +230,7 @@ function InlineForm({ type, faqId }: { type: FAQActionType; faqId: number }) {
       lines: [
         `Ad Soyad: ${formData.fullName}`,
         `Telefon: +90 ${formData.phone}`,
-        `E-posta: ${formData.email}`,
+        `E-posta: ${formData.email || '-'}`,
         `Yas Araligi: ${formData.age}`,
         `Dil: ${selectedLanguageLabel || formData.language}`,
         `Kaynak: FAQ Inline Form #${faqId}`,

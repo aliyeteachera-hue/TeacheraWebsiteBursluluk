@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router';
 import {
@@ -7,9 +7,13 @@ import {
 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ARTICLE_SLUG_MAP } from './ArticleDetailPage';
+import { openMailDraft } from './formMailto';
+import mentalTranslationCollapseImage from '../../assets/blog/mental-translation-collapse.webp';
+import targetLanguageThinkingImage from '../../assets/blog/target-language-thinking-techniques.webp';
+import grammarTranslationFossilizationImage from '../../assets/blog/gramer-ceviri-fosillesme-dongusu.webp';
 
 /* ═══════════════════════════════════════════════════════════════════════
-   ARTICLE DATA — 15 Makale
+   ARTICLE DATA — Academy İçerikleri
    ═══════════════════════════════════════════════════════════════════════ */
 interface Article {
   id: number;
@@ -25,190 +29,56 @@ interface Article {
 }
 
 const articles: Article[] = [
-  // ── GENEL ────────────────────────────────────
   {
-    id: 1,
+    id: 3,
     category: 'genel',
-    title: 'Çeviri Hastalığı: Biliyorum Ama Konuşamıyorum',
-    excerpt: 'Dil öğrenme sürecinde, teknik ve gramer bilgisine hakim olsanız bile anlama ve konuşma becerilerinizi geliştiremeyişinizi anlamlandıramıyor olabilirsiniz. Bu yazıda "çeviri hastalığı" kavramını çözüyoruz.',
-    image: 'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'Teachera Uzman Ekibi',
-    date: '12 Eki 2025',
+    title: 'Hedef Dilde Düşünmeyi Sağlayacak Teknikler',
+    excerpt: 'Lexical chunks, massive input, direct association, circumlocution ve shadowing gibi tekniklerle çeviri refleksini zayıflatıp hedef dilde düşünme becerisi oluşturun.',
+    image: targetLanguageThinkingImage,
+    readTime: '10 dk',
+    author: 'Teachera Akademik İçerik Ekibi',
+    date: '28 Şub 2026',
     featured: true,
+    trending: true,
+  },
+  {
+    id: 5,
+    category: 'genel',
+    title: 'Yabancı Dil Ediniminde İletişimsel Felç',
+    excerpt: 'Gramer-çeviri yöntemi, çeviri hastalığı ve fosilleşme döngüsünü nörobilişsel temelde inceleyen kapsamlı analiz.',
+    image: grammarTranslationFossilizationImage,
+    readTime: '11 dk',
+    author: 'Teachera Akademik İçerik Ekibi',
+    date: '28 Şub 2026',
     trending: true,
   },
   {
     id: 2,
     category: 'genel',
-    title: 'Motor Beceri mi? Mantıksal Bilgi Edinimi mi?',
-    excerpt: 'Dil öğrenmenin temel amacı iletişim kurabilmektir. Ancak çoğu sistem dili bir "matematik problemi" gibi öğretir. Beyin bilimi bu konuda ne söylüyor?',
-    image: 'https://images.unsplash.com/photo-1725399633872-32ba508b0607?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '7 dk',
-    author: 'Dr. Elena Rossi',
-    date: '10 Eki 2025',
-  },
-  {
-    id: 10,
-    category: 'genel',
-    title: 'Dil Öğreniminde Yapay Zeka Devrimi',
-    excerpt: 'Yapay zeka araçları dil öğrenimini nasıl kişiselleştiriyor ve hızlandırıyor? ChatGPT\'den Duolingo AI\'a, yeni nesil öğrenme araçlarını keşfedin.',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'Teknoloji Ekibi',
-    date: '08 Eki 2025',
+    title: 'Konuşma Akıcılığının Fiziksel ve İşitsel Çöküşü',
+    excerpt: 'Bilişsel yükün konuşma ritmini nasıl bozduğunu, disfluency fenomenlerini ve zihinsel çevirinin dilsel doğallığı nasıl tahrip ettiğini bilimsel çerçevede inceleyin.',
+    image: mentalTranslationCollapseImage,
+    readTime: '12 dk',
+    author: 'Teachera Akademik İçerik Ekibi',
+    date: '28 Şub 2026',
     trending: true,
   },
   {
-    id: 12,
+    id: 1,
     category: 'genel',
-    title: 'Çocuklarda Erken Yaşta Dil Öğrenimi: Neden 7 Yaş Kritik?',
-    excerpt: 'Nörobilim araştırmaları, çocukların dil öğrenme kapasitesinin 7 yaşında zirve yaptığını gösteriyor. Ebeveynler için pratik bir rehber.',
-    image: 'https://images.unsplash.com/photo-1544776193-352d25ca82cd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '6 dk',
-    author: 'Pedagoji Ekibi',
-    date: '02 Eki 2025',
-  },
-  {
-    id: 13,
-    category: 'genel',
-    title: 'Yurtdışında Yaşam: Dil Bariyerini Kırmak İçin İlk 90 Gün',
-    excerpt: 'Yeni bir ülkeye taşındığınızda dil bariyeri en büyük stres kaynağı olabilir. İlk 90 günde uygulamanız gereken 7 altın kural.',
-    image: 'https://images.unsplash.com/photo-1561558471-ea8ebc7c9ae5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'Teachera Uzman Ekibi',
-    date: '28 Eyl 2025',
-  },
-  {
-    id: 14,
-    category: 'genel',
-    title: 'Polyglot Olmanın Sırları: 3\'ten Fazla Dil Nasıl Öğrenilir?',
-    excerpt: 'Dünyada 50\'den fazla dil konuşan insanlar var. Polyglot\'ların ortak kullandığı teknikleri ve beyin stratejilerini inceliyoruz.',
-    image: 'https://images.unsplash.com/photo-1743565900437-f232da3a22c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
+    title: 'Zihinsel Çeviri Tuzağı: Biliyoruz Ama Konuşamıyoruz',
+    excerpt: 'Zihinsel çeviri alışkanlığının konuşma akıcılığını nasıl sabote ettiğini, neden kronik kaygı ürettiğini ve hedef dilde düşünme stratejileriyle nasıl kırılacağını öğrenin.',
+    image: 'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
     readTime: '8 dk',
-    author: 'Dr. Elena Rossi',
-    date: '22 Eyl 2025',
+    author: 'Teachera Uzman Ekibi',
+    date: '27 Şub 2026',
     trending: true,
-  },
-  {
-    id: 15,
-    category: 'genel',
-    title: 'Netflix ile Dil Öğrenmek: Eğlenceli Ama Gerçekten Etkili mi?',
-    excerpt: 'Dizi ve film izleyerek dil öğrenme trendi giderek büyüyor. Altyazı stratejileri, en iyi içerik önerileri ve bilimsel veriler bu yazıda.',
-    image: 'https://images.unsplash.com/photo-1608737739007-f0019bc67f59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'Kültür Ekibi',
-    date: '18 Eyl 2025',
-  },
-
-  // ── İNGİLİZCE ────────────────────────────────
-  {
-    id: 3,
-    category: 'ingilizce',
-    title: 'Business English: Küresel Pazarda Yerinizi Alın',
-    excerpt: 'Profesyonel hayatta İngilizce sadece bir dil değil, bir yetkinliktir. Toplantılarda, sunumlarda ve müzakerelerde kullanabileceğiniz kilit stratejiler.',
-    image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'James Wilson',
-    date: '15 Eki 2025',
-    featured: true,
-  },
-  {
-    id: 4,
-    category: 'ingilizce',
-    title: 'IELTS & TOEFL Sınav Stratejileri',
-    excerpt: 'Akademik sınavlara hazırlanırken yapılan en yaygın hatalar ve yüksek skor için "Time Management" taktikleri.',
-    image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '6 dk',
-    author: 'Sarah Jenkins',
-    date: '14 Eki 2025',
-  },
-  {
-    id: 11,
-    category: 'ingilizce',
-    title: 'İngilizce Deyimler ve Atasözleri: Native Gibi Konuşun',
-    excerpt: 'Native speaker gibi konuşmak için bilmeniz gereken en popüler 50 İngilizce deyim ve kullanım alanları.',
-    image: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'John Smith',
-    date: '11 Eki 2025',
-  },
-
-  // ── ALMANCA ──────────────────────────────────
-  {
-    id: 5,
-    category: 'almanca',
-    title: 'Alman Mühendisliği ve Dilin Yapısı',
-    excerpt: 'Almanca, kuralların ve netliğin dilidir. Mühendislik ve teknik alanlarda kariyer hedefleyenler için temel terminoloji rehberi.',
-    image: 'https://images.unsplash.com/photo-1517457210348-703079e57d4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'Hans Müller',
-    date: '13 Eki 2025',
-    featured: true,
-  },
-
-  // ── İSPANYOLCA ───────────────────────────────
-  {
-    id: 6,
-    category: 'ispanyolca',
-    title: 'Ritmi Yakalayın: Hızlı İspanyolca Konuşma Rehberi',
-    excerpt: 'İspanyolca, dünyanın en hızlı konuşulan dillerinden biridir. Duyduğunu anlama ve bu hıza ayak uydurma egzersizleri.',
-    image: 'https://images.unsplash.com/photo-1547990196-80517909c0aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'Maria Garcia',
-    date: '09 Eki 2025',
-    featured: true,
-  },
-
-  // ── FRANSIZCA ────────────────────────────────
-  {
-    id: 7,
-    category: 'fransizca',
-    title: 'Sanatın Dili: Paris Sokaklarında Bir Gezinti',
-    excerpt: 'Fransızca telaffuzunun incelikleri ve günlük hayatta kullanılan, ders kitaplarında bulamayacağınız deyimler.',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk',
-    author: 'Sophie Martin',
-    date: '07 Eki 2025',
-    featured: true,
-  },
-
-  // ── İTALYANCA ────────────────────────────────
-  {
-    id: 8,
-    category: 'italyanca',
-    title: 'La Dolce Vita: Jestler, Mimikler ve Sözsüz İletişim',
-    excerpt: 'İtalyanca konuşurken ellerinizi nasıl kullanmalısınız? Sözsüz iletişimin İtalyan kültüründeki hayati önemi.',
-    image: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk',
-    author: 'Marco Rossi',
-    date: '06 Eki 2025',
-    featured: true,
-  },
-
-  // ── RUSÇA ────────────────────────────────────
-  {
-    id: 9,
-    category: 'rusca',
-    title: 'Kiril Alfabesi: Korkulan Engeli 2 Saatte Aşmak',
-    excerpt: 'Rusça öğrenmeye başlarken gözünüzü korkutan alfabe aslında en kolay kısımdır. Bilimsel temelli hızlı okuma tekniği.',
-    image: 'https://images.unsplash.com/photo-1513326738677-b964603b136d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '6 dk',
-    author: 'Ivan Petrov',
-    date: '05 Eki 2025',
-    featured: true,
   },
 ];
 
 const categories = [
   { id: 'hepsi', label: 'TÜMÜ' },
   { id: 'genel', label: 'DİL ÖĞRENİMİ' },
-  { id: 'ingilizce', label: 'İNGİLİZCE' },
-  { id: 'almanca', label: 'ALMANCA' },
-  { id: 'ispanyolca', label: 'İSPANYOLCA' },
-  { id: 'fransizca', label: 'FRANSIZCA' },
-  { id: 'italyanca', label: 'İTALYANCA' },
-  { id: 'rusca', label: 'RUSÇA' },
 ];
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -218,6 +88,9 @@ export default function AcademyPage() {
   const [activeCategory, setActiveCategory] = useState('hepsi');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false);
+  const [newsletterFeedback, setNewsletterFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const filtered = articles
     .filter((a) => activeCategory === 'hepsi' || a.category === activeCategory)
@@ -238,6 +111,39 @@ export default function AcademyPage() {
   }, []);
 
   const navigate = useNavigate();
+
+  const handleNewsletterSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (isNewsletterSubmitting) return;
+
+    const email = newsletterEmail.trim();
+    const isEmailValid = email === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if (!isEmailValid) {
+      setNewsletterFeedback({ type: 'error', text: 'Lütfen geçerli bir e-posta adresi giriniz veya alanı boş bırakınız.' });
+      return;
+    }
+
+    setIsNewsletterSubmitting(true);
+    setNewsletterFeedback(null);
+
+    const sent = await openMailDraft({
+      subject: 'Teachera Academy Bulten Abonelik Talebi',
+      lines: [
+        `E-posta: ${email || '-'}`,
+        'Kaynak: Academy Bulten Formu',
+      ],
+    });
+
+    if (sent) {
+      setNewsletterFeedback({ type: 'success', text: 'Abonelik talebiniz alındı. Teşekkür ederiz.' });
+      setNewsletterEmail('');
+    } else {
+      setNewsletterFeedback({ type: 'error', text: 'Abonelik talebi gönderilemedi. Lütfen tekrar deneyin.' });
+    }
+
+    setIsNewsletterSubmitting(false);
+  };
 
   return (
     <div className="min-h-screen bg-[#F4EBD1] font-sans">
@@ -641,16 +547,33 @@ export default function AcademyPage() {
               </p>
             </div>
 
-            <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                placeholder="E-posta adresiniz"
-                className="h-[48px] px-6 bg-[#ffffff]/[0.06] border border-[#ffffff]/10 rounded-full text-white text-[13px] font-['Neutraface_2_Text:Book',sans-serif] placeholder:text-[#ffffff]/25 focus:outline-none focus:border-[#ffffff]/25 focus:bg-[#ffffff]/[0.1] transition-all w-full sm:w-[260px]"
-              />
-              <button className="h-[48px] px-7 bg-[#E70000] hover:bg-[#c40000] text-white rounded-full font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-wide transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer whitespace-nowrap hover:shadow-[#E70000]/30">
-                Abone Ol
-              </button>
-            </div>
+            <form onSubmit={handleNewsletterSubmit} className="w-full lg:w-auto">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={(event) => setNewsletterEmail(event.target.value)}
+                  placeholder="E-posta adresiniz"
+                  className="h-[48px] px-6 bg-[#ffffff]/[0.06] border border-[#ffffff]/10 rounded-full text-white text-[13px] font-['Neutraface_2_Text:Book',sans-serif] placeholder:text-[#ffffff]/25 focus:outline-none focus:border-[#ffffff]/25 focus:bg-[#ffffff]/[0.1] transition-all w-full sm:w-[260px]"
+                />
+                <button
+                  type="submit"
+                  disabled={isNewsletterSubmitting}
+                  className="h-[48px] px-7 bg-[#E70000] hover:bg-[#c40000] text-white rounded-full font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-wide transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer whitespace-nowrap hover:shadow-[#E70000]/30 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isNewsletterSubmitting ? 'Gönderiliyor...' : 'Abone Ol'}
+                </button>
+              </div>
+              {newsletterFeedback && (
+                <p
+                  className={`mt-3 text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] ${
+                    newsletterFeedback.type === 'success' ? 'text-[#C4F7D9]' : 'text-[#FFD4D1]'
+                  }`}
+                >
+                  {newsletterFeedback.text}
+                </p>
+              )}
+            </form>
           </div>
         </motion.div>
       </div>

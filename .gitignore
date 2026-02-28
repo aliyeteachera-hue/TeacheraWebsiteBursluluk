@@ -6,3 +6,10 @@ output
 .playwright-cli
 .tooling
 .DS_Store
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+!.env.example

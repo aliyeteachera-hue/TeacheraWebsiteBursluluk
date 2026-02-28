@@ -3,7 +3,7 @@ import { trackEvent } from '../lib/analytics';
 
 interface FreeTrialContextType {
   isOpen: boolean;
-  open: () => void;
+  open: (source?: string) => void;
   close: () => void;
 }
 
@@ -16,9 +16,9 @@ const FreeTrialContext = createContext<FreeTrialContextType>({
 export function FreeTrialProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const open = () => {
+  const open = (source = 'unknown') => {
     setIsOpen(true);
-    trackEvent('free_trial_open');
+    trackEvent('free_trial_open', { source });
   };
 
   const close = () => {

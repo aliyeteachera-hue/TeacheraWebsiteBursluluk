@@ -123,14 +123,14 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!kvkkConsent || !formData.fullName || !formData.email || !formData.language || !isPhoneValid) return;
+    if (!kvkkConsent || !formData.fullName || !formData.language || !isPhoneValid) return;
 
     const sent = await openMailDraft({
       subject: 'Egitim Formati Danismanlik Talebi',
       lines: [
         `Ad Soyad: ${formData.fullName}`,
         `Telefon: +90 ${formData.phone}`,
-        `E-posta: ${formData.email}`,
+        `E-posta: ${formData.email || '-'}`,
         `Dil: ${LANGUAGES.find((lang) => lang.id === formData.language)?.name || formData.language}`,
         `Tarih: ${selectedDate ? formatDate(selectedDate) : '-'}`,
         `Saat Araligi: ${timeSlots.find((slot) => slot.id === selectedTime)?.label || selectedTime || '-'}`,
@@ -226,7 +226,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                       saatleri arasında kampüsümüzde ağırlamaktan mutluluk duyacağız.
                     </p>
                     <p className="text-white/40 font-['Neutraface_2_Text:Book',sans-serif] text-[12px] mb-8">
-                      Detaylar e-posta adresinize gönderilecektir.
+                      Detaylar, paylaştığınız iletişim bilgileriniz üzerinden iletilecektir.
                     </p>
                     <button
                       onClick={onClose}
@@ -314,7 +314,6 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                       <FieldWrap icon={<Mail size={14} />} label="E-posta Adresiniz">
                         <input
                           type="email"
-                          required
                           placeholder="ornek@email.com"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}

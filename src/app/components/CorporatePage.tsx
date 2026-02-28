@@ -198,7 +198,7 @@ function CorporateForm() {
   };
 
   const canStep0 = companyName && sector && city;
-  const canStep1 = fullName && email && isValidTrMobilePhone(phone) && callTime;
+  const canStep1 = fullName && isValidTrMobilePhone(phone) && callTime;
   const canStep2 = selectedLanguages.length > 0 && selectedGoals.length > 0 && participants && level && model && kvkk;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -215,7 +215,7 @@ function CorporateForm() {
         `Coklu Lokasyon: ${multiLocation ? 'Evet' : 'Hayir'}`,
         `Yetkili Ad Soyad: ${fullName}`,
         `Unvan: ${title || '-'}`,
-        `E-posta: ${email}`,
+        `E-posta: ${email || '-'}`,
         `Telefon: +90 ${phone}`,
         `Aranma Saati: ${timeSlots.find((slot) => slot.id === callTime)?.label || callTime}`,
         `Diller: ${selectedLanguages.map((id) => languages.find((lang) => lang.id === id)?.name || id).join(', ')}`,
@@ -277,7 +277,7 @@ function CorporateForm() {
               </h3>
               <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[14px] text-white/70 max-w-[420px] leading-relaxed mb-2">
                 <span className="text-white">{companyName}</span> için hazırlanacak teklif,{' '}
-                <span className="text-white">{fullName}</span> adresine en kısa sürede iletilecektir.
+                <span className="text-white">{fullName}</span> adına en kısa sürede iletilecektir.
               </p>
               <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] text-white/50 mb-8">
                 Eğitim danışmanlarımız sizi {timeSlots.find((t) => t.id === callTime)?.label || ''} saatleri arasında arayacaktır.
@@ -460,7 +460,6 @@ function CorporateForm() {
                       <FieldWrap icon={<Mail size={14} />} label="Kurumsal E-posta">
                         <input
                           type="email"
-                          required
                           placeholder="ad.soyad@sirket.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}

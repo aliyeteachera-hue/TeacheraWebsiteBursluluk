@@ -2,6 +2,14 @@ export const COOKIE_CONSENT_KEY = 'teachera_cookie_consent';
 export const CONSENT_UPDATED_EVENT = 'teachera:consent-updated';
 
 const ATTRIBUTION_STORAGE_KEY = 'teachera_attribution';
+const FUNNEL_CONTEXT_STORAGE_KEY = 'teachera_funnel_context';
+const SEO_FUNNEL_NAME = 'konya_turkiye_seo_funnel';
+const SEO_LANDING_PATHS = new Set([
+  '/konya-ingilizce-kursu',
+  '/konya-speaking-club',
+  '/konya-online-dil-kursu',
+  '/turkiye-online-dil-kursu',
+]);
 const UTM_KEYS = [
   'utm_source',
   'utm_medium',
@@ -25,6 +33,20 @@ export interface CookiePreferences {
 
 interface TrackEventOptions {
   requires?: ConsentRequirement;
+}
+
+interface FunnelContext {
+  funnel_name?: string;
+  funnel_landing_path?: string;
+  funnel_last_cta_id?: string;
+  funnel_last_destination?: string;
+  funnel_updated_at?: string;
+}
+
+interface SeoLandingCtaOptions {
+  ctaId: string;
+  destination: string;
+  position?: string;
 }
 
 const fallbackPreferences: CookiePreferences = {
@@ -95,6 +117,32 @@ function saveAttributionStorage(attribution: Record<string, string>) {
   }
 }
 
+function readFunnelContext(): FunnelContext {
+  if (typeof window === 'undefined') return {};
+
+  try {
+    const raw = window.sessionStorage.getItem(FUNNEL_CONTEXT_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as FunnelContext;
+    if (!parsed || typeof parsed !== 'object') return {};
+    return parsed;
+  } catch {
+    return {};
+  }
+}
+
+function saveFunnelContext(context: FunnelContext) {
+  try {
+    window.sessionStorage.setItem(FUNNEL_CONTEXT_STORAGE_KEY, JSON.stringify(context));
+  } catch {
+    // Ignore storage quota/private mode issues.
+  }
+}
+
+function resolveSeoLandingPath(pathname: string): string | null {
+  return SEO_LANDING_PATHS.has(pathname) ? pathname : null;
+}
+
 function getLinkText(element: Element) {
   const text = element.textContent?.replace(/\s+/g, ' ').trim();
   if (text) return text.slice(0, 120);
@@ -154,6 +202,40 @@ export function captureAttributionFromUrl(): Record<string, string> {
   return current;
 }
 
+export function setFunnelContext(patch: Partial<FunnelContext>) {
+  if (typeof window === 'undefined') return;
+  const current = readFunnelContext();
+  const next: FunnelContext = {
+    ...current,
+    ...patch,
+    funnel_updated_at: new Date().toISOString(),
+  };
+  saveFunnelContext(next);
+}
+
+export function trackSeoLandingCta({ ctaId, destination, position = 'unknown' }: SeoLandingCtaOptions) {
+  if (typeof window === 'undefined') return false;
+  const landingPath = resolveSeoLandingPath(window.location.pathname);
+
+  if (landingPath) {
+    setFunnelContext({
+      funnel_name: SEO_FUNNEL_NAME,
+      funnel_landing_path: landingPath,
+      funnel_last_cta_id: ctaId,
+      funnel_last_destination: destination,
+    });
+  }
+
+  return trackEvent('seo_landing_cta_click', {
+    funnel_name: SEO_FUNNEL_NAME,
+    funnel_step: 'cta_click',
+    landing_path: landingPath || window.location.pathname,
+    cta_id: ctaId,
+    cta_destination: destination,
+    cta_position: position,
+  });
+}
+
 export function trackEvent(eventName: string, params: Record<string, EventValue> = {}, options: TrackEventOptions = {}) {
   if (typeof window === 'undefined') return false;
 
@@ -168,6 +250,7 @@ export function trackEvent(eventName: string, params: Record<string, EventValue>
     page_location: window.location.href,
     page_title: document.title,
     ...captureAttributionFromUrl(),
+    ...readFunnelContext(),
   };
 
   const normalizedParams: Record<string, EventValue> = {};
@@ -193,6 +276,21 @@ export function trackEvent(eventName: string, params: Record<string, EventValue>
 }
 
 export function trackPageView() {
+  if (typeof window === 'undefined') return false;
+  const landingPath = resolveSeoLandingPath(window.location.pathname);
+
+  if (landingPath) {
+    setFunnelContext({
+      funnel_name: SEO_FUNNEL_NAME,
+      funnel_landing_path: landingPath,
+    });
+    trackEvent('seo_landing_view', {
+      funnel_name: SEO_FUNNEL_NAME,
+      funnel_step: 'landing_view',
+      landing_path: landingPath,
+    });
+  }
+
   return trackEvent('page_view');
 }
 

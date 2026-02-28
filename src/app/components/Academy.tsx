@@ -4,9 +4,12 @@ import { ArrowRight, Clock, Sparkles, User, Calendar, ArrowUpRight } from 'lucid
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { useNavigate } from 'react-router';
+import mentalTranslationCollapseImage from '../../assets/blog/mental-translation-collapse.webp';
+import targetLanguageThinkingImage from '../../assets/blog/target-language-thinking-techniques.webp';
+import grammarTranslationFossilizationImage from '../../assets/blog/gramer-ceviri-fosillesme-dongusu.webp';
 
 interface Article {
-  id: number;
+  slug: string;
   category: string;
   categoryLabel: string;
   title: string;
@@ -17,35 +20,35 @@ interface Article {
   date: string;
 }
 
-/* ── Editörün seçtiği 4 makale ── */
+/* ── Ana sayfada gösterilen Academy seçkisi (1 editör + 3 yazı) ── */
 const pickedArticles: Article[] = [
   {
-    id: 1, category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
-    title: 'Çeviri Hastalığı: Biliyorum Ama Konuşamıyorum',
-    excerpt: 'Dil öğrenme sürecinde, teknik ve gramer bilgisine hâkim olsanız bile anlama ve konuşma becerilerinizi geliştiremeyişinizi anlamlandıramıyor olabilirsiniz.',
+    slug: 'hedef-dilde-dusunmeyi-saglayacak-teknikler', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
+    title: 'Hedef Dilde Düşünmeyi Sağlayacak Teknikler',
+    excerpt: 'Çeviri refleksini kırmak için lexical chunks, direct association, shadowing ve constrained output stratejileriyle günlük bir uygulama planı kurun.',
+    image: targetLanguageThinkingImage,
+    readTime: '10 dk', author: 'Teachera Akademik İçerik Ekibi', date: '28 Şub 2026',
+  },
+  {
+    slug: 'iletisimsel-felc-gramer-ceviri-fosillesme-dongusu', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
+    title: 'Yabancı Dil Ediniminde İletişimsel Felç',
+    excerpt: 'Gramer-çeviri yöntemi, çeviri hastalığı ve fosilleşme döngüsünün akıcılığı nasıl kilitlediğini bilimsel çerçevede inceleyin.',
+    image: grammarTranslationFossilizationImage,
+    readTime: '11 dk', author: 'Teachera Akademik İçerik Ekibi', date: '28 Şub 2026',
+  },
+  {
+    slug: 'konusma-akiciliginin-fiziksel-ve-isitsel-cokusu', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
+    title: 'Konuşma Akıcılığının Fiziksel ve İşitsel Çöküşü',
+    excerpt: 'Bilişsel yükün ses, ritim ve beden dilini nasıl kilitlediğini; disfluency ve işlemleme darboğazları üzerinden inceleyin.',
+    image: mentalTranslationCollapseImage,
+    readTime: '12 dk', author: 'Teachera Akademik İçerik Ekibi', date: '28 Şub 2026',
+  },
+  {
+    slug: 'ceviri-hastaligi', category: 'genel', categoryLabel: 'DİL ÖĞRENİMİ',
+    title: 'Zihinsel Çeviri Tuzağı: Biliyoruz Ama Konuşamıyoruz',
+    excerpt: 'Zihinsel çeviri alışkanlığının akıcılığı nasıl sabote ettiğini ve hedef dilde düşünme geçişini adım adım keşfedin.',
     image: 'https://images.unsplash.com/photo-1725190216145-ea1455fd9914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk', author: 'Teachera Uzman Ekibi', date: '12 Eki',
-  },
-  {
-    id: 3, category: 'ingilizce', categoryLabel: 'İNGİLİZCE',
-    title: 'Business English: Küresel Pazarda Yerinizi Alın',
-    excerpt: 'Profesyonel hayatta İngilizce sadece bir dil değil, bir yetkinliktir. Toplantılarda ve sunumlarda kullanabileceğiniz kilit stratejiler.',
-    image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '4 dk', author: 'James Wilson', date: '15 Eki',
-  },
-  {
-    id: 5, category: 'almanca', categoryLabel: 'ALMANCA',
-    title: 'Alman Mühendisliği ve Dilin Yapısı',
-    excerpt: 'Almanca, kuralların ve netliğin dilidir. Mühendislik ve teknik alanlarda kariyer hedefleyenler için temel terminoloji rehberi.',
-    image: 'https://images.unsplash.com/photo-1517457210348-703079e57d4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk', author: 'Hans Müller', date: '13 Eki',
-  },
-  {
-    id: 7, category: 'fransizca', categoryLabel: 'FRANSIZCA',
-    title: 'Sanatın Dili: Paris Sokaklarında Gezinti',
-    excerpt: 'Fransızca telaffuzunun incelikleri ve günlük hayatta kullanılan, ders kitaplarında bulamayacağınız deyimler.',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
-    readTime: '5 dk', author: 'Sophie Martin', date: '07 Eki',
+    readTime: '8 dk', author: 'Teachera Uzman Ekibi', date: '27 Şub 2026',
   },
 ];
 
@@ -54,7 +57,8 @@ export default function Academy() {
   const navigate = useNavigate();
 
   const featured = pickedArticles[0];
-  const grid = pickedArticles.slice(1);
+  const grid = pickedArticles.slice(1, 4);
+  const goToFeatured = () => navigate(`/academy/${featured.slug}`);
 
   return (
     <section id="academy" ref={ref} className="relative bg-[#F4EBD1] font-sans">
@@ -116,6 +120,7 @@ export default function Academy() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
             className="w-full group cursor-pointer"
+            onClick={goToFeatured}
           >
             <div className="relative h-[300px] md:h-[380px] rounded-[24px] overflow-hidden bg-[#0a0a10] shadow-lg shadow-[#324D47]/10 hover:shadow-xl hover:shadow-[#324D47]/15 transition-shadow duration-500">
               <ImageWithFallback
@@ -142,6 +147,7 @@ export default function Academy() {
                 </p>
                 <div className="flex items-center gap-5 text-white/40 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.12em] mt-1">
                   <span className="flex items-center gap-1.5"><User size={11} /> {featured.author}</span>
+                  <span className="flex items-center gap-1.5"><Calendar size={11} /> {featured.date}</span>
                   <span className="flex items-center gap-1.5"><Clock size={11} /> {featured.readTime}</span>
                 </div>
               </div>
@@ -158,14 +164,14 @@ export default function Academy() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {grid.map((article, index) => (
               <motion.article
-                key={article.id}
+                key={article.slug}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.08, duration: 0.4 }}
                 className="group flex flex-col bg-white rounded-[20px] overflow-hidden shadow-[0_4px_24px_-6px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.08)] transition-all duration-300 border border-[#324D47]/[0.04] hover:-translate-y-1 cursor-pointer h-full"
+                onClick={() => navigate(`/academy/${article.slug}`)}
               >
-                {/* Image */}
                 <div className="h-40 overflow-hidden relative">
                   <ImageWithFallback
                     src={article.image}
@@ -180,7 +186,6 @@ export default function Academy() {
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="flex flex-col flex-1 p-5">
                   <div className="flex items-center gap-2.5 text-[9px] text-[#324D47]/35 font-['Neutraface_2_Text:Demi',sans-serif] uppercase tracking-[0.12em] mb-2">
                     <span className="flex items-center gap-1"><Calendar size={10} /> {article.date}</span>
@@ -218,7 +223,7 @@ export default function Academy() {
               onClick={() => navigate('/academy')}
               className="group px-7 py-2.5 bg-white border border-[#324D47]/8 rounded-full text-[#324D47] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] uppercase overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#324D47]/15 cursor-pointer"
             >
-              <span className="group-hover:text-[#E70000] transition-colors">Tüm Yazıları Gör</span>
+              <span className="group-hover:text-[#E70000] transition-colors">Academy Sayfasına Git</span>
             </button>
           </div>
         </div>

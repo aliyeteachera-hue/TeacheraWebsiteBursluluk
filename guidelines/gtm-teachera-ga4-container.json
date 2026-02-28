@@ -1,0 +1,714 @@
+{
+  "exportFormatVersion": 2,
+  "exportTime": "2026-02-27 22:30:00",
+  "containerVersion": {
+    "path": "accounts/0000000000/containers/000000000/versions/0",
+    "accountId": "0000000000",
+    "containerId": "000000000",
+    "containerVersionId": "0",
+    "container": {
+      "path": "accounts/0000000000/containers/000000000",
+      "accountId": "0000000000",
+      "containerId": "000000000",
+      "name": "Teachera Web",
+      "publicId": "GTM-XXXXXXX",
+      "usageContext": [
+        "WEB"
+      ],
+      "features": {
+        "supportUserPermissions": true,
+        "supportEnvironments": true,
+        "supportWorkspaces": true,
+        "supportGtagConfigs": false,
+        "supportBuiltInVariables": true,
+        "supportClients": false,
+        "supportFolders": true,
+        "supportTags": true,
+        "supportTemplates": true,
+        "supportTriggers": true,
+        "supportVariables": true,
+        "supportVersions": true,
+        "supportZones": true,
+        "supportTransformations": false
+      },
+      "tagIds": [
+        "GTM-XXXXXXX"
+      ]
+    },
+    "tag": [
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "1",
+        "name": "Teachera / GA4 Configuration",
+        "type": "gaawc",
+        "parameter": [
+          {
+            "type": "BOOLEAN",
+            "key": "sendPageView",
+            "value": "false"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "enableSendToServerContainer",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "measurementId",
+            "value": "{{c - GA4 Measurement ID}}"
+          }
+        ],
+        "firingTriggerId": [
+          "2147479553"
+        ],
+        "tagFiringOption": "ONCE_PER_LOAD",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "2",
+        "name": "Teachera / GA4 Event / page_view",
+        "type": "gaawe",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "eventName",
+            "value": "page_view"
+          },
+          {
+            "type": "TAG_REFERENCE",
+            "key": "measurementId",
+            "value": "Teachera / GA4 Configuration"
+          },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "name", "value": "page_path" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - page_path}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "name", "value": "page_location" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - page_location}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "name", "value": "page_title" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - page_title}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "name", "value": "funnel_name" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_name}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "name", "value": "funnel_landing_path" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_landing_path}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "name", "value": "utm_source" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - utm_source}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "name", "value": "utm_medium" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - utm_medium}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "name", "value": "utm_campaign" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - utm_campaign}}" }
+                ]
+              }
+            ]
+          }
+        ],
+        "firingTriggerId": [
+          "1001"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "3",
+        "name": "Teachera / GA4 Event / seo_landing_view",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "seo_landing_view" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_name" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_name}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_step" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_step}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "landing_path" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - landing_path}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_landing_path" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_landing_path}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1002"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "4",
+        "name": "Teachera / GA4 Event / seo_landing_cta_click",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "seo_landing_cta_click" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "cta_id" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - cta_id}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "cta_destination" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - cta_destination}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "cta_position" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - cta_position}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "landing_path" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - landing_path}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_name" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_name}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1003"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "5",
+        "name": "Teachera / GA4 Event / free_trial_open",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "free_trial_open" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "source" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - source}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_name" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_name}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_landing_path" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_landing_path}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1004"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "6",
+        "name": "Teachera / GA4 Event / level_assessment_open",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "level_assessment_open" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "source" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - source}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_name" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_name}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_landing_path" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_landing_path}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1005"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "7",
+        "name": "Teachera / GA4 Event / whatsapp_click",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "whatsapp_click" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "source" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - source}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "href" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - href}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "phone_number" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - phone_number}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "link_text" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - link_text}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_name" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_name}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1006"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "8",
+        "name": "Teachera / GA4 Event / phone_click",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "phone_click" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "phone_number" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - phone_number}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "link_text" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - link_text}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_name" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_name}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1007"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "9",
+        "name": "Teachera / GA4 Event / mailto_click",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "mailto_click" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "email" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - email}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "link_text" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - link_text}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1008"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "10",
+        "name": "Teachera / GA4 Event / lead_form_submit_attempt",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "lead_form_submit_attempt" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "form_subject" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - form_subject}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "field_count" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - field_count}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "endpoint_domain" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - endpoint_domain}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_name" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_name}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_landing_path" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_landing_path}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1009"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "11",
+        "name": "Teachera / GA4 Event / lead_form_submit_success",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "lead_form_submit_success" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "form_subject" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - form_subject}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "field_count" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - field_count}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_name" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_name}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "funnel_landing_path" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - funnel_landing_path}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1010"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "12",
+        "name": "Teachera / GA4 Event / lead_form_submit_failure",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "lead_form_submit_failure" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "form_subject" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - form_subject}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "field_count" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - field_count}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "error_message" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - error_message}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1011"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "tagId": "13",
+        "name": "Teachera / GA4 Event / cookie_consent_updated",
+        "type": "gaawe",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "eventName", "value": "cookie_consent_updated" },
+          { "type": "TAG_REFERENCE", "key": "measurementId", "value": "Teachera / GA4 Configuration" },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "action" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - action}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "analytics" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - analytics}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "marketing" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - marketing}}" } ] },
+              { "type": "MAP", "map": [ { "type": "TEMPLATE", "key": "name", "value": "personalization" }, { "type": "TEMPLATE", "key": "value", "value": "{{dlv - personalization}}" } ] }
+            ]
+          }
+        ],
+        "firingTriggerId": ["1012"],
+        "tagFiringOption": "ONCE_PER_EVENT",
+        "monitoringMetadata": { "type": "MAP" },
+        "consentSettings": { "consentStatus": "NOT_SET" },
+        "parentFolderId": "100"
+      }
+    ],
+    "trigger": [
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1001",
+        "name": "Teachera / CE / page_view",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "page_view" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1002",
+        "name": "Teachera / CE / seo_landing_view",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "seo_landing_view" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1003",
+        "name": "Teachera / CE / seo_landing_cta_click",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "seo_landing_cta_click" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1004",
+        "name": "Teachera / CE / free_trial_open",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "free_trial_open" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1005",
+        "name": "Teachera / CE / level_assessment_open",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "level_assessment_open" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1006",
+        "name": "Teachera / CE / whatsapp_click",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "whatsapp_click" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1007",
+        "name": "Teachera / CE / phone_click",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "phone_click" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1008",
+        "name": "Teachera / CE / mailto_click",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "mailto_click" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1009",
+        "name": "Teachera / CE / lead_form_submit_attempt",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "lead_form_submit_attempt" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1010",
+        "name": "Teachera / CE / lead_form_submit_success",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "lead_form_submit_success" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1011",
+        "name": "Teachera / CE / lead_form_submit_failure",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "lead_form_submit_failure" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "triggerId": "1012",
+        "name": "Teachera / CE / cookie_consent_updated",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "cookie_consent_updated" }
+            ]
+          }
+        ],
+        "parentFolderId": "100"
+      }
+    ],
+    "variable": [
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "variableId": "1",
+        "name": "c - GA4 Measurement ID",
+        "type": "c",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "value",
+            "value": "G-XXXXXXXXXX"
+          }
+        ],
+        "parentFolderId": "100"
+      },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "2", "name": "dlv - page_path", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "page_path" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "3", "name": "dlv - page_location", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "page_location" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "4", "name": "dlv - page_title", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "page_title" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "5", "name": "dlv - source", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "source" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "6", "name": "dlv - cta_id", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "cta_id" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "7", "name": "dlv - cta_destination", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "cta_destination" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "8", "name": "dlv - cta_position", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "cta_position" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "9", "name": "dlv - funnel_name", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "funnel_name" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "10", "name": "dlv - funnel_landing_path", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "funnel_landing_path" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "11", "name": "dlv - landing_path", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "landing_path" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "12", "name": "dlv - form_subject", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "form_subject" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "13", "name": "dlv - field_count", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "field_count" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "14", "name": "dlv - endpoint_domain", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "endpoint_domain" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "15", "name": "dlv - phone_number", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "phone_number" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "16", "name": "dlv - link_text", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "link_text" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "17", "name": "dlv - email", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "email" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "18", "name": "dlv - action", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "action" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "19", "name": "dlv - analytics", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "analytics" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "20", "name": "dlv - marketing", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "marketing" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "21", "name": "dlv - personalization", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "personalization" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "22", "name": "dlv - error_message", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "error_message" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "23", "name": "dlv - href", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "href" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "24", "name": "dlv - funnel_step", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "funnel_step" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "25", "name": "dlv - utm_source", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "utm_source" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "26", "name": "dlv - utm_medium", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "utm_medium" } ], "formatValue": {}, "parentFolderId": "100" },
+      { "accountId": "0000000000", "containerId": "000000000", "variableId": "27", "name": "dlv - utm_campaign", "type": "v", "parameter": [ { "type": "INTEGER", "key": "dataLayerVersion", "value": "2" }, { "type": "BOOLEAN", "key": "setDefaultValue", "value": "false" }, { "type": "TEMPLATE", "key": "name", "value": "utm_campaign" } ], "formatValue": {}, "parentFolderId": "100" }
+    ],
+    "folder": [
+      {
+        "accountId": "0000000000",
+        "containerId": "000000000",
+        "folderId": "100",
+        "name": "Teachera / GA4 SEO Funnel"
+      }
+    ],
+    "builtInVariable": [
+      { "accountId": "0000000000", "containerId": "000000000", "type": "PAGE_URL", "name": "Page URL" },
+      { "accountId": "0000000000", "containerId": "000000000", "type": "PAGE_HOSTNAME", "name": "Page Hostname" },
+      { "accountId": "0000000000", "containerId": "000000000", "type": "PAGE_PATH", "name": "Page Path" },
+      { "accountId": "0000000000", "containerId": "000000000", "type": "REFERRER", "name": "Referrer" }
+    ]
+  }
+}

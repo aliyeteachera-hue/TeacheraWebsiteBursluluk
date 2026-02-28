@@ -166,7 +166,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   transition={{ duration: 0.8, delay: 0.15 }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => openLevelAssessment()}
+                  onClick={() => openLevelAssessment('navigation_desktop_level_assessment')}
                   className="hidden md:block px-5 py-2 rounded-full border border-white/[0.08] text-white/40 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.14em] uppercase cursor-pointer hover:border-white/20 hover:text-white/70 transition-all duration-500"
                 >
                   Seviye Tespit
@@ -179,7 +179,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   transition={{ duration: 0.8, delay: 0.2 }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => openFreeTrial()}
+                  onClick={() => openFreeTrial('navigation_desktop_free_trial')}
                   className="hidden md:block px-5 py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.14em] uppercase cursor-pointer hover:bg-[#3d5e56] hover:border-[#3d5e56] hover:text-white transition-all duration-500"
                 >
                   Ücretsiz Deneme Seansı
@@ -190,7 +190,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
-                  onClick={() => openFreeTrial()}
+                  onClick={() => openFreeTrial('navigation_mobile_free_trial')}
                   className="md:hidden px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 text-[8px] sm:text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.1em] sm:tracking-[0.12em] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
                 >
                   Ücretsiz Seans

@@ -1,6 +1,6 @@
-import { Instagram, Linkedin, Facebook, Youtube, Clock, Navigation } from 'lucide-react';
+import { useState } from 'react';
+import { Instagram, Linkedin, Facebook, Youtube, Clock, Navigation, ChevronDown, PhoneCall, MapPin } from 'lucide-react';
 import TeacheraLogo from '../../imports/TeacheraLogo';
-import svgPaths from '../../imports/svg-1964oew5l0';
 
 /* ── X (Twitter) Icon ── */
 function XIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
@@ -20,7 +20,46 @@ const SOCIAL_LINKS = [
   { Icon: Youtube, href: 'https://www.youtube.com/@teacheradilokullari', label: 'YouTube' },
 ] as const;
 
+function FooterAccordionSection({
+  title,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="mt-4 pt-4 border-t border-[#ffffff]/5">
+      <div className="flex items-center justify-between gap-3">
+        <h4 className="text-[#4A7067] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] uppercase tracking-[0.15em]">
+          {title}
+        </h4>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={isOpen}
+          aria-label={`${title} bölümünü ${isOpen ? 'kapat' : 'aç'}`}
+          className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#4A7067]/35 text-[#4A7067] hover:text-white hover:border-[#4A7067] hover:bg-[#4A7067]/10 transition-colors"
+        >
+          <ChevronDown
+            size={11}
+            className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+      </div>
+
+      {isOpen && <div className="pt-3">{children}</div>}
+    </div>
+  );
+}
+
 export default function Footer() {
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isKvkkOpen, setIsKvkkOpen] = useState(false);
+
   return (
     <footer className="bg-[#00000B] text-white pt-20 pb-12 overflow-hidden relative font-['Neutraface_2_Text:Book',sans-serif]">
        {/* Background Grid Pattern */}
@@ -90,38 +129,27 @@ export default function Footer() {
              </div>
 
              {/* COL 2: SİTE HARİTASI (2 Cols) */}
-             <div className="lg:col-span-2 flex flex-col gap-5">
+             <div className="lg:col-span-2 flex flex-col gap-4">
                 <h4 className="text-[#4A7067] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] uppercase tracking-[0.15em] mb-1">
                   Site Haritası
                 </h4>
-                <ul className="flex flex-col gap-3.5 text-[14px] font-['Neutraface_2_Text:Demi',sans-serif]">
-                   <li><a href="/#home" className="text-white/80 hover:text-[#4A7067] transition-colors">Ana Sayfa</a></li>
-                   <li><a href="/metodoloji" className="text-white/80 hover:text-[#4A7067] transition-colors">Metodoloji</a></li>
-                   <li><a href="/#delivery-options" className="text-white/80 hover:text-[#4A7067] transition-colors">Eğitim Formatları</a></li>
-                   <li><a href="/egitimlerimiz" className="text-white/80 hover:text-[#4A7067] transition-colors">Eğitim Programları</a></li>
-                   <li><a href="/academy" className="text-white/80 hover:text-[#4A7067] transition-colors">Academy</a></li>
-                   <li><a href="/speakup" className="text-white/80 hover:text-[#4A7067] transition-colors">SpeakUp</a></li>
-                   <li><a href="/#faq" className="text-white/80 hover:text-[#4A7067] transition-colors">S.S.S.</a></li>
-                   <li><a href="/iletisim" className="text-white/80 hover:text-[#4A7067] transition-colors">İletişim</a></li>
+                <ul className="flex flex-col gap-2.5 text-[13px] font-['Neutraface_2_Text:Book',sans-serif]">
+                   <li><a href="/#home" className="text-white/75 hover:text-white transition-colors">Ana Sayfa</a></li>
+                   <li><a href="/metodoloji" className="text-white/75 hover:text-white transition-colors">Metodoloji</a></li>
+                   <li><a href="/#delivery-options" className="text-white/75 hover:text-white transition-colors">Eğitim Formatları</a></li>
+                   <li><a href="/egitimlerimiz" className="text-white/75 hover:text-white transition-colors">Eğitim Programları</a></li>
+                   <li><a href="/academy" className="text-white/75 hover:text-white transition-colors">Academy</a></li>
+                   <li><a href="/speakup" className="text-white/75 hover:text-white transition-colors">SpeakUp</a></li>
+                   <li><a href="/#faq" className="text-white/75 hover:text-white transition-colors">S.S.S.</a></li>
+                   <li><a href="/iletisim" className="text-white/75 hover:text-white transition-colors">İletişim</a></li>
                 </ul>
 
-                <div className="mt-4 pt-4 border-t border-[#ffffff]/5">
-                   <h4 className="text-[#4A7067] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] uppercase tracking-[0.15em] mb-4">
-                     Konya & Türkiye Rehberi
-                   </h4>
-                   <ul className="flex flex-col gap-2.5 text-[13px] font-['Neutraface_2_Text:Book',sans-serif]">
-                      <li><a href="/egitimlerimiz/ingilizce/grup-programi" className="text-white/60 hover:text-white transition-colors">Konya İngilizce Kursu</a></li>
-                      <li><a href="/speakup" className="text-white/60 hover:text-white transition-colors">Konya Speaking Club</a></li>
-                      <li><a href="/egitimlerimiz" className="text-white/60 hover:text-white transition-colors">Türkiye Online Dil Kursu</a></li>
-                   </ul>
-                </div>
-
                 {/* Diller */}
-                <div className="mt-4 pt-4 border-t border-[#ffffff]/5">
+                <div className="mt-3 pt-3 border-t border-[#ffffff]/5">
                    <h4 className="text-[#4A7067] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] uppercase tracking-[0.15em] mb-4">
                      Diller
                    </h4>
-                   <ul className="flex flex-col gap-3 text-[13px] font-['Neutraface_2_Text:Book',sans-serif]">
+                   <ul className="flex flex-col gap-2.5 text-[13px] font-['Neutraface_2_Text:Book',sans-serif]">
                       <li><a href="/egitimlerimiz/ingilizce/grup-programi" className="text-white/60 hover:text-white transition-colors">İngilizce</a></li>
                       <li><a href="/egitimlerimiz/ispanyolca/grup-programi" className="text-white/60 hover:text-white transition-colors">İspanyolca</a></li>
                       <li><a href="/egitimlerimiz/almanca/grup-programi" className="text-white/60 hover:text-white transition-colors">Almanca</a></li>
@@ -134,88 +162,136 @@ export default function Footer() {
              </div>
 
              {/* COL 3: KURUMSAL + KARİYER (3 Cols) */}
-             <div className="lg:col-span-3 flex flex-col gap-5">
+             <div className="lg:col-span-2 flex flex-col gap-4">
                 <h4 className="text-[#4A7067] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] uppercase tracking-[0.15em] mb-1">
                   Kurumsal
                 </h4>
-                <ul className="flex flex-col gap-3.5 text-[14px] font-['Neutraface_2_Text:Demi',sans-serif]">
-                   <li><a href="/is-firsatlari" className="text-[#4A7067] hover:text-[#6A9B8F] transition-colors">İş Fırsatları</a></li>
-                   <li><a href="/musteri-temsilcisi-ol" className="text-[#4A7067] hover:text-[#6A9B8F] transition-colors">Müşteri Temsilcisi Ol</a></li>
-                   <li><a href="/elci-ol" className="text-[#4A7067] hover:text-[#6A9B8F] transition-colors">Elçi Ol</a></li>
-                   <li><a href="/fiyatlar" className="text-white/80 hover:text-[#4A7067] transition-colors">Fiyatlar</a></li>
+                <ul className="flex flex-col gap-2.5 text-[13px] font-['Neutraface_2_Text:Book',sans-serif]">
+                   <li><a href="/is-firsatlari" className="text-white/75 hover:text-white transition-colors">İş Fırsatları</a></li>
+                   <li><a href="/musteri-temsilcisi-ol" className="text-white/75 hover:text-white transition-colors">Müşteri Temsilcisi Ol</a></li>
+                   <li><a href="/elci-ol" className="text-white/75 hover:text-white transition-colors">Elçi Ol</a></li>
+                   <li><a href="/kurumsal" className="text-white/75 hover:text-white transition-colors">Kurumsal Fiyat Teklifi</a></li>
+                   <li><a href="/fiyatlar" className="text-white/75 hover:text-white transition-colors">Fiyatlar</a></li>
                 </ul>
 
-                {/* KVKK */}
-                <div className="mt-4 pt-4 border-t border-[#ffffff]/5">
-                   <h4 className="text-[#4A7067] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] uppercase tracking-[0.15em] mb-4">
-                     Kişisel Verilerin Korunması
-                   </h4>
-                   <ul className="flex flex-col gap-2.5 text-[13px] text-[#ffffff]/60 font-['Neutraface_2_Text:Book',sans-serif]">
-                      <li><a href="/hukuki/gizlilik-politikasi" className="hover:text-[#4A7067] transition-colors">Gizlilik Politikası</a></li>
-                      <li><a href="/hukuki/cocuklarin-gizlilik-politikasi" className="hover:text-[#4A7067] transition-colors">Çocukların Gizlilik Politikası</a></li>
-                      <li><a href="/hukuki/cerez-politikasi" className="hover:text-[#4A7067] transition-colors">Çerez Politikası</a></li>
-                      <li><a href="/hukuki/ebeveyn-muvafakatname" className="hover:text-[#4A7067] transition-colors">Ebeveyn Muvafakatname</a></li>
-                      <li><a href="/hukuki/yurt-disina-aktarim-acik-riza" className="hover:text-[#4A7067] transition-colors">Yurt Dışına Aktarım Açık Rıza</a></li>
-                      <li><a href="/hukuki/whatsapp-acik-riza-metni" className="hover:text-[#4A7067] transition-colors">WhatsApp Açık Rıza Metni</a></li>
-                      <li><a href="/hukuki/musteri-aydinlatma-metni" className="hover:text-[#4A7067] transition-colors">Müşteri Aydınlatma Metni</a></li>
-                      <li><a href="/hukuki/iletisim-aydinlatma-metni" className="hover:text-[#4A7067] transition-colors">İletişim Aydınlatma Metni</a></li>
-                      <li><a href="/hukuki/cagri-merkezi-aydinlatma-metni" className="hover:text-[#4A7067] transition-colors">Çağrı Merkezi Aydınlatma Metni</a></li>
-                      <li><a href="/hukuki/ilgili-kisi-basvuru-formu" className="hover:text-[#4A7067] transition-colors">İlgili Kişi Başvuru Formu</a></li>
-                   </ul>
-                </div>
+                <FooterAccordionSection
+                  title="KONYA"
+                  isOpen={isGuideOpen}
+                  onToggle={() => setIsGuideOpen((prev) => !prev)}
+                >
+                  <ul className="flex flex-col gap-2 text-[12px] font-['Neutraface_2_Text:Book',sans-serif]">
+                    <li><a href="/" className="text-white/55 hover:text-white/75 transition-colors">Konya Dil Kursu</a></li>
+                    <li><a href="/konya-ingilizce-kursu" className="text-white/55 hover:text-white/75 transition-colors">Konya İngilizce Kursu</a></li>
+                    <li><a href="/egitimlerimiz/ispanyolca/grup-programi" className="text-white/55 hover:text-white/75 transition-colors">Konya İspanyolca Kursu</a></li>
+                    <li><a href="/egitimlerimiz/rusca/grup-programi" className="text-white/55 hover:text-white/75 transition-colors">Konya Rusça Kursu</a></li>
+                    <li><a href="/egitimlerimiz/arapca/grup-programi" className="text-white/55 hover:text-white/75 transition-colors">Konya Arapça Kursu</a></li>
+                    <li><a href="/egitimlerimiz/almanca/grup-programi" className="text-white/55 hover:text-white/75 transition-colors">Konya Almanca Kursu</a></li>
+                    <li><a href="/egitimlerimiz/almanca/goethe-testdaf" className="text-white/55 hover:text-white/75 transition-colors">Konya Goethe Kursu</a></li>
+                    <li><a href="/egitimlerimiz/ingilizce/ielts" className="text-white/55 hover:text-white/75 transition-colors">Konya IELTS Kursu</a></li>
+                    <li><a href="/egitimlerimiz/ingilizce/toefl" className="text-white/55 hover:text-white/75 transition-colors">Konya TOEFL Kursu</a></li>
+                    <li><a href="/egitimlerimiz/italyanca/grup-programi" className="text-white/55 hover:text-white/75 transition-colors">Konya İtalyanca Kursu</a></li>
+                    <li><a href="/egitimlerimiz/ingilizce/kids-grup" className="text-white/55 hover:text-white/75 transition-colors">Konya Çocuklar İçin İngilizce</a></li>
+                    <li><a href="/" className="text-white/55 hover:text-white/75 transition-colors">Konya En İyi Dil Kursu</a></li>
+                  </ul>
+                </FooterAccordionSection>
+
+                <FooterAccordionSection
+                  title="Kişisel Verilerin Korunması"
+                  isOpen={isKvkkOpen}
+                  onToggle={() => setIsKvkkOpen((prev) => !prev)}
+                >
+                  <ul className="flex flex-col gap-2 text-[12px] font-['Neutraface_2_Text:Book',sans-serif]">
+                    <li><a href="/hukuki/gizlilik-politikasi" className="text-white/55 hover:text-white/75 transition-colors">Gizlilik Politikası</a></li>
+                    <li><a href="/hukuki/cocuklarin-gizlilik-politikasi" className="text-white/55 hover:text-white/75 transition-colors">Çocukların Gizlilik Politikası</a></li>
+                    <li><a href="/hukuki/cerez-politikasi" className="text-white/55 hover:text-white/75 transition-colors">Çerez Politikası</a></li>
+                    <li><a href="/hukuki/ebeveyn-muvafakatname" className="text-white/55 hover:text-white/75 transition-colors">Ebeveyn Muvafakatname</a></li>
+                    <li><a href="/hukuki/yurt-disina-aktarim-acik-riza" className="text-white/55 hover:text-white/75 transition-colors">Yurt Dışına Aktarım Açık Rıza</a></li>
+                    <li><a href="/hukuki/whatsapp-acik-riza-metni" className="text-white/55 hover:text-white/75 transition-colors">WhatsApp Açık Rıza Metni</a></li>
+                    <li><a href="/hukuki/musteri-aydinlatma-metni" className="text-white/55 hover:text-white/75 transition-colors">Müşteri Aydınlatma Metni</a></li>
+                    <li><a href="/hukuki/iletisim-aydinlatma-metni" className="text-white/55 hover:text-white/75 transition-colors">İletişim Aydınlatma Metni</a></li>
+                    <li><a href="/hukuki/cagri-merkezi-aydinlatma-metni" className="text-white/55 hover:text-white/75 transition-colors">Çağrı Merkezi Aydınlatma Metni</a></li>
+                    <li><a href="/hukuki/ilgili-kisi-basvuru-formu" className="text-white/55 hover:text-white/75 transition-colors">İlgili Kişi Başvuru Formu</a></li>
+                  </ul>
+                </FooterAccordionSection>
              </div>
 
-             {/* COL 4: İLETİŞİM (3 Cols) */}
-             <div className="lg:col-span-3 flex flex-col gap-8 font-['Neutraface_2_Text:Demi',sans-serif]">
+             {/* COL 4: İLETİŞİM */}
+             <div className="lg:col-span-4 flex flex-col gap-6 font-['Neutraface_2_Text:Demi',sans-serif]">
                 <h4 className="text-[#4A7067] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] uppercase tracking-[0.15em] mb-1">
                   İletişim
                 </h4>
 
-                {/* Phone Main */}
-                <div className="relative">
-                   <div className="flex items-center gap-3">
-                      <div className="w-[22px] h-[22px] relative top-1">
-                         <svg viewBox="0 0 21.9585 21.9561" className="w-full h-full fill-white">
-                            <path clipRule="evenodd" d={svgPaths.p1f388280} fillRule="evenodd" />
-                         </svg>
+                {/* Phone Card */}
+                <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-4">
+                   <div className="absolute -left-10 top-1/2 h-20 w-20 -translate-y-1/2 rounded-full bg-[#4A7067]/15 blur-2xl transition-colors duration-300 group-hover:bg-[#4A7067]/30" />
+                   <div className="relative flex items-center gap-3">
+                      <div className="relative">
+                         <div className="absolute inset-0 rounded-full bg-[#4A7067]/25 animate-ping" style={{ animationDuration: '2.4s' }} />
+                         <div className="relative h-9 w-9 rounded-full border border-[#4A7067]/45 bg-[#4A7067]/15 flex items-center justify-center">
+                            <PhoneCall size={15} className="text-[#6A9B8F]" />
+                         </div>
                       </div>
-                      <a href="tel:03322368066" className="text-[26px] text-white hover:text-[#4A7067] transition-colors">0332 236 80 66</a>
+                      <div>
+                         <p className="text-[11px] uppercase tracking-[0.16em] text-[#4A7067] mb-0.5">Telefon</p>
+                         <a href="tel:03322368066" className="text-[24px] leading-none text-white hover:text-[#6A9B8F] transition-colors">
+                           0332 236 80 66
+                         </a>
+                      </div>
                    </div>
                 </div>
 
-                {/* WhatsApp Info */}
-                <div>
-                   <h4 className="text-[14px] text-white/50 mb-1">Sadece yazılı iletişim</h4>
-                   <a href="https://wa.me/905528674226" className="text-[20px] text-white hover:text-[#4A7067] transition-colors block">WP: +905528674226</a>
-                </div>
+                {/* WhatsApp Button */}
+                <a
+                  href="https://wa.me/905528674226"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2.5 h-[44px] rounded-full bg-[#25D366] hover:bg-[#20BD5C] text-[#0B2A19] font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-[0.04em] transition-colors"
+                >
+                  <PhoneCall size={15} />
+                  WhatsApp'tan Yaz
+                </a>
 
-                {/* Address */}
-                <div>
-                   <p className="text-[16px] text-white leading-tight">
-                     KULE PLÂZA KAT: <span className="text-[22px]">26</span>
-                   </p>
-                   <p className="text-[16px] text-white mt-1">
-                     Selçuklu – KONYA
-                   </p>
+                {/* Address Card */}
+                <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-4">
+                   <div className="absolute top-3 right-4 text-right select-none">
+                     <span className="font-['Neutraface_2_Text:Bold',sans-serif] text-[2.2rem] leading-none tracking-tighter text-white/[0.08]">
+                       26
+                     </span>
+                     <span className="block font-['Neutraface_2_Text:Demi',sans-serif] text-[9px] tracking-[0.22em] uppercase text-white/20 text-right -mt-1">
+                       . KAT
+                     </span>
+                   </div>
+                   <div className="relative">
+                     <div className="inline-flex items-center gap-2 mb-2">
+                       <MapPin size={12} className="text-[#E70000]" />
+                       <span className="text-[10px] uppercase tracking-[0.18em] text-[#4A7067]">Kampüs</span>
+                     </div>
+                     <p className="text-[16px] text-white leading-tight font-['Neutraface_2_Text:Bold',sans-serif]">
+                       Kule Plaza, <span className="text-[#F4EBD1]">Kat 26</span>
+                     </p>
+                     <p className="text-[13px] text-white/65 mt-1 font-['Neutraface_2_Text:Book',sans-serif]">
+                       Selçuklu – Konya
+                     </p>
+                   </div>
                 </div>
 
                 {/* Emails */}
                 <div className="space-y-5">
                    <div>
                       <h4 className="text-[13px] text-white/50 mb-1">Genel Sorularınız İçin</h4>
-                      <a href="mailto:info@teachera.com.tr" className="text-[18px] text-white hover:text-[#4A7067] transition-colors block">info@teachera.com.tr</a>
+                      <a href="mailto:info@teachera.com.tr" className="text-[17px] text-white hover:text-[#6A9B8F] transition-colors block">info@teachera.com.tr</a>
                    </div>
                    <div>
                       <h4 className="text-[13px] text-white/50 mb-1">Satış Departmanı</h4>
-                      <a href="mailto:sales@teachera.com.tr" className="text-[18px] text-white hover:text-[#4A7067] transition-colors block">sales@teachera.com.tr</a>
+                      <a href="mailto:sales@teachera.com.tr" className="text-[17px] text-white hover:text-[#6A9B8F] transition-colors block">sales@teachera.com.tr</a>
                    </div>
                    <div>
                       <h4 className="text-[13px] text-white/50 mb-1">Medya Soruları İçin</h4>
-                      <a href="mailto:media@teachera.com.tr" className="text-[18px] text-white hover:text-[#4A7067] transition-colors block">media@teachera.com.tr</a>
+                      <a href="mailto:media@teachera.com.tr" className="text-[17px] text-white hover:text-[#6A9B8F] transition-colors block">media@teachera.com.tr</a>
                    </div>
                    <div>
                       <h4 className="text-[13px] text-white/50 mb-1">Ortaklıklar için</h4>
-                      <a href="mailto:partners@teachera.com.tr" className="text-[18px] text-white hover:text-[#4A7067] transition-colors block">partners@teachera.com.tr</a>
+                      <a href="mailto:partners@teachera.com.tr" className="text-[17px] text-white hover:text-[#6A9B8F] transition-colors block">partners@teachera.com.tr</a>
                    </div>
                 </div>
              </div>

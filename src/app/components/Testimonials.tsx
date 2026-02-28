@@ -2,6 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import EraSlogan from './EraSlogan';
+import architechtLogo from '../../assets/partners/architecht.png';
+import msbLogo from '../../assets/partners/msb-logo.png';
+import neuLogoWhite from '../../assets/partners/neu-logo-white.png';
+import wessonLogo from '../../assets/partners/wesson.png';
+import mondiLogo from '../../assets/partners/mondi-white.png';
+import mebLogo from '../../assets/partners/meb-white.png';
+import unileverLogo from '../../assets/partners/unilever-white.png';
 
 const AUTOPLAY_MS = 6000;
 
@@ -49,14 +56,13 @@ const testimonials = [
 ];
 
 const partners = [
-  { name: 'Microsoft', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Microsoft_logo_%282012%29.svg/2560px-Microsoft_logo_%282012%29.svg.png' },
-  { name: 'Google', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/2560px-Google_2015_logo.svg.png' },
-  { name: 'Amazon', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/2560px-Amazon_logo.svg.png' },
-  { name: 'Spotify', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/2048px-Spotify_logo_without_text.svg.png' },
-  { name: 'Netflix', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/2560px-Netflix_2015_logo.svg.png' },
-  { name: 'Tesla', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Tesla_Motors.svg/2048px-Tesla_Motors.svg.png' },
-  { name: 'Samsung', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Samsung_Galaxy_logo.svg' },
-  { name: 'Adobe', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Adobe_Systems_logo_and_wordmark.svg' },
+  { name: 'Architecht', logo: architechtLogo, frameClass: 'w-[176px] h-[58px]' },
+  { name: 'NEU', logo: neuLogoWhite, frameClass: 'w-[156px] h-[52px]' },
+  { name: 'Wesson', logo: wessonLogo, frameClass: 'w-[154px] h-[42px]' },
+  { name: 'MSB', logo: msbLogo, frameClass: 'w-[88px] h-[88px]' },
+  { name: 'MEB', logo: mebLogo, frameClass: 'w-[96px] h-[96px]' },
+  { name: 'Mondi', logo: mondiLogo, frameClass: 'w-[162px] h-[54px]' },
+  { name: 'Unilever', logo: unileverLogo, frameClass: 'w-[156px] h-[50px]' },
 ];
 
 export default function Testimonials() {
@@ -210,7 +216,7 @@ export default function Testimonials() {
         </div>
       </div>
 
-      {/* ── Partners Marquee ── */}
+      {/* ── Education Partners ── */}
       <div className="max-w-[860px] mx-auto px-6 mt-8 pt-6 border-t border-white/[0.04] relative z-10">
         <p className="text-center text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] text-white/15 tracking-[0.25em] uppercase mb-4">
           Eğitim Partnerlerimiz
@@ -222,19 +228,20 @@ export default function Testimonials() {
 
           <div className="flex whitespace-nowrap overflow-hidden">
             <motion.div
-              className="flex items-center gap-14"
-              animate={{ x: [0, -1920] }}
-              transition={{ repeat: Infinity, ease: 'linear', duration: 50 }}
+              className="flex items-center gap-14 min-w-max"
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{ repeat: Infinity, ease: 'linear', duration: 42 }}
             >
-              {[...partners, ...partners, ...partners].map((p, idx) => (
+              {[...partners, ...partners].map((p, idx) => (
                 <div
-                  key={idx}
-                  className="flex-shrink-0 w-16 h-8 opacity-15 hover:opacity-40 transition-opacity duration-500 flex items-center justify-center"
+                  key={`${p.name}-${idx}`}
+                  className={`flex-shrink-0 ${p.frameClass} opacity-[0.22] hover:opacity-50 transition-opacity duration-500 flex items-center justify-center`}
                 >
                   <img
                     src={p.logo}
                     alt={p.name}
-                    className="max-w-full max-h-full object-contain brightness-0 invert"
+                    loading="lazy"
+                    className="w-full h-full object-contain brightness-0 invert"
                   />
                 </div>
               ))}

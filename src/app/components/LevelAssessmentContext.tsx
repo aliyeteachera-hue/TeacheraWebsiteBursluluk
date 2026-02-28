@@ -3,7 +3,7 @@ import { trackEvent } from '../lib/analytics';
 
 interface LevelAssessmentContextType {
   isOpen: boolean;
-  open: () => void;
+  open: (source?: string) => void;
   close: () => void;
 }
 
@@ -16,9 +16,9 @@ const LevelAssessmentContext = createContext<LevelAssessmentContextType>({
 export function LevelAssessmentProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const open = () => {
+  const open = (source = 'unknown') => {
     setIsOpen(true);
-    trackEvent('level_assessment_open');
+    trackEvent('level_assessment_open', { source });
   };
 
   const close = () => {
