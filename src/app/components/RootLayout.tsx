@@ -22,6 +22,18 @@ export default function RootLayout() {
   const [showDeferredUi, setShowDeferredUi] = useState(false);
   const [forceReducedMotion, setForceReducedMotion] = useState(false);
   const currentSectionRef = useRef('home');
+  const menuScrollLockStateRef = useRef<{
+    scrollY: number;
+    bodyOverflow: string;
+    bodyPosition: string;
+    bodyTop: string;
+    bodyWidth: string;
+    bodyLeft: string;
+    bodyRight: string;
+    bodyTouchAction: string;
+    htmlOverflow: string;
+    htmlOverscrollY: string;
+  } | null>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -65,10 +77,58 @@ export default function RootLayout() {
   }, [forceReducedMotion]);
 
   useEffect(() => {
+    const restoreMenuScrollLock = (restoreScrollPosition: boolean) => {
+      const saved = menuScrollLockStateRef.current;
+      if (!saved) return;
+
+      const bodyStyle = document.body.style;
+      const htmlStyle = document.documentElement.style;
+      bodyStyle.overflow = saved.bodyOverflow;
+      bodyStyle.position = saved.bodyPosition;
+      bodyStyle.top = saved.bodyTop;
+      bodyStyle.width = saved.bodyWidth;
+      bodyStyle.left = saved.bodyLeft;
+      bodyStyle.right = saved.bodyRight;
+      bodyStyle.touchAction = saved.bodyTouchAction;
+      htmlStyle.overflow = saved.htmlOverflow;
+      htmlStyle.overscrollBehaviorY = saved.htmlOverscrollY;
+
+      if (restoreScrollPosition) {
+        window.scrollTo(0, saved.scrollY);
+      }
+
+      menuScrollLockStateRef.current = null;
+    };
+
     if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      const bodyStyle = document.body.style;
+      const htmlStyle = document.documentElement.style;
+      const scrollY = window.scrollY;
+
+      menuScrollLockStateRef.current = {
+        scrollY,
+        bodyOverflow: bodyStyle.overflow,
+        bodyPosition: bodyStyle.position,
+        bodyTop: bodyStyle.top,
+        bodyWidth: bodyStyle.width,
+        bodyLeft: bodyStyle.left,
+        bodyRight: bodyStyle.right,
+        bodyTouchAction: bodyStyle.touchAction,
+        htmlOverflow: htmlStyle.overflow,
+        htmlOverscrollY: htmlStyle.overscrollBehaviorY,
+      };
+
+      bodyStyle.overflow = 'hidden';
+      bodyStyle.position = 'fixed';
+      bodyStyle.top = `-${scrollY}px`;
+      bodyStyle.width = '100%';
+      bodyStyle.left = '0';
+      bodyStyle.right = '0';
+      htmlStyle.overflow = 'hidden';
+      htmlStyle.overscrollBehaviorY = 'none';
+      return () => restoreMenuScrollLock(true);
     } else {
-      document.body.style.overflow = 'unset';
+      restoreMenuScrollLock(true);
     }
   }, [isMenuOpen]);
 

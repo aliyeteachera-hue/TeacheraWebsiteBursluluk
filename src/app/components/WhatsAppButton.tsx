@@ -76,12 +76,24 @@ export function WhatsAppButton() {
               </div>
               
               {/* Chat bubble */}
-              <div className="bg-[#ffffff] rounded-2xl rounded-tl-sm p-3.5 mb-4 shadow-sm border border-[#324D47]/5 relative">
+              <button
+                type="button"
+                onClick={handleClick}
+                className="w-full text-left bg-[#ffffff] rounded-2xl rounded-tl-sm p-3.5 mb-3 shadow-sm border border-[#324D47]/5 relative cursor-pointer hover:border-[#25D366]/40 transition-colors"
+              >
                 <div className="absolute top-0 left-0 w-2 h-2 bg-[#ffffff] -translate-x-1/2 rotate-45 border-l border-b border-[#324D47]/5" />
                 <p className="text-[13px] text-[#00000B] font-['Neutraface_2_Text:Book',sans-serif] leading-relaxed">
                   Merhaba! Ben Muazzez. Size nasıl yardımcı olabilirim?
                 </p>
-              </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleClick}
+                className="w-full h-[42px] mb-4 px-3.5 rounded-xl bg-[#ffffff] border border-[#324D47]/10 text-[#324D47]/55 text-[12px] font-['Neutraface_2_Text:Book',sans-serif] text-left hover:border-[#25D366]/40 hover:text-[#324D47] transition-colors cursor-pointer"
+              >
+                WhatsApp'ta mesaj yazın...
+              </button>
               
               <button
                 onClick={handleClick}

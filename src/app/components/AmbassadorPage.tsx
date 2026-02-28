@@ -167,6 +167,7 @@ export default function AmbassadorPage() {
               />
               <input
                 type="date"
+                lang="tr-TR"
                 required
                 value={formData.birthDate}
                 onChange={(e) => handleField('birthDate', e.target.value)}

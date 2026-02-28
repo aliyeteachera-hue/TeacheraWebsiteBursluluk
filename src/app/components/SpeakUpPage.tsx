@@ -77,7 +77,10 @@ function getMonthGrid(year: number, month: number) {
 }
 
 function formatDateTr(d: Date) {
-  return `${d.getDate()} ${TR_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}.${month}.${year}`;
 }
 
 function isSameDay(a: Date, b: Date) {

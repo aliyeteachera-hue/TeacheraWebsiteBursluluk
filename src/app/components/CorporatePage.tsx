@@ -91,7 +91,7 @@ const inputBase =
    ═══════════════════════════════════════════════════════════════════════ */
 export default function CorporatePage() {
   return (
-    <div className="relative min-h-screen w-full bg-[#00000B] overflow-hidden">
+    <div className="relative min-h-screen w-full bg-[#00000B] overflow-x-hidden">
       {/* Background */}
       <div className="absolute inset-0">
         <img
@@ -315,7 +315,7 @@ function CorporateForm() {
               </div>
 
               {/* ── Step Indicator ── */}
-              <div className="flex items-center justify-center gap-1 mb-6 md:mb-8">
+              <div className="flex flex-wrap items-center justify-center gap-1.5 mb-6 md:mb-8">
                 {steps.map((s, i) => (
                   <button
                     key={s.label}
@@ -325,7 +325,7 @@ function CorporateForm() {
                       if (i === 1 && canStep0) setStep(1);
                       if (i === 2 && canStep0 && canStep1) setStep(2);
                     }}
-                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-[11px] sm:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] transition-all duration-300 cursor-pointer border ${
+                    className={`min-w-0 flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-[11px] sm:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] transition-all duration-300 cursor-pointer border ${
                       step === i
                         ? 'bg-white text-[#324D47] border-white shadow-lg shadow-black/10'
                         : step > i
@@ -547,7 +547,7 @@ function CorporateForm() {
                             onClick={() => setLangOpen(!langOpen)}
                             className={`${inputBase} text-left flex items-center justify-between cursor-pointer`}
                           >
-                            <span className={selectedLanguages.length > 0 ? 'text-[#00000B] truncate pr-4' : 'text-[#686767]'}>
+                            <span className={selectedLanguages.length > 0 ? 'text-[#00000B] truncate pr-4 min-w-0' : 'text-[#686767] min-w-0'}>
                               {selectedLanguages.length > 0
                                 ? selectedLanguages.map((id) => languages.find((l) => l.id === id)?.name).join(', ')
                                 : 'Dil Seçiniz (çoklu)'}
@@ -576,7 +576,7 @@ function CorporateForm() {
                                 key={goal}
                                 type="button"
                                 onClick={() => toggleGoal(goal)}
-                                className={`px-3.5 py-2 rounded-full text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] border transition-all duration-200 cursor-pointer ${
+                                className={`max-w-full whitespace-normal leading-tight px-3.5 py-2 rounded-full text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] border transition-all duration-200 cursor-pointer ${
                                   active
                                     ? 'bg-white text-[#324D47] border-white shadow-md shadow-black/10'
                                     : 'bg-white/10 text-white/70 border-white/15 hover:bg-white/20 hover:border-white/30'
@@ -642,7 +642,7 @@ function CorporateForm() {
 
                       {/* Eğitim Modeli */}
                       <FieldWrap icon={<Monitor size={14} />} label="Eğitim Modeli">
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           {modelOptions.map((m) => (
                             <button
                               key={m.id}
@@ -765,12 +765,12 @@ function WhyTeacheraCard() {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 + i * 0.08 }}
-              className="flex items-center gap-3"
+              className="flex items-center gap-3 min-w-0"
             >
               <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                 <span className="text-white/70">{f.icon}</span>
               </div>
-              <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] text-white/80">
+              <span className="font-['Neutraface_2_Text:Book',sans-serif] text-[13px] text-white/80 leading-snug break-words">
                 {f.text}
               </span>
             </motion.div>
@@ -812,7 +812,7 @@ function DirectContactCard() {
             <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[11px] text-white/40 uppercase tracking-wider">
               E-posta
             </p>
-            <a href="mailto:corporate@teachera.com.tr" className="font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] text-white hover:text-[#F4EBD1] transition-colors">
+            <a href="mailto:corporate@teachera.com.tr" className="font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] text-white hover:text-[#F4EBD1] transition-colors break-all">
               corporate@teachera.com.tr
             </a>
           </div>

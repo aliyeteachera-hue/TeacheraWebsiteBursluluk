@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Linkedin, Facebook, Youtube, ArrowRight, User, X, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
 import imgRectangle279 from "figma:asset/884befb1e78a75b64de1fe6d23317da411da15ba.webp";
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { useFreeTrial } from './FreeTrialContext';
@@ -64,11 +65,41 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
   const navigate = useNavigate();
   const { open: openFreeTrial } = useFreeTrial();
   const { open: openLevelAssessment } = useLevelAssessment();
+  const [disableMenuAnimations, setDisableMenuAnimations] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 1023px)');
+    const update = () => setDisableMenuAnimations(mediaQuery.matches);
+    update();
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', update);
+      return () => mediaQuery.removeEventListener('change', update);
+    }
+
+    mediaQuery.addListener(update);
+    return () => mediaQuery.removeListener(update);
+  }, []);
   
   const handleLinkClick = (item: MenuItem) => {
     if (item.isRoute) {
+      const targetPath = item.href;
+      const currentPath = window.location.pathname;
+
+      navigate(targetPath);
       onClose();
-      navigate(item.href);
+
+      if (currentPath === targetPath) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // Fallback for rare mobile navigation race conditions.
+      window.setTimeout(() => {
+        if (window.location.pathname !== targetPath) {
+          window.location.assign(targetPath);
+        }
+      }, 350);
       return;
     }
     if (window.location.pathname !== '/') {
@@ -109,30 +140,30 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={disableMenuAnimations ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.3 } }}
-          className="fixed inset-0 z-[55] bg-[#00000B] overflow-hidden"
+          exit={{ opacity: 0, transition: { duration: disableMenuAnimations ? 0.12 : 0.3 } }}
+          className="fixed inset-0 z-[55] h-[100svh] bg-[#00000B] overflow-x-hidden overflow-y-hidden overscroll-none"
         >
           {/* BACKGROUND IMAGE & OVERLAY */}
           <div className="absolute inset-0 z-0 pointer-events-none">
              <motion.img 
-               initial={{ scale: 1.1, opacity: 0 }}
-               animate={{ scale: 1, opacity: 0.2 }}
-               transition={{ duration: 1.5, ease: "easeOut" }}
+               initial={disableMenuAnimations ? false : { scale: 1.1, opacity: 0 }}
+               animate={disableMenuAnimations ? { opacity: 0.2 } : { scale: 1, opacity: 0.2 }}
+               transition={disableMenuAnimations ? { duration: 0.12 } : { duration: 1.5, ease: "easeOut" }}
                src={imgRectangle279} 
                alt="Background" 
-               className="w-full h-full object-cover grayscale mix-blend-luminosity"
+               className="hidden lg:block w-full h-full object-cover grayscale mix-blend-luminosity"
              />
              <div className="absolute inset-0 bg-gradient-to-r from-[#00000B] via-[#00000B]/95 to-[#00000B]/90" />
           </div>
 
           {/* CONTENT CONTAINER */}
-          <div className="relative z-10 w-full h-full max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col pt-32 lg:pt-0">
+          <div className="relative z-10 w-full h-full min-h-0 max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col pt-32 lg:pt-0">
             
             {/* Close Button - Always visible on top */}
             <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={disableMenuAnimations ? false : { opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               whileTap={{ scale: 0.95 }}
               onClick={onClose}
@@ -142,7 +173,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
               <X size={24} />
             </motion.button>
 
-            <div className="flex flex-col lg:grid lg:grid-cols-12 h-full pb-12 lg:pt-40 lg:pb-32">
+            <div className="flex flex-col lg:grid lg:grid-cols-12 h-full min-h-0 pb-12 lg:pt-40 lg:pb-32">
                
                {/* LEFT SIDE: INFO (Desktop Only) */}
                <div className="hidden lg:flex lg:col-span-5 flex-col justify-between h-full border-r border-[#ffffff]/10 pr-16 relative">
@@ -221,22 +252,22 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                </div>
 
                {/* RIGHT SIDE / MOBILE CONTENT */}
-               <div className="lg:col-span-7 flex flex-col justify-between h-full lg:justify-start lg:pl-24 lg:pt-4 overflow-y-auto no-scrollbar">
+               <div className="lg:col-span-7 flex flex-col h-full min-h-0 lg:justify-start lg:pl-24 lg:pt-4 overflow-hidden">
                   
                   {/* Mobile Branding (Visible only on mobile) */}
                   <div className="lg:hidden mb-8">
                      <motion.p 
-                       initial={{ opacity: 0, y: 10 }}
+                       initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
-                       transition={{ delay: 0.2 }}
+                       transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 }}
                        className="text-[#E70000] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.3em] uppercase mb-2"
                      >
                        Premium Education
                      </motion.p>
                      <motion.h3
-                       initial={{ opacity: 0, y: 10 }}
+                       initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
-                       transition={{ delay: 0.3 }}
+                       transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.3 }}
                        className="text-2xl font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-tight"
                      >
                        Menü
@@ -244,17 +275,17 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                   </div>
 
                   {/* Navigation Links */}
-                  <nav className="flex flex-col gap-4 lg:gap-6 w-full">
+                  <nav className="flex flex-col gap-4 lg:gap-6 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1">
                      {menuItems.map((item, index) => (
                         <motion.button
                            key={item.id}
-                           initial={{ opacity: 0, x: 20 }}
+                           initial={disableMenuAnimations ? false : { opacity: 0, x: 20 }}
                            animate={{ opacity: 1, x: 0 }}
-                           transition={{ delay: 0.2 + (index * 0.05), ease: "easeOut" }}
+                           transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 + (index * 0.05), ease: "easeOut" }}
                            onClick={() => handleLinkClick(item)}
-                           className="group relative flex items-center justify-between py-2 transition-all duration-500"
+                           className="group relative flex items-center justify-between py-2 transition-all duration-500 min-w-0"
                         >
-                           <div className="flex items-center gap-4 lg:gap-6">
+                           <div className="flex items-center gap-4 lg:gap-6 min-w-0">
                               <span className={`
                                  text-xs lg:text-sm font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/20 w-5 lg:w-6 group-hover:text-[#324D47] transition-colors
                               `}>
@@ -262,7 +293,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                               </span>
                               
                               <span className={`
-                                 text-2xl md:text-4xl font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left
+                                 text-2xl md:text-4xl font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.05] break-words min-w-0
                                  ${item.highlight ? 'text-[#E70000]' : 'text-[#ffffff]/80 group-hover:text-white group-hover:translate-x-2'}
                               `}>
                                  {item.id === 'academy' ? (
@@ -291,11 +322,11 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                   </nav>
 
                   {/* Mobile Footer & Actions */}
-                  <div className="lg:hidden mt-8 border-t border-[#ffffff]/10 pt-6">
+                  <div className="lg:hidden mt-6 border-t border-[#ffffff]/10 pt-5 shrink-0">
                      <motion.button
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={disableMenuAnimations ? false : { opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
+                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.5 }}
                         onClick={() => {
                           onClose();
                           openLevelAssessment('mobile_menu_level_assessment');
@@ -305,9 +336,9 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                         <span>SEVİYE TESPİT</span>
                      </motion.button>
                      <motion.button
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={disableMenuAnimations ? false : { opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.55 }}
+                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.55 }}
                         onClick={handleLogin}
                         className="w-full flex items-center justify-center gap-2 px-6 py-4 mb-8 bg-[#ffffff]/5 hover:bg-[#324D47] text-white border border-[#ffffff]/10 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-sm transition-all duration-300 group"
                      >
