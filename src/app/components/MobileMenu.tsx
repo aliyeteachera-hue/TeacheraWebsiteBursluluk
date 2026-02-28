@@ -1,7 +1,6 @@
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { Instagram, Linkedin, Facebook, Youtube, ArrowRight, User, X, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import { useEffect, useState } from 'react';
 import imgRectangle279 from "figma:asset/884befb1e78a75b64de1fe6d23317da411da15ba.webp";
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { useFreeTrial } from './FreeTrialContext';
@@ -65,21 +64,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
   const navigate = useNavigate();
   const { open: openFreeTrial } = useFreeTrial();
   const { open: openLevelAssessment } = useLevelAssessment();
-  const [disableMenuAnimations, setDisableMenuAnimations] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 1023px)');
-    const update = () => setDisableMenuAnimations(mediaQuery.matches);
-    update();
-
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', update);
-      return () => mediaQuery.removeEventListener('change', update);
-    }
-
-    mediaQuery.addListener(update);
-    return () => mediaQuery.removeListener(update);
-  }, []);
+  const disableMenuAnimations = true;
   
   const handleLinkClick = (item: MenuItem) => {
     if (item.isRoute) {
@@ -136,13 +121,10 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
     window.open(LOGIN_URL, '_blank', 'noopener,noreferrer');
   };
 
+  if (!isOpen) return null;
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={disableMenuAnimations ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: disableMenuAnimations ? 0.12 : 0.3 } }}
+        <div
           className="fixed inset-0 z-[55] h-[100svh] bg-[#00000B] overflow-x-hidden overflow-y-hidden overscroll-none"
         >
           {/* BACKGROUND IMAGE & OVERLAY */}
@@ -153,7 +135,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                transition={disableMenuAnimations ? { duration: 0.12 } : { duration: 1.5, ease: "easeOut" }}
                src={imgRectangle279} 
                alt="Background" 
-               className="hidden lg:block w-full h-full object-cover grayscale mix-blend-luminosity"
+               className="w-full h-full object-cover grayscale mix-blend-luminosity"
              />
              <div className="absolute inset-0 bg-gradient-to-r from-[#00000B] via-[#00000B]/95 to-[#00000B]/90" />
           </div>
@@ -349,8 +331,6 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                </div>
             </div>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
   );
 }
