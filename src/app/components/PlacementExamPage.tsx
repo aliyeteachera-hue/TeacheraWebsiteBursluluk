@@ -594,9 +594,11 @@ export default function PlacementExamPage() {
                     <>
                       <button
                         onClick={skipQuestion}
-                        className="h-[42px] px-5 rounded-full border border-[#324D47]/25 text-[#324D47] hover:bg-[#324D47]/10 text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors inline-flex items-center cursor-pointer"
+                        aria-label="Soruyu atla"
+                        className="h-[36px] px-2 text-[#324D47]/65 hover:text-[#324D47] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-1 transition-colors cursor-pointer"
                       >
-                        SORUYU ATLA
+                        Atla
+                        <ArrowRight size={12} />
                       </button>
                       <button
                         onClick={goToNext}
