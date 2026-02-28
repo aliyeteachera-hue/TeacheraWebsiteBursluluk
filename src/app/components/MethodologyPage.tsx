@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
 import methodologyHeroVideo from '../../assets/video/methodology-hero.mp4';
-import { useLiteMode } from '../lib/useLiteMode';
+import methodologyHeroVideoWebm from '../../assets/video/methodology-hero.webm';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
 import Group1000004255 from '../../imports/Group1000004255';
 import TeachingMethod from './TeachingMethod';
@@ -80,18 +80,17 @@ function HeroSection() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const shouldReduceMotion = useReducedMotion();
-  const isLiteMode = useLiteMode();
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
 
   useEffect(() => {
-    if (shouldReduceMotion || isLiteMode) {
+    if (shouldReduceMotion) {
       setShouldLoadVideo(false);
       return;
     }
 
     const timer = window.setTimeout(() => setShouldLoadVideo(true), 320);
     return () => window.clearTimeout(timer);
-  }, [isLiteMode, shouldReduceMotion]);
+  }, [shouldReduceMotion]);
 
   return (
     <section ref={ref} className="relative h-auto min-h-[80vh] md:min-h-[88vh] overflow-hidden">
@@ -103,11 +102,13 @@ function HeroSection() {
             className="absolute inset-0 w-full h-full object-cover"
             autoPlay
             muted
+            defaultMuted
             loop
             playsInline
-            preload="none"
+            preload="metadata"
             aria-hidden="true"
           >
+            <source src={methodologyHeroVideoWebm} type="video/webm" />
             <source src={methodologyHeroVideo} type="video/mp4" />
           </video>
         ) : (

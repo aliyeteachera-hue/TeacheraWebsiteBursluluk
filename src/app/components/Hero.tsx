@@ -3,6 +3,7 @@ import { useRef, useEffect, useState, type ReactNode } from 'react';
 import { ChevronDown, Play } from 'lucide-react';
 import Group1000004255 from '../../imports/Group1000004255';
 import homeHeroVideo from '../../assets/video/home-hero.mp4';
+import homeHeroVideoWebm from '../../assets/video/home-hero.webm';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
 import { useLiteMode } from '../lib/useLiteMode';
@@ -136,7 +137,7 @@ export default function Hero() {
       setEnableHeroMotion(shouldEnableMotion);
       setEnableDesktopEffects(shouldEnableDesktopEffects);
 
-      if (!shouldEnableMotion) {
+      if (shouldReduceMotion) {
         setShouldLoadVideo(false);
         return;
       }
@@ -175,11 +176,13 @@ export default function Hero() {
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               muted
+              defaultMuted
               loop
               playsInline
-              preload="none"
+              preload="metadata"
               aria-hidden="true"
             >
+              <source src={homeHeroVideoWebm} type="video/webm" />
               <source src={homeHeroVideo} type="video/mp4" />
             </video>
           </div>

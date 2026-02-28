@@ -3,19 +3,18 @@ import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { MessageCircle, X } from 'lucide-react';
 import whatsappImage from 'figma:asset/9694b181704f98419b88c2856e9838e3f6edf1aa.webp';
 import whatsappLoopVideo from '../../assets/video/whatsapp-loop.mp4';
+import whatsappLoopVideoWebm from '../../assets/video/whatsapp-loop.webm';
 import { trackEvent } from '../lib/analytics';
-import { useLiteMode } from '../lib/useLiteMode';
 
 export function WhatsAppButton() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showSoftPrompt, setShowSoftPrompt] = useState(false);
   const shouldReduceMotion = useReducedMotion();
-  const isLiteMode = useLiteMode();
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    if (shouldReduceMotion || isLiteMode) {
+    if (shouldReduceMotion) {
       setShowSoftPrompt(false);
       return;
     }
@@ -37,11 +36,11 @@ export function WhatsAppButton() {
       clearInterval(cycleTimer);
       if (hideTimer) clearTimeout(hideTimer);
     };
-  }, [isExpanded, isHovered, isLiteMode, shouldReduceMotion]);
+  }, [isExpanded, isHovered, shouldReduceMotion]);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || isLiteMode || shouldReduceMotion) return;
+    if (!video || shouldReduceMotion) return;
 
     if (isExpanded) {
       video.pause();
@@ -54,7 +53,7 @@ export function WhatsAppButton() {
         // Autoplay can be blocked by browser policy on some devices; ignore silently.
       });
     }
-  }, [isExpanded, isLiteMode, shouldReduceMotion]);
+  }, [isExpanded, shouldReduceMotion]);
 
   const handleClick = () => {
     const phoneNumber = '905528674226';
@@ -159,33 +158,25 @@ export function WhatsAppButton() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="relative w-16 h-16 rounded-full shadow-xl overflow-hidden cursor-pointer border border-[#324D47]/20"
-        animate={!shouldReduceMotion && !isLiteMode && !isExpanded ? { y: [0, -2, 0], scale: [1, 1.015, 1] } : undefined}
-        transition={!shouldReduceMotion && !isLiteMode && !isExpanded ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
+        animate={!shouldReduceMotion && !isExpanded ? { y: [0, -2, 0], scale: [1, 1.015, 1] } : undefined}
+        transition={!shouldReduceMotion && !isExpanded ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
       >
-        {isLiteMode ? (
-          <img
-            src={whatsappImage}
-            alt="WhatsApp Destek"
-            className="w-full h-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
-        ) : (
-          <video
-            ref={videoRef}
-            className="w-full h-full object-cover will-change-transform"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="none"
-            aria-label="WhatsApp Destek"
-          >
-            <source src={whatsappLoopVideo} type="video/mp4" />
-          </video>
-        )}
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover will-change-transform"
+          autoPlay
+          muted
+          defaultMuted
+          loop
+          playsInline
+          preload="metadata"
+          aria-label="WhatsApp Destek"
+        >
+          <source src={whatsappLoopVideoWebm} type="video/webm" />
+          <source src={whatsappLoopVideo} type="video/mp4" />
+        </video>
 
         {isExpanded && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#324D47]/90">
@@ -196,8 +187,8 @@ export function WhatsAppButton() {
         <div className="absolute bottom-1 right-1 w-4 h-4 bg-[#ffffff] rounded-full flex items-center justify-center shadow">
           <motion.div
             className="w-2.5 h-2.5 bg-[#324D47] rounded-full"
-            animate={!shouldReduceMotion && !isLiteMode ? { scale: [1, 1.25, 1], opacity: [1, 0.65, 1] } : undefined}
-            transition={!shouldReduceMotion && !isLiteMode ? { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } : undefined}
+            animate={!shouldReduceMotion ? { scale: [1, 1.25, 1], opacity: [1, 0.65, 1] } : undefined}
+            transition={!shouldReduceMotion ? { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } : undefined}
           />
         </div>
       </motion.button>
