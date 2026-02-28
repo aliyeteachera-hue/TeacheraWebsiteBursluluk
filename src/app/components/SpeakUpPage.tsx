@@ -1,18 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router';
-import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Maximize2, X } from 'lucide-react';
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
    ═══════════════════════════════════════════════════════════════════════ */
+const HERO_BG =
+  'https://i.vimeocdn.com/video/2127141444-043cac2f34ca64e888937f7529031536449858723a1e4ee57eff49ce43a90075-d_1080x1920?region=us';
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
-const SPEAKUP_VIDEO_EMBED_BASE =
-  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=0&app_id=58479';
+const SPEAKUP_VIDEO_INLINE_BASE =
+  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-inline&app_id=58479';
+const SPEAKUP_VIDEO_FULLSCREEN_BASE =
+  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-fullscreen&app_id=58479';
 const SPEAKUP_VIDEO_INLINE_SRC =
-  `${SPEAKUP_VIDEO_EMBED_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&autoplay=0&muted=0`;
+  `${SPEAKUP_VIDEO_INLINE_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&muted=1`;
+const SPEAKUP_VIDEO_FULLSCREEN_SRC =
+  `${SPEAKUP_VIDEO_FULLSCREEN_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&muted=1`;
 
 const SESSIONS = [
   { id: 's1', label: '14:00 – 15:20', value: '14:00-15:20' },
@@ -265,10 +271,16 @@ export default function SpeakUpPage() {
   const formRef = useRef<HTMLDivElement>(null);
   const whatRef = useRef<HTMLDivElement>(null);
   const howRef = useRef<HTMLDivElement>(null);
+  const videoCardRef = useRef<HTMLDivElement>(null);
   const inlineIframeRef = useRef<HTMLIFrameElement>(null);
+  const fullscreenIframeRef = useRef<HTMLIFrameElement>(null);
+  const isInlineVideoInView = useInView(videoCardRef, { margin: '-20% 0px -20% 0px' });
 
   /* ── Video Mute State ── */
-  const [isMuted, setIsMuted] = useState(false);
+  const [isInlineVideoStarted, setIsInlineVideoStarted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
+  const [showFullscreenSoundPrompt, setShowFullscreenSoundPrompt] = useState(false);
 
   const postToPlayer = (
     iframe: HTMLIFrameElement | null,
@@ -286,21 +298,106 @@ export default function SpeakUpPage() {
     postToPlayer(iframe, 'setVolume', muted ? 0 : 1);
   };
 
+  const syncAllPlayers = (muted: boolean) => {
+    syncIframeVolume(inlineIframeRef.current, muted);
+    syncIframeVolume(fullscreenIframeRef.current, muted);
+  };
+
   const toggleMute = (event?: { stopPropagation?: () => void }) => {
     event?.stopPropagation?.();
-    setIsMuted((prev) => !prev);
+    setIsMuted((prev) => {
+      const nextMuted = !prev;
+      syncAllPlayers(nextMuted);
+      if (!nextMuted) setShowFullscreenSoundPrompt(false);
+      return nextMuted;
+    });
+  };
+
+  const openVideoFullscreen = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.();
+    setIsMuted(true);
+    setShowFullscreenSoundPrompt(true);
+    setIsVideoFullscreen(true);
+  };
+
+  const startInlineVideo = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.();
+    setIsInlineVideoStarted(true);
+    setIsMuted(false);
+  };
+
+  const enableFullscreenSound = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.();
+    setIsMuted(false);
+    setShowFullscreenSoundPrompt(false);
+    postToPlayer(fullscreenIframeRef.current, 'setMuted', false);
+    postToPlayer(fullscreenIframeRef.current, 'setVolume', 1);
+    postToPlayer(fullscreenIframeRef.current, 'play');
+    window.setTimeout(() => {
+      postToPlayer(fullscreenIframeRef.current, 'setMuted', false);
+      postToPlayer(fullscreenIframeRef.current, 'setVolume', 1);
+      postToPlayer(fullscreenIframeRef.current, 'play');
+    }, 220);
   };
 
   const handleInlineIframeLoad = () => {
     window.setTimeout(() => {
+      postToPlayer(inlineIframeRef.current, 'play');
       syncIframeVolume(inlineIframeRef.current, isMuted);
-    }, 200);
+    }, 350);
+  };
+
+  const handleFullscreenIframeLoad = () => {
+    window.setTimeout(() => {
+      postToPlayer(fullscreenIframeRef.current, 'play');
+      syncIframeVolume(fullscreenIframeRef.current, isMuted);
+    }, 250);
   };
 
   useEffect(() => {
-    const timerId = window.setTimeout(() => syncIframeVolume(inlineIframeRef.current, isMuted), 80);
+    const timerId = window.setTimeout(() => syncAllPlayers(isMuted), 80);
     return () => window.clearTimeout(timerId);
   }, [isMuted]);
+
+  useEffect(() => {
+    if (isVideoFullscreen || !isInlineVideoStarted) return;
+    const timerId = window.setTimeout(() => {
+      postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
+      if (isInlineVideoInView) syncIframeVolume(inlineIframeRef.current, isMuted);
+    }, 100);
+    return () => window.clearTimeout(timerId);
+  }, [isInlineVideoInView, isVideoFullscreen, isInlineVideoStarted, isMuted]);
+
+  useEffect(() => {
+    if (!isVideoFullscreen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const keyHandler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsVideoFullscreen(false);
+    };
+    document.addEventListener('keydown', keyHandler);
+
+    postToPlayer(inlineIframeRef.current, 'pause');
+    const timerId = window.setTimeout(() => {
+      postToPlayer(fullscreenIframeRef.current, 'play');
+      syncIframeVolume(fullscreenIframeRef.current, isMuted);
+    }, 200);
+
+    return () => {
+      window.clearTimeout(timerId);
+      setShowFullscreenSoundPrompt(false);
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', keyHandler);
+      if (isInlineVideoStarted) {
+        postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
+      }
+      if (isInlineVideoStarted && isInlineVideoInView) {
+        window.setTimeout(() => syncIframeVolume(inlineIframeRef.current, isMuted), 120);
+      }
+    };
+  }, [isVideoFullscreen, isInlineVideoInView, isInlineVideoStarted, isMuted]);
 
   /* ── Form State ── */
   const [formData, setFormData] = useState({
@@ -497,32 +594,80 @@ export default function SpeakUpPage() {
             >
               <div className="relative rounded-[30px] p-[1.5px] bg-[linear-gradient(140deg,rgba(231,0,0,0.75),rgba(255,255,255,0.35),rgba(50,77,71,0.65))] shadow-[0_24px_70px_rgba(0,0,0,0.55)]">
                 <div
-                  className="relative w-[280px] md:w-[320px] lg:w-[340px] rounded-[24px] overflow-hidden bg-[#1a1a24] shadow-2xl shadow-black/40"
+                  ref={videoCardRef}
+                  className="relative w-[280px] md:w-[320px] lg:w-[340px] rounded-[24px] overflow-hidden bg-[#1a1a24] shadow-2xl shadow-black/40 cursor-pointer"
                   style={{ aspectRatio: '9/16' }}
+                  onClick={isInlineVideoStarted ? openVideoFullscreen : startInlineVideo}
                 >
-                  <iframe
-                    ref={inlineIframeRef}
-                    src={SPEAKUP_VIDEO_INLINE_SRC}
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    title="Teachera SpeakUP"
-                    className="absolute inset-0 w-full h-full border-0"
-                    loading="eager"
-                    onLoad={handleInlineIframeLoad}
-                  />
-                  <button
-                    onClick={(event) => toggleMute(event)}
-                    className="absolute top-2 right-2 h-8 px-3 bg-[#324D47]/80 rounded-full flex items-center justify-center gap-1.5 cursor-pointer text-white text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em]"
-                  >
-                    {isMuted ? <VolumeX size={13} className="text-white" /> : <Volume2 size={13} className="text-white" />}
-                    {isMuted ? 'SESİ AÇ' : 'SESİ KAPAT'}
-                  </button>
+                  {isInlineVideoStarted ? (
+                    <>
+                      <iframe
+                        ref={inlineIframeRef}
+                        src={SPEAKUP_VIDEO_INLINE_SRC}
+                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        title="Teachera SpeakUP"
+                        className="absolute inset-0 w-full h-full border-0"
+                        loading="eager"
+                        onLoad={handleInlineIframeLoad}
+                      />
+                      <button
+                        onClick={(event) => toggleMute(event)}
+                        className="absolute top-2 right-2 w-8 h-8 bg-[#324D47]/[0.8] rounded-full flex items-center justify-center cursor-pointer"
+                      >
+                        {isMuted ? <VolumeX size={14} className="text-white" /> : <Volume2 size={14} className="text-white" />}
+                      </button>
+                      <button
+                        onClick={openVideoFullscreen}
+                        className="absolute top-2 left-2 h-8 px-3 bg-[#00000B]/70 rounded-full flex items-center justify-center gap-1.5 cursor-pointer text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em]"
+                      >
+                        <Maximize2 size={12} />
+                        TAM EKRAN
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <img
+                        src={HERO_BG}
+                        alt="SpeakUP Bilgilendirme Videosu"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,11,0.1),rgba(0,0,11,0.72))]" />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <motion.button
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.2, duration: 0.5 }}
+                          className="group cursor-pointer relative block pointer-events-auto"
+                          onClick={startInlineVideo}
+                          aria-label="Videoyu oynat"
+                        >
+                          <div className="absolute inset-0 bg-white/10 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
+                          <div className="w-14 h-14 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full flex items-center justify-center group-hover:bg-white/10 transition-all duration-500 relative z-10">
+                            <div className="w-9 h-9 bg-[#E70000] rounded-full flex items-center justify-center pl-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                              <span
+                                aria-hidden="true"
+                                className="inline-block w-0 h-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-white ml-[1px]"
+                              />
+                            </div>
+                          </div>
+                        </motion.button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
-              <p className="mt-4 text-center text-white/70 text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.14em] uppercase">
-                Videoyu oynat, sardır ve tam ekrana geç
-              </p>
+              {!isInlineVideoStarted && (
+                <motion.p
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: [0.45, 0.9, 0.45], y: [0, -3, 0] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="mt-4 text-center text-white/70 text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.14em] uppercase"
+                >
+                  Önce Bilgilendirme Videosunu İzle
+                </motion.p>
+              )}
 
               {/* Floating glow behind video */}
               <div className="absolute -inset-10 bg-[#E70000] rounded-full filter blur-[120px] opacity-[0.06] -z-10 pointer-events-none" />
@@ -530,6 +675,66 @@ export default function SpeakUpPage() {
           </div>
         </div>
       </section>
+
+      <AnimatePresence>
+        {isVideoFullscreen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[90] bg-[#00000B]/95 backdrop-blur-sm flex items-center justify-center p-3"
+            onClick={() => setIsVideoFullscreen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.95 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              className="relative h-[92svh] max-h-[92svh] max-w-[96vw] aspect-[9/16] rounded-[22px] overflow-hidden bg-black shadow-2xl shadow-black/60"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <iframe
+                ref={fullscreenIframeRef}
+                src={SPEAKUP_VIDEO_FULLSCREEN_SRC}
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                title="Teachera SpeakUP Fullscreen"
+                className="absolute inset-0 w-full h-full border-0"
+                loading="lazy"
+                onLoad={handleFullscreenIframeLoad}
+              />
+
+              <button
+                onClick={(event) => toggleMute(event)}
+                className="absolute top-3 left-3 h-9 px-3 bg-[#324D47]/85 rounded-full flex items-center justify-center gap-2 cursor-pointer text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em]"
+              >
+                {isMuted ? <VolumeX size={15} className="text-white" /> : <Volume2 size={15} className="text-white" />}
+                {isMuted ? 'SESİ AÇ' : 'SESİ KAPAT'}
+              </button>
+
+              {showFullscreenSoundPrompt && (
+                <button
+                  onClick={enableFullscreenSound}
+                  className="absolute inset-0 flex items-center justify-center bg-[#00000B]/15 cursor-pointer"
+                >
+                  <span className="px-5 py-3 rounded-full bg-[#324D47]/92 border border-white/20 text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.08em] uppercase">
+                    Ekrana Dokun: Sesi Aç
+                  </span>
+                </button>
+              )}
+
+              <button
+                onClick={() => setIsVideoFullscreen(false)}
+                className="absolute top-3 right-3 w-9 h-9 bg-[#00000B]/75 rounded-full flex items-center justify-center cursor-pointer text-white"
+                aria-label="Tam ekran videoyu kapat"
+              >
+                <X size={18} />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ═══════════════════════════════════════════════════════
           2 — SPEAKUP NEDIR?
