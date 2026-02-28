@@ -350,7 +350,7 @@ export default function Programs() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="relative min-w-[85vw] h-[470px] rounded-2xl overflow-hidden snap-center flex-shrink-0"
+                className="relative min-w-[90vw] sm:min-w-[85vw] h-[560px] sm:h-[500px] rounded-2xl overflow-hidden snap-center flex-shrink-0"
               >
                 <ImageWithFallback src={lang.image} alt={lang.name} className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.88)] via-[rgba(0,0,0,0.48)] to-[rgba(0,0,0,0.06)]" />

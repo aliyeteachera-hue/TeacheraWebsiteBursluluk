@@ -35,8 +35,8 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
       ? 'w-[98px] sm:w-[108px] md:w-[122px]'
       : 'w-[110px] sm:w-[124px] md:w-[142px]'
     : scrolled
-      ? 'w-[106px] sm:w-[122px] md:w-[128px]'
-      : 'w-[118px] sm:w-[138px] md:w-[146px]';
+      ? 'w-[98px] sm:w-[122px] md:w-[128px]'
+      : 'w-[108px] sm:w-[138px] md:w-[146px]';
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const next = latest > 40;
@@ -84,7 +84,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
       }`}
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
-        <div className={`flex items-center justify-between transition-all duration-700 ease-out ${navHeightClass}`}>
+        <div className={`flex items-center justify-between gap-2 transition-all duration-700 ease-out ${navHeightClass}`}>
           {/* ═══ Logo ═══ */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -135,7 +135,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
           </motion.div>
 
           {/* ═══ Right: CTAs + Menu ═══ */}
-          <div className={`flex items-center shrink-0 ${isSpeakUpPage ? 'gap-2 sm:gap-2.5' : 'gap-2.5 sm:gap-3.5'}`}>
+          <div className={`flex items-center shrink-0 ${isSpeakUpPage ? 'gap-2 sm:gap-2.5' : 'gap-2 sm:gap-3.5'}`}>
 
             {/* ── SpeakUP page: "Hemen Başvur" red CTA ── */}
             {isSpeakUpPage ? (
@@ -200,7 +200,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={() => openFreeTrial('navigation_mobile_free_trial')}
-                  className="md:hidden mobile-nav-cta-text text-mobile-kicker min-h-[44px] px-3.5 sm:px-5 py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 font-['Neutraface_2_Text:Demi',sans-serif] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
+                  className="md:hidden mobile-nav-cta-text text-mobile-kicker min-h-[44px] px-3 sm:px-5 py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 font-['Neutraface_2_Text:Demi',sans-serif] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
                 >
                   Ücretsiz Seans
                 </motion.button>
@@ -223,7 +223,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
               }`}
               aria-label="Toggle menu"
             >
-              <div className={`flex min-h-[44px] items-center gap-2 sm:gap-3 rounded-full border border-white/[0.12] sm:border-white/[0.1] bg-transparent sm:bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu ${isSpeakUpPage ? 'px-3 sm:px-5 py-2 sm:py-2.5' : 'px-3.5 sm:px-5 py-2 sm:py-2.5'}`}>
+              <div className={`flex min-h-[44px] items-center gap-1.5 sm:gap-3 rounded-full border border-white/[0.12] sm:border-white/[0.1] bg-transparent sm:bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/[0.18] transition-all duration-500 group/menu ${isSpeakUpPage ? 'px-2.5 sm:px-5 py-2 sm:py-2.5' : 'px-2.5 sm:px-5 py-2 sm:py-2.5'}`}>
                 <span className="text-mobile-kicker md:text-[11px] md:tracking-[0.1em] inline font-['Neutraface_2_Text:Demi',sans-serif] uppercase text-white/62 group-hover/menu:text-white/85 transition-colors duration-300">
                   Menü
                 </span>
