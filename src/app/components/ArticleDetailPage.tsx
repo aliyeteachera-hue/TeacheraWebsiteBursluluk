@@ -75,9 +75,9 @@ const ARTICLES: Record<string, FullArticle> = {
         number: '02',
         title: 'Beyninizi Yormayın: Çevirinin Nörolojik Maliyeti',
         content: [
-          'Zihinsel çeviri sırasında beyin aynı anda iki işi yapar: önce L1\'de düşünür, sonra L2\'ye aktarır. Bu çift işlem, konuşma anında bilişsel yükü gereksiz biçimde artırır.',
+          'Zihinsel çeviri sırasında beyin aynı anda iki işi yapar: önce anadilde düşünür, sonra hedef dile aktarır. Bu çift işlem, konuşma anında bilişsel yükü gereksiz biçimde artırır.',
           'Aşırı Yorgunluk (Brain Fatigue): Çeviri odaklı işlemleme, beynin enerji kaynaklarını hızlı tüketir. Sonuç; kısa sürede zihinsel yorgunluk, odak kaybı ve konuşma isteğinde düşüştür.',
-          'Milisaniyelik Gecikmeler: Her kelimede L1-L2 eşlemesi için harcanan çok küçük gecikmeler, cümle boyunca birikerek "ölümcül sessizlikler" üretir. Akıcılık hissi tam da bu noktada dağılır.',
+          'Milisaniyelik Gecikmeler: Her kelimede anadil-hedef dil eşlemesi için harcanan çok küçük gecikmeler, cümle boyunca birikerek "ölümcül sessizlikler" üretir. Akıcılık hissi tam da bu noktada dağılır.',
         ],
         image: 'https://images.unsplash.com/photo-1649937801620-d31db7fb3ab3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080',
         imageCaption: 'Konuşma anındaki bilişsel yük, çeviri basamağı eklendiğinde katlanarak artar.',
@@ -88,7 +88,7 @@ const ARTICLES: Record<string, FullArticle> = {
         content: [
           'Dil sadece kelime listesi değildir; doğal eşdizimler, kalıplar ve kültürel kodlarla anlam kazanır. Zihinsel çeviri ise bu yapıları bozarak "doğru ama doğal olmayan" cümleler üretir.',
           'Yanlış Eşdizimler (Collocation Errors): Kelimeyi sözlük karşılığıyla taşımak, hedef dildeki gerçek kullanım kalıplarını kaçırmanıza neden olur. Bu da "anlaşılan ama yapay" konuşma üretir.',
-          'Fosilleşme (Fossilization): L1 kurallarını sürekli L2\'ye kopyalamak, hataların kalıcı alışkanlığa dönüşmesine yol açar. Bir süre sonra bu hataları düzeltmek çok daha maliyetli hale gelir.',
+          'Fosilleşme (Fossilization): anadil kurallarını sürekli hedef dile kopyalamak, hataların kalıcı alışkanlığa dönüşmesine yol açar. Bir süre sonra bu hataları düzeltmek çok daha maliyetli hale gelir.',
         ],
         pullQuote: 'Doğru kelimeyi bilmek yetmez; o kelimenin hedef dilde kimlerle "yan yana yürüdüğünü" de bilmek gerekir.',
       },
@@ -108,7 +108,7 @@ const ARTICLES: Record<string, FullArticle> = {
         title: 'Kurtulma Rehberi: Hedef Dilde Düşünme Stratejileri',
         content: [
           '1) İfade Kalıpları (Lexical Chunks): Tek kelime ezberi yerine "From my perspective..." gibi bloklar öğrenin. Kalıplar, çeviri basamağını kısaltır ve otomatik üretimi güçlendirir.',
-          '2) Circumlocution (Etrafından Dolaşma): Bilinmeyen kelimede L1\'e dönmek yerine tarif edin. "Matkap" akla gelmiyorsa "a tool you use to make holes in the wall" diyebilmek akışı korur.',
+          '2) Circumlocution (Etrafından Dolaşma): Bilinmeyen kelimede anadile dönmek yerine tarif edin. "Matkap" akla gelmiyorsa "a tool you use to make holes in the wall" diyebilmek akışı korur.',
           '3) Meaningful Fillers (Anlamlı Dolgular): "Iıı..." yerine "Well, let me think..." gibi profesyonel köprü ifadeleri kullanın. Bu, düşünmek için süre kazandırırken akıcılığı da korur.',
           '4) Massive Input (Yoğun ve Hızlı Girdi): Biraz hızlı içerik dinleyerek beyni doğrudan anlamlandırmaya zorlayın. Çeviriye zaman kalmadığında kavramsal aracılık gelişir.',
           '5) Günlük Sınırlandırılmış Çıktı: Her gün 5-10 dakika basit eylemleri hedef dilde seslendirin. Küçük ama düzenli tekrar, yeni nöral yolların kalıcılaşmasını sağlar.',
@@ -117,7 +117,7 @@ const ARTICLES: Record<string, FullArticle> = {
       },
     ],
     conclusion: [
-      'Zihinsel çeviri alışkanlığından çıkış, pasif bir "bırakma" değil aktif bir "yeniden inşa" sürecidir. Amaç, L1 arayüzünü devreden çıkarıp düşünceden hedef dile doğrudan geçiş yapabilmektir.',
+      'Zihinsel çeviri alışkanlığından çıkış, pasif bir "bırakma" değil aktif bir "yeniden inşa" sürecidir. Amaç, anadil arayüzünü devreden çıkarıp düşünceden hedef dile doğrudan geçiş yapabilmektir.',
       '"Biliyoruz ama konuşamıyoruz" kader değildir. Doğru girdi, doğru çıktı ve doğru strateji ile beyin yeni konuşma yollarını üretir.',
     ],
     closingLine: 'Zihinsel çeviriyi bıraktığınız gün, konuşma akıcılığınızın gerçekten başladığı gündür.',
@@ -144,8 +144,8 @@ const ARTICLES: Record<string, FullArticle> = {
         number: '01',
         title: 'Bilişsel Yükün Dışavurumu: Akıcılık Neden Çöker?',
         content: [
-          'Zihinsel çeviri sırasında çalışan bellek aynı anda dört işi yapmaya zorlanır: anadilde taslak kurma, L2 karşılıklarını arama, dilbilgisel denetim ve artikülasyon planlama. Bilişsel Yük Teorisi açısından bu, sistemin doğal kapasitesini aşan bir yüklenmedir.',
-          'Bu nedenle konuşmadaki akıcılık bozuklukları rastlantı değildir; doğrudan bilişsel darboğazın dışavurumudur. Anadilde veya doğrudan L2 üretimde düşük olan duraksama oranı, çeviri baskısı altında dramatik biçimde yükselir.',
+          'Zihinsel çeviri sırasında çalışan bellek aynı anda dört işi yapmaya zorlanır: anadilde taslak kurma, hedef dil karşılıklarını arama, dilbilgisel denetim ve artikülasyon planlama. Bilişsel Yük Teorisi açısından bu, sistemin doğal kapasitesini aşan bir yüklenmedir.',
+          'Bu nedenle konuşmadaki akıcılık bozuklukları rastlantı değildir; doğrudan bilişsel darboğazın dışavurumudur. Anadilde veya doğrudan hedef dil üretimde düşük olan duraksama oranı, çeviri baskısı altında dramatik biçimde yükselir.',
           'Akıcılık düşüşü "az pratik" problemi gibi görünse de, özünde işlemleme mimarisinin yanlış kurulması problemidir: düşünce ile ifade arasına zorunlu bir çeviri katmanı yerleştirmek.',
         ],
         pullQuote: 'Çeviri alışkanlığı, konuşmayı bilgi testine değil gerçek zamanlı bir işlemleme krizine dönüştürür.',
@@ -176,7 +176,7 @@ const ARTICLES: Record<string, FullArticle> = {
         number: '04',
         title: 'Dilbilimsel Tahribat: Ara Dil Felci ve Fosilleşme',
         content: [
-          'Ara Dil (Interlanguage) normalde geçirgen ve gelişen bir sistemdir. Ancak L2 üretimi sürekli zihinsel çeviri ile yapıldığında bu sistem donarak fosilleşmeye girer; hatalar kalıcılaşır.',
+          'Ara Dil (Interlanguage) normalde geçirgen ve gelişen bir sistemdir. Ancak hedef dil üretimi sürekli zihinsel çeviri ile yapıldığında bu sistem donarak fosilleşmeye girer; hatalar kalıcılaşır.',
           'Negatif Aktarım (Negative Transfer) bu süreci hızlandırır: öğrenici, anadilin sözdizimini ve kelime örgüsünü hedef dile şablon gibi taşır. Sıfat-isim sıralaması, edat seçimi ve cümle dizilimleri bu yüzden sistematik biçimde bozulur.',
           'En kritik risk şudur: tekrar eden çeviri kaynaklı yapılar, örtük alışkanlığa dönüşür. Öğrenci hata yaptığını fark etmese bile aynı bozuk kalıpları otomatik olarak üretmeye devam eder.',
         ],
@@ -225,8 +225,8 @@ const ARTICLES: Record<string, FullArticle> = {
         title: 'Nöroplastisite Perspektifi: Hedef Dilde Düşünme Nasıl Oluşur?',
         content: [
           'Hedef dilde düşünme, uykudan uyanınca aniden ortaya çıkan bir yetenek değildir; tekrar eden doğru görevlerle beynin bağlantı haritasını yeniden kurma sürecidir.',
-          'Çeviri refleksi güçlü olduğunda beyin, L1 basamağını güvenli yol olarak kullanır. Bu da hızlı iletişimde işlemleme gecikmesine ve akıcılık kaybına neden olur.',
-          'Amaç, L1 üzerinden dolaylı üretimi azaltıp kavramdan hedef dile doğrudan geçişi güçlendirmektir. Bu geçiş ancak düzenli, yapılandırılmış ve ölçülebilir pratikle kalıcı hale gelir.',
+          'Çeviri refleksi güçlü olduğunda beyin, anadil basamağını güvenli yol olarak kullanır. Bu da hızlı iletişimde işlemleme gecikmesine ve akıcılık kaybına neden olur.',
+          'Amaç, anadil üzerinden dolaylı üretimi azaltıp kavramdan hedef dile doğrudan geçişi güçlendirmektir. Bu geçiş ancak düzenli, yapılandırılmış ve ölçülebilir pratikle kalıcı hale gelir.',
         ],
         pullQuote: 'Hedef dilde düşünme bir karar değil, tekrar edilen doğru işlemleme alışkanlıklarının nörobiyolojik sonucudur.',
       },
@@ -235,7 +235,7 @@ const ARTICLES: Record<string, FullArticle> = {
         title: 'Lexical Chunks ve Direct Association',
         content: [
           'İzole kelime ezberi, çeviri alışkanlığının ana yakıtıdır. Bunun yerine dil birimleri bloklar halinde öğrenilmelidir: "From my perspective..." gibi açılış kalıpları tek bir kavramsal birim olarak otomatikleştirilmelidir.',
-          'Doğrudan ilişkilendirme stratejisinde yeni kelime, anadil karşılığıyla değil görsel/nesne/his ile eşleştirilir. Böylece beyin L1 köprüsünü atlayarak kavram-L2 hattını güçlendirir.',
+          'Doğrudan ilişkilendirme stratejisinde yeni kelime, anadil karşılığıyla değil görsel/nesne/his ile eşleştirilir. Böylece beyin anadil köprüsünü atlayarak kavram-hedef dil hattını güçlendirir.',
           'Evde etiketleme, kelimeyi nesneyle eşzamanlı görme ve tek dilli sözlük kullanımı; bu doğrudan hattı destekleyen düşük maliyetli ama yüksek etkili araçlardır.',
         ],
         image: targetLanguageThinkingImage,
@@ -266,9 +266,9 @@ const ARTICLES: Record<string, FullArticle> = {
         title: 'Günlük Sınırlandırılmış Çıktı Planı',
         content: [
           '1) 5-10 Dakika Mikro Üretim: Her gün kısa oturumlarda yalnızca hedef dilde basit eylemleri seslendirin (ör. kahve hazırlama adımları).',
-          '2) Çevresel Tasarım: Çalışma ve yaşam alanında hedef dil etiketleri ve tek dilli kaynaklar kullanarak L1 tetikleyicilerini azaltın.',
+          '2) Çevresel Tasarım: Çalışma ve yaşam alanında hedef dil etiketleri ve tek dilli kaynaklar kullanarak anadil tetikleyicilerini azaltın.',
           '3) Düşük Karmaşıklık, Yüksek Tutarlılık: Karmaşık cümle hedeflemek yerine her gün sürdürülebilir ve tekrarlanabilir basit üretim döngüsü kurun.',
-          '4) Çeviri Yasağı Pencereleri: Gün içinde belirli zaman bloklarında L1 karşılık aramayı bilinçli biçimde kapatın; gerekirse sadece tarif ederek ilerleyin.',
+          '4) Çeviri Yasağı Pencereleri: Gün içinde belirli zaman bloklarında anadil karşılık aramayı bilinçli biçimde kapatın; gerekirse sadece tarif ederek ilerleyin.',
           '5) Haftalık Geri Bildirim: Üretim kayıtlarını dinleyip sessizlik, dolgu sesi ve uzatma anlarını izleyin; bir sonraki hafta için tek bir odak hedef belirleyin.',
           '6) Shadowing Döngüsü: Kısa bir ses kaydını önce dinle, sonra eşzamanlı tekrar et, sonra gecikmeli tekrar et; ritim ve vurgu gelişimini kaydet.',
         ],
