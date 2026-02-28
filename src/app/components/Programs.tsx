@@ -247,7 +247,7 @@ export default function Programs() {
         </motion.div>
 
         {/* === DESKTOP: Interactive grid === */}
-        <div className="hidden md:flex gap-3 h-[500px]">
+        <div className="hidden md:flex gap-2 lg:gap-3 h-[480px] lg:h-[500px]">
           {languages.map((lang) => {
             const isActive = lang.id === activeId;
             return (
@@ -269,10 +269,10 @@ export default function Programs() {
 
                 {/* Collapsed state */}
                 {!isActive && (
-                  <div className="absolute inset-0 flex items-end p-6">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: lang.accent }} />
-                      <span className="text-white text-sm font-['Neutraface_2_Text:Demi',sans-serif] [writing-mode:vertical-lr] rotate-180">
+                  <div className="absolute inset-0 flex items-end p-3 lg:p-6">
+                    <div className="flex min-w-0 items-center gap-1.5 lg:gap-2">
+                      <div className="h-1.5 w-1.5 shrink-0 rounded-full lg:h-2 lg:w-2" style={{ backgroundColor: lang.accent }} />
+                      <span className="text-white text-[11px] leading-none lg:text-sm font-['Neutraface_2_Text:Demi',sans-serif] [writing-mode:vertical-lr] rotate-180 whitespace-nowrap">
                         {lang.name}
                       </span>
                     </div>
