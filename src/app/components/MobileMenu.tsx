@@ -1,9 +1,7 @@
 import { motion } from 'motion/react';
-import { Instagram, Linkedin, Facebook, Youtube, ArrowRight, User, X, Phone } from 'lucide-react';
+import { Instagram, Linkedin, Facebook, Youtube, ArrowRight, User, X } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import imgRectangle279 from "figma:asset/884befb1e78a75b64de1fe6d23317da411da15ba.webp";
-import TeacheraLogo from '../../imports/TeacheraLogo';
-import { useFreeTrial } from './FreeTrialContext';
 import { useLevelAssessment } from './LevelAssessmentContext';
 
 /* ── X (Twitter) Icon ── */
@@ -41,12 +39,15 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
+  { id: 'home', label: 'Ana Sayfa', href: '/', isRoute: true },
   { id: 'about', label: 'Biz Kimiz?', href: '/biz-kimiz', isRoute: true },
   { id: 'methodology', label: 'Metodoloji', href: '/metodoloji', isRoute: true },
   { id: 'prices', label: 'Fiyatlar', href: '/fiyatlar', isRoute: true },
   { id: 'programs', label: 'Eğitim Programları', href: '/egitimlerimiz', isRoute: true },
   { id: 'corporate', label: 'Kurumsal Teklif', href: '/kurumsal', isRoute: true },
+  { id: 'speakup', label: 'SpeakUP Campus', href: '/speakup', isRoute: true },
   { id: 'academy', label: 'Teachera Academy', href: '/academy', isRoute: true, highlight: true },
+  { id: 'exam', label: 'Seviye Tespit', href: '/seviye-tespit-sinavi', isRoute: true },
   { id: 'contact', label: 'İletişim', href: '/iletisim', isRoute: true },
 ];
 
@@ -60,9 +61,8 @@ const SOCIAL_LINKS = [
 
 const LOGIN_URL = 'https://teachera.dlpro.eu/';
 
-export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMenuProps) {
+export default function MobileMenu({ isOpen, onClose, currentSection: _currentSection }: MobileMenuProps) {
   const navigate = useNavigate();
-  const { open: openFreeTrial } = useFreeTrial();
   const { open: openLevelAssessment } = useLevelAssessment();
   const disableMenuAnimations = true;
   
@@ -155,10 +155,10 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
               <X size={24} />
             </motion.button>
 
-            <div className="flex flex-col lg:grid lg:grid-cols-12 h-full min-h-0 pb-8 lg:pt-40 lg:pb-32">
+            <div className="flex flex-col lg:grid lg:grid-cols-12 h-full min-h-0 pb-6 lg:pt-32 lg:pb-24">
                
                {/* LEFT SIDE: INFO (Desktop Only) */}
-               <div className="hidden lg:flex lg:col-span-5 flex-col justify-between h-full border-r border-[#ffffff]/10 pr-16 relative">
+               <div className="hidden lg:flex lg:col-span-4 flex-col justify-between h-full border-r border-[#ffffff]/10 pr-10 relative">
                   
                   {/* Decorative Line */}
                   <div className="absolute top-0 right-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#ffffff]/10 to-transparent" />
@@ -181,7 +181,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
-                        className="text-5xl font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-[1.1]"
+                        className="text-[2.6rem] xl:text-[3rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-[1.1]"
                      >
                         Dünyanın kapılarını<br/>
                         <span className="text-[#ffffff]/40">dil ile arala.</span>
@@ -189,7 +189,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                   </div>
 
                   {/* Bottom: Phone, Login, Social & Contact */}
-                  <div className="space-y-8 mt-20">
+                  <div className="space-y-6 mt-12">
                      {/* Desktop: Giris Yap */}
                      <motion.button
                         initial={{ opacity: 0, y: 10 }}
@@ -234,15 +234,15 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                </div>
 
                {/* RIGHT SIDE / MOBILE CONTENT */}
-               <div className="lg:col-span-7 flex flex-col h-full min-h-0 lg:justify-start lg:pl-24 lg:pt-4 overflow-hidden">
+               <div className="lg:col-span-8 flex flex-col h-full min-h-0 lg:justify-start lg:pl-12 lg:pt-2 overflow-hidden">
                   
                   {/* Mobile Branding (Visible only on mobile) */}
-                  <div className="lg:hidden mb-5">
+                  <div className="lg:hidden mb-3">
                      <motion.p 
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 }}
-                       className="text-[#E70000] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.22em] uppercase mb-1.5"
+                       className="text-[#E70000] text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.2em] uppercase mb-1"
                      >
                        Premium Education
                      </motion.p>
@@ -250,14 +250,14 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.3 }}
-                       className="text-[1.55rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-tight"
+                       className="text-[1.35rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-tight"
                      >
                        Menü
                      </motion.h3>
                   </div>
 
                   {/* Navigation Links */}
-                  <nav className="flex flex-col gap-2.5 lg:gap-6 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1">
+                  <nav className="grid grid-cols-2 lg:grid-cols-2 gap-x-4 lg:gap-x-8 gap-y-1.5 lg:gap-y-2 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1 content-start">
                      {menuItems.map((item, index) => (
                         <motion.button
                            key={item.id}
@@ -265,46 +265,34 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                            animate={{ opacity: 1, x: 0 }}
                            transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 + (index * 0.05), ease: "easeOut" }}
                            onClick={() => handleLinkClick(item)}
-                           className="group relative flex items-center justify-between py-1.5 transition-all duration-500 min-w-0"
+                           className="group relative flex items-center justify-between py-1.5 lg:py-2 transition-all duration-500 min-w-0 text-left"
                         >
-                           <div className="flex items-center gap-4 lg:gap-6 min-w-0">
+                           <div className="flex items-center gap-2.5 lg:gap-4 min-w-0">
                               <span className={`
-                                 text-[12px] lg:text-sm font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/20 w-5 lg:w-6 group-hover:text-[#324D47] transition-colors
+                                 text-[10px] lg:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/20 w-4 lg:w-5 group-hover:text-[#324D47] transition-colors
                               `}>
                                  0{index + 1}
                               </span>
                               
                               <span className={`
-                                 text-[1.62rem] md:text-4xl font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.05] break-words min-w-0
+                                 text-[1.03rem] sm:text-[1.08rem] lg:text-[1.7rem] xl:text-[2rem] font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.08] break-words min-w-0
                                  ${item.highlight ? 'text-[#E70000]' : 'text-[#ffffff]/80 group-hover:text-white group-hover:translate-x-2'}
                               `}>
-                                 {item.id === 'academy' ? (
-                                   <span className="inline-flex items-center gap-2 md:gap-3">
-                                     <span 
-                                       className="relative w-[100px] h-[20px] md:w-[140px] md:h-[28px] inline-block align-middle"
-                                       style={{ '--fill-0': '#E70000' } as React.CSSProperties}
-                                     >
-                                       <TeacheraLogo />
-                                     </span>
-                                     <span>Academy</span>
-                                   </span>
-                                 ) : (
-                                   item.label
-                                 )}
+                                 {item.label}
                               </span>
                            </div>
 
                            <div className={`
-                              hidden lg:flex w-12 h-12 rounded-full border border-[#ffffff]/10 items-center justify-center opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 group-hover:border-[#324D47]
+                              hidden lg:flex w-10 h-10 rounded-full border border-[#ffffff]/10 items-center justify-center opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 group-hover:border-[#324D47]
                            `}>
-                              <ArrowRight size={20} className="text-[#324D47]" />
+                              <ArrowRight size={16} className="text-[#324D47]" />
                            </div>
                         </motion.button>
                      ))}
                   </nav>
 
                   {/* Mobile Footer & Actions */}
-                  <div className="lg:hidden mt-6 border-t border-[#ffffff]/10 pt-5 shrink-0">
+                  <div className="lg:hidden mt-3 border-t border-[#ffffff]/10 pt-3 shrink-0">
                      <motion.button
                         initial={disableMenuAnimations ? false : { opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -313,7 +301,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                           onClose();
                           openLevelAssessment('mobile_menu_level_assessment');
                         }}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-4 mb-3 bg-[#324D47] hover:bg-[#3d5e56] text-white border border-[#324D47] rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-sm transition-all duration-300"
+                        className="w-full flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#324D47] hover:bg-[#3d5e56] text-white border border-[#324D47] rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] transition-all duration-300"
                      >
                         <span>SEVİYE TESPİT</span>
                      </motion.button>
@@ -322,9 +310,9 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                         animate={{ opacity: 1, y: 0 }}
                         transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.55 }}
                         onClick={handleLogin}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-4 mb-8 bg-[#ffffff]/5 hover:bg-[#324D47] text-white border border-[#ffffff]/10 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-sm transition-all duration-300 group"
+                        className="w-full flex items-center justify-center gap-2 px-5 py-2.5 mb-2 bg-[#ffffff]/5 hover:bg-[#324D47] text-white border border-[#ffffff]/10 rounded-xl font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] transition-all duration-300 group"
                      >
-                        <User size={18} className="text-[#324D47] group-hover:text-white transition-colors" />
+                        <User size={16} className="text-[#324D47] group-hover:text-white transition-colors" />
                         <span>GİRİŞ YAP</span>
                      </motion.button>
                   </div>
