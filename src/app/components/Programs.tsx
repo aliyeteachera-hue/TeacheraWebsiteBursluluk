@@ -265,14 +265,14 @@ export default function Programs() {
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.9)] via-[rgba(0,0,0,0.4)] to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.9)] via-[rgba(0,0,0,0.5)] to-[rgba(0,0,0,0.08)]" />
 
                 {/* Collapsed state */}
                 {!isActive && (
                   <div className="absolute inset-0 flex items-end p-3 lg:p-6">
-                    <div className="flex min-w-0 items-center gap-1.5 lg:gap-2">
+                    <div className="flex h-[70%] min-w-0 items-end gap-1.5 lg:gap-2">
                       <div className="h-1.5 w-1.5 shrink-0 rounded-full lg:h-2 lg:w-2" style={{ backgroundColor: lang.accent }} />
-                      <span className="text-white text-[11px] leading-none lg:text-sm font-['Neutraface_2_Text:Demi',sans-serif] [writing-mode:vertical-lr] rotate-180 whitespace-nowrap">
+                      <span className="max-h-full overflow-hidden text-white text-[10px] leading-none lg:text-xs font-['Neutraface_2_Text:Demi',sans-serif] [writing-mode:vertical-lr] rotate-180 whitespace-nowrap">
                         {lang.name}
                       </span>
                     </div>
@@ -292,23 +292,23 @@ export default function Programs() {
                       {/* Language badge */}
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: lang.accent }} />
-                        <span className="text-white/60 text-sm font-['Neutraface_2_Text:Book',sans-serif]">{lang.nativeName}</span>
+                        <span className="text-white/70 text-sm font-['Neutraface_2_Text:Book',sans-serif] drop-shadow-[0_1px_1px_rgba(0,0,0,0.55)]">{lang.nativeName}</span>
                       </div>
 
-                      <h3 className="text-3xl font-['Neutraface_2_Text:Bold',sans-serif] text-white mb-2">{lang.name}</h3>
-                      <p className="text-white/60 text-sm font-['Neutraface_2_Text:Book',sans-serif] mb-6">{lang.description}</p>
+                      <h3 className="text-3xl font-['Neutraface_2_Text:Bold',sans-serif] text-white mb-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{lang.name}</h3>
+                      <p className="text-white/75 text-sm font-['Neutraface_2_Text:Book',sans-serif] mb-6 drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]">{lang.description}</p>
 
                       {/* Categories */}
                       <div className="flex flex-wrap gap-3 mb-6">
                         {lang.categories.map((cat, ci) => (
-                          <div key={ci} className="bg-[rgba(255,255,255,0.08)] backdrop-blur-sm rounded-xl px-4 py-3 border border-[rgba(255,255,255,0.06)]">
-                            <div className="flex items-center gap-2 mb-2 text-white/80 text-xs font-['Neutraface_2_Text:Demi',sans-serif]">
+                          <div key={ci} className="bg-[rgba(255,255,255,0.1)] backdrop-blur-sm rounded-xl px-4 py-3 border border-[rgba(255,255,255,0.08)]">
+                            <div className="flex items-center gap-2 mb-2 text-white/90 text-xs font-['Neutraface_2_Text:Demi',sans-serif]">
                               {cat.icon}
                               <span>{cat.title}</span>
                             </div>
                             <div className="flex flex-wrap gap-1">
                               {cat.items?.map((item, i) => (
-                                <span key={i} className="text-[11px] text-[rgba(255,255,255,0.6)] bg-[rgba(0,0,0,0.2)] px-2 py-0.5 rounded-md">
+                                <span key={i} className="text-[11px] text-[rgba(255,255,255,0.75)] bg-[rgba(0,0,0,0.3)] px-2 py-0.5 rounded-md">
                                   {item}
                                 </span>
                               ))}
@@ -348,27 +348,27 @@ export default function Programs() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="relative min-w-[85vw] h-[420px] rounded-2xl overflow-hidden snap-center flex-shrink-0"
+                className="relative min-w-[85vw] h-[470px] rounded-2xl overflow-hidden snap-center flex-shrink-0"
               >
                 <ImageWithFallback src={lang.image} alt={lang.name} className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.95)] via-[rgba(0,0,0,0.4)] to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.88)] via-[rgba(0,0,0,0.48)] to-[rgba(0,0,0,0.06)]" />
 
                 <div className="absolute inset-0 flex flex-col justify-end p-6">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: lang.accent }} />
-                    <span className="text-white/50 text-xs font-['Neutraface_2_Text:Book',sans-serif]">{lang.nativeName}</span>
+                    <span className="text-white/70 text-xs font-['Neutraface_2_Text:Book',sans-serif] drop-shadow-[0_1px_1px_rgba(0,0,0,0.55)]">{lang.nativeName}</span>
                   </div>
 
-                  <h3 className="text-2xl font-['Neutraface_2_Text:Bold',sans-serif] text-white mb-1">{lang.name}</h3>
-                  <p className="text-white/50 text-xs font-['Neutraface_2_Text:Book',sans-serif] mb-4">{lang.description}</p>
+                  <h3 className="text-2xl font-['Neutraface_2_Text:Bold',sans-serif] text-white mb-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)]">{lang.name}</h3>
+                  <p className="text-white/75 text-xs font-['Neutraface_2_Text:Book',sans-serif] mb-4 drop-shadow-[0_1px_1px_rgba(0,0,0,0.55)]">{lang.description}</p>
 
                   <div className="flex flex-wrap gap-2 mb-5">
                     {lang.categories.map((cat, ci) => (
-                      <div key={ci} className="bg-[rgba(255,255,255,0.06)] rounded-lg px-3 py-2 border border-[rgba(255,255,255,0.04)]">
-                        <span className="text-white/60 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif]">{cat.title}</span>
-                        <div className="flex gap-1 mt-1">
+                      <div key={ci} className="bg-[rgba(255,255,255,0.1)] rounded-lg px-3 py-2 border border-[rgba(255,255,255,0.08)]">
+                        <span className="text-white/85 text-[10px] font-['Neutraface_2_Text:Demi',sans-serif]">{cat.title}</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
                           {cat.items?.map((item, i) => (
-                            <span key={i} className="text-[9px] text-white/40 bg-[rgba(0,0,0,0.3)] px-1.5 py-0.5 rounded">
+                            <span key={i} className="text-[9px] text-white/70 bg-[rgba(0,0,0,0.34)] px-1.5 py-0.5 rounded">
                               {item}
                             </span>
                           ))}
