@@ -122,7 +122,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                 <img
                   src={neuLogoImg}
                   alt="Necmettin Erbakan Üniversitesi"
-                  className={`object-contain transition-all duration-700 opacity-95 ${scrolled ? 'h-[22px] sm:h-[26px] md:h-[32px]' : 'h-[26px] sm:h-[32px] md:h-[40px]'}`}
+                  className={`object-contain transition-all duration-700 opacity-95 ${scrolled ? 'h-[24px] sm:h-[30px] md:h-[38px]' : 'h-[30px] sm:h-[38px] md:h-[48px]'}`}
                 />
               </motion.div>
             )}
