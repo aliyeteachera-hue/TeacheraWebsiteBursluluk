@@ -579,9 +579,6 @@ export default function SpeakUpPage() {
               className="relative order-1 lg:order-2 shrink-0"
             >
               <div className="relative rounded-[30px] p-[1.5px] bg-[linear-gradient(140deg,rgba(231,0,0,0.75),rgba(255,255,255,0.35),rgba(50,77,71,0.65))] shadow-[0_24px_70px_rgba(0,0,0,0.55)]">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#E70000] text-white text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] uppercase">
-                  Önce Videoyu İzle
-                </div>
                 <div
                   ref={videoCardRef}
                   className="relative w-[280px] md:w-[320px] lg:w-[340px] rounded-[24px] overflow-hidden bg-[#1a1a24] shadow-2xl shadow-black/40 cursor-pointer"
