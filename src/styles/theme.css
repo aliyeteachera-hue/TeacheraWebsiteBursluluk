@@ -325,4 +325,11 @@ html.teachera-reduce-motion [class*='blur-'] {
     font-size: 0.875rem !important;
     line-height: 1.45 !important;
   }
+
+  /* Keep top navbar free-trial CTA balanced after global text scaling */
+  .mobile-nav-cta-text {
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+    letter-spacing: 0.06em !important;
+  }
 }

@@ -192,7 +192,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                   onClick={() => openFreeTrial('navigation_mobile_free_trial')}
-                  className="md:hidden px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 text-[11px] sm:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
+                  className="md:hidden mobile-nav-cta-text px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#324D47] border border-[#324D47] text-white/90 text-[10px] sm:text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.06em] uppercase cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap"
                 >
                   Ücretsiz Seans
                 </motion.button>
