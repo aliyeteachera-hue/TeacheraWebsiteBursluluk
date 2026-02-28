@@ -612,12 +612,12 @@ export default function SpeakUpPage() {
               initial={{ opacity: 0, scale: 0.92 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              className="relative order-1 lg:order-2 shrink-0"
+              className="relative order-1 lg:order-2 shrink-0 w-[280px] md:w-[320px] lg:w-[340px]"
             >
               <div className="relative rounded-[30px] p-[1.5px] bg-[linear-gradient(140deg,rgba(231,0,0,0.75),rgba(255,255,255,0.35),rgba(50,77,71,0.65))] shadow-[0_24px_70px_rgba(0,0,0,0.55)]">
                 <div
                   ref={videoCardRef}
-                  className="relative w-[280px] md:w-[320px] lg:w-[340px] rounded-[24px] overflow-hidden bg-[#1a1a24] shadow-2xl shadow-black/40 cursor-pointer"
+                  className="relative w-full rounded-[24px] overflow-hidden bg-[#1a1a24] shadow-2xl shadow-black/40 cursor-pointer"
                   style={{ aspectRatio: '9/16' }}
                   onClick={isInlineVideoStarted ? openVideoFullscreen : startInlineVideo}
                 >
@@ -694,7 +694,7 @@ export default function SpeakUpPage() {
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: [0.45, 0.82, 0.45], y: [0, -1, 0] }}
                   transition={{ duration: 2.6, ease: 'easeInOut', repeat: Infinity }}
-                  className="mt-4 text-center text-white/60 font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] md:text-[12px] tracking-[0.22em] uppercase pointer-events-none select-none"
+                  className="w-full mt-3 px-2 text-center text-white/60 font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] md:text-[11px] tracking-[0.08em] uppercase pointer-events-none select-none"
                 >
                   Önce Bilgilendirme Videosunu İzle
                 </motion.p>
