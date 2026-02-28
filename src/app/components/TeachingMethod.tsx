@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from 'react';
 import { RotateCcw, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
+import { useLiteMode } from '../lib/useLiteMode';
 
 const FLOW_STEPS = [
   {
@@ -55,18 +56,104 @@ export default function TeachingMethod() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: '-80px' });
   const [activeStep, setActiveStep] = useState(-1);
+  const isLiteMode = useLiteMode();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (inView) {
-      FLOW_STEPS.forEach((_, i) => {
-        setTimeout(() => setActiveStep(i), 800 + i * 600);
-      });
+    if (isLiteMode) {
+      setActiveStep(FLOW_STEPS.length - 1);
+      return;
     }
-  }, [inView]);
+    if (!inView) return;
+
+    const timers = FLOW_STEPS.map((_, i) => (
+      window.setTimeout(() => setActiveStep(i), 800 + i * 600)
+    ));
+
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, [inView, isLiteMode]);
+
+  if (isLiteMode) {
+    return (
+      <section id="how-it-works" ref={sectionRef} className="bg-[#09090F] relative overflow-hidden">
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+
+        <div className="pt-16 pb-8 text-center px-6">
+          <h2 className="font-['Luxury:Gold',sans-serif] text-[0.82rem] tracking-[0.28em] mb-4 text-[#F4EBD1]/90">
+            TEACHERA TEACHING METHOD
+          </h2>
+          <p className="font-['Neutraface_2_Text:Book',sans-serif] text-white/45 text-[13px] max-w-[420px] mx-auto leading-[1.7]">
+            Daha akıcı bir mobil deneyim için sadeleştirilmiş görünüm.
+          </p>
+        </div>
+
+        <div className="max-w-[760px] mx-auto px-5 pb-12">
+          <div className="space-y-4">
+            {FLOW_STEPS.map((step) => {
+              const CustomIcon = step.customIcon;
+              return (
+                <article
+                  key={step.num}
+                  className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5"
+                  style={{ boxShadow: `inset 0 1px 0 ${step.accent}20` }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: `${step.accent}20` }}
+                    >
+                      <CustomIcon color={step.accent} className="w-5 h-5" />
+                    </div>
+                    <div className="flex items-end gap-2">
+                      <span className="font-['Neutraface_2_Text:Bold',sans-serif] text-white/45 text-lg">
+                        {step.num}
+                      </span>
+                      <span
+                        className="font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.18em] uppercase"
+                        style={{ color: step.accent }}
+                      >
+                        {step.tag}
+                      </span>
+                    </div>
+                  </div>
+                  <h3 className="font-['Neutraface_2_Text:Bold',sans-serif] text-white text-[1.12rem] mb-2">
+                    {step.headline}
+                  </h3>
+                  <p className="font-['Neutraface_2_Text:Book',sans-serif] text-white/62 text-[14px] leading-[1.7] mb-2.5">
+                    {step.body}
+                  </p>
+                  <p
+                    className="font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] italic"
+                    style={{ color: `${step.accent}CC` }}
+                  >
+                    {step.detail}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => navigate('/metodoloji')}
+              className="group inline-flex items-center gap-2 bg-white/[0.04] border border-white/[0.1] rounded-full px-6 py-2.5 cursor-pointer"
+            >
+              <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-white/80 text-[13px]">
+                Metodolojimizi Keşfet
+              </span>
+              <ArrowRight size={14} className="text-white/70" />
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section ref={sectionRef} className="bg-[#09090F] relative overflow-hidden">
+    <section id="how-it-works" ref={sectionRef} className="bg-[#09090F] relative overflow-hidden">
       {/* Top / bottom edge lines */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
       <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />

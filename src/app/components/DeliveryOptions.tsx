@@ -11,6 +11,7 @@ import imgSocrates2 from "figma:asset/d0efa1d17e60c4d8b427e8eb1d1c0847176f4733.w
 import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+import { useLiteMode } from '../lib/useLiteMode';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -88,12 +89,13 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
 
   useEffect(() => {
+    if (!isOpen) return;
     const handler = (e: MouseEvent) => {
       if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden';
@@ -610,36 +612,53 @@ function MiniCalendar({
 export default function DeliveryOptions() {
   const navigate = useNavigate();
   const [showAppointment, setShowAppointment] = useState(false);
+  const isLiteMode = useLiteMode();
 
   return (
     <>
       <section 
         id="delivery-options" 
-        className="relative py-20 md:py-28 bg-[#00000B] overflow-hidden"
+        className={`relative ${isLiteMode ? 'py-14' : 'py-20 md:py-28'} bg-[#00000B] overflow-hidden`}
       >
         {/* Background Ambience */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-[#324D47] rounded-full mix-blend-screen filter blur-[150px] opacity-[0.04]" />
+          <div
+            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full mix-blend-screen ${
+              isLiteMode ? 'w-[40vw] h-[40vw] opacity-[0.02]' : 'w-[60vw] h-[60vw] filter blur-[150px] opacity-[0.04]'
+            }`}
+            style={{ backgroundColor: '#324D47' }}
+          />
         </div>
 
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-['Neutraface_2_Text:Bold',sans-serif] text-[#ffffff] leading-tight mb-4">
-              Online mı, Yüz Yüze mi?
-            </h2>
-            <p className="text-[#ffffff]/60 font-['Neutraface_2_Text:Book',sans-serif] text-lg max-w-2xl mx-auto">
-              İster dünyanın herhangi bir yerinden bağlanın, ister kampüsümüzün büyülü atmosferinde yerinizi alın. 
-              <span className="text-[#ffffff] block mt-1">Standart değişmez! Sahne farklı olabilir. Sistem aynı kalır.</span>
-            </p>
-          </motion.div>
+          {isLiteMode ? (
+            <div className="text-center mb-10">
+              <h2 className="text-2xl font-['Neutraface_2_Text:Bold',sans-serif] text-[#ffffff] leading-tight mb-3">
+                Online mı, Yüz Yüze mi?
+              </h2>
+              <p className="text-[#ffffff]/70 font-['Neutraface_2_Text:Book',sans-serif] text-[15px] max-w-xl mx-auto">
+                Standart değişmez, sistem aynı kalır. Sana uygun öğrenme biçimini seç.
+              </p>
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-['Neutraface_2_Text:Bold',sans-serif] text-[#ffffff] leading-tight mb-4">
+                Online mı, Yüz Yüze mi?
+              </h2>
+              <p className="text-[#ffffff]/60 font-['Neutraface_2_Text:Book',sans-serif] text-lg max-w-2xl mx-auto">
+                İster dünyanın herhangi bir yerinden bağlanın, ister kampüsümüzün büyülü atmosferinde yerinizi alın. 
+                <span className="text-[#ffffff] block mt-1">Standart değişmez! Sahne farklı olabilir. Sistem aynı kalır.</span>
+              </p>
+            </motion.div>
+          )}
 
           {/* Options Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -655,6 +674,7 @@ export default function DeliveryOptions() {
               glowColor="#E70000"
               buttonText="Online Planları Gör"
               delay={0.1}
+              liteMode={isLiteMode}
               onButtonClick={() => navigate('/fiyatlar')}
             />
 
@@ -669,6 +689,7 @@ export default function DeliveryOptions() {
               glowColor="#4A7067"
               buttonText="Randevu Oluştur"
               delay={0.2}
+              liteMode={isLiteMode}
               onButtonClick={() => setShowAppointment(true)}
             />
 
@@ -695,6 +716,7 @@ function Card({
   glowColor, 
   buttonText, 
   delay,
+  liteMode = false,
   onButtonClick,
 }: {
   title: string;
@@ -706,8 +728,56 @@ function Card({
   glowColor: string;
   buttonText: string;
   delay: number;
+  liteMode?: boolean;
   onButtonClick?: () => void;
 }) {
+  if (liteMode) {
+    return (
+      <div className="relative flex flex-col w-full rounded-[1.35rem] overflow-hidden border border-[#ffffff]/10 bg-[#0f0f16]">
+        <div
+          className="absolute inset-0 pointer-events-none opacity-25"
+          style={{ background: `radial-gradient(circle at 50% 100%, ${accentColor}, transparent 75%)` }}
+        />
+        <div className="relative z-10 p-5 pb-4">
+          <h3 className="text-xl font-['Neutraface_2_Text:Bold',sans-serif] text-[#ffffff] mb-1.5 leading-tight">
+            {title}
+          </h3>
+          <p
+            className="font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] mb-3 leading-relaxed"
+            style={{ color: glowColor }}
+          >
+            {subtitle}
+          </p>
+          <p className="text-[#ffffff]/66 font-['Neutraface_2_Text:Book',sans-serif] text-[13px] leading-relaxed">
+            {description}
+          </p>
+        </div>
+
+        <div className="relative z-10 h-[200px] flex items-end justify-center overflow-hidden bg-[#0a0a10]">
+          <img
+            src={image}
+            alt={imageAlt}
+            loading="lazy"
+            decoding="async"
+            className="w-auto h-[88%] object-contain object-bottom"
+          />
+        </div>
+
+        <div className="relative z-10 p-5 pt-4">
+          <button
+            onClick={onButtonClick}
+            className="w-full inline-flex items-center justify-center gap-2.5 py-2.5 bg-[#ffffff]/6 border border-[#ffffff]/12 rounded-full cursor-pointer"
+          >
+            <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff] text-[12px] tracking-wide">
+              {buttonText}
+            </span>
+            <ArrowRight size={14} className="text-white/80" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
