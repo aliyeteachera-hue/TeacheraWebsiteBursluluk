@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'motion/react';
 import { useNavigate, useLocation } from 'react-router';
-import { Sparkles } from 'lucide-react';
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
@@ -107,7 +106,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
               </motion.div>
             )}
 
-            {/* SpeakUP badge — Teachera & NEÜ co-branding */}
+            {/* SpeakUP badge — Teachera x NEÜ co-branding */}
             {isSpeakUpPage && (
               <motion.div
                 initial={{ opacity: 0, x: -10 }}
@@ -115,13 +114,15 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="flex items-center gap-2 sm:gap-2.5 md:gap-3"
               >
-                <div className={`flex items-center justify-center rounded-full border border-[#E8D9A7]/45 bg-[#E8D9A7]/15 text-[#E8D9A7] transition-all duration-700 ${scrolled ? 'w-6 h-6' : 'w-7 h-7 md:w-8 md:h-8'}`}>
-                  <Sparkles size={scrolled ? 11 : 12} />
-                </div>
+                <span
+                  className={`font-['Neutraface_2_Text:Bold',sans-serif] text-[#E70000] leading-none transition-all duration-700 ${scrolled ? 'text-[15px] md:text-[18px]' : 'text-[18px] md:text-[22px]'}`}
+                >
+                  x
+                </span>
                 <img
                   src={neuLogoImg}
                   alt="Necmettin Erbakan Üniversitesi"
-                  className={`object-contain transition-all duration-700 opacity-90 ${scrolled ? 'h-[18px] sm:h-[22px] md:h-[26px]' : 'h-[22px] sm:h-[27px] md:h-[32px]'}`}
+                  className={`object-contain transition-all duration-700 opacity-95 ${scrolled ? 'h-[22px] sm:h-[26px] md:h-[32px]' : 'h-[26px] sm:h-[32px] md:h-[40px]'}`}
                 />
               </motion.div>
             )}
