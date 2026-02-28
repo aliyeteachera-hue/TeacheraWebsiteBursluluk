@@ -141,7 +141,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
           </div>
 
           {/* CONTENT CONTAINER */}
-          <div className="relative z-10 w-full h-full min-h-0 max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col pt-32 lg:pt-0">
+          <div className="relative z-10 w-full h-full min-h-0 max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col pt-24 lg:pt-0">
             
             {/* Close Button - Always visible on top */}
             <motion.button
@@ -155,7 +155,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
               <X size={24} />
             </motion.button>
 
-            <div className="flex flex-col lg:grid lg:grid-cols-12 h-full min-h-0 pb-12 lg:pt-40 lg:pb-32">
+            <div className="flex flex-col lg:grid lg:grid-cols-12 h-full min-h-0 pb-8 lg:pt-40 lg:pb-32">
                
                {/* LEFT SIDE: INFO (Desktop Only) */}
                <div className="hidden lg:flex lg:col-span-5 flex-col justify-between h-full border-r border-[#ffffff]/10 pr-16 relative">
@@ -237,12 +237,12 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                <div className="lg:col-span-7 flex flex-col h-full min-h-0 lg:justify-start lg:pl-24 lg:pt-4 overflow-hidden">
                   
                   {/* Mobile Branding (Visible only on mobile) */}
-                  <div className="lg:hidden mb-9">
+                  <div className="lg:hidden mb-5">
                      <motion.p 
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 }}
-                       className="text-[#E70000] text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.24em] uppercase mb-2"
+                       className="text-[#E70000] text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.22em] uppercase mb-1.5"
                      >
                        Premium Education
                      </motion.p>
@@ -250,14 +250,14 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                        initial={disableMenuAnimations ? false : { opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.3 }}
-                       className="text-[1.95rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-tight"
+                       className="text-[1.55rem] font-['Neutraface_2_Text:Bold',sans-serif] text-white leading-tight"
                      >
                        Menü
                      </motion.h3>
                   </div>
 
                   {/* Navigation Links */}
-                  <nav className="flex flex-col gap-5 lg:gap-6 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1">
+                  <nav className="flex flex-col gap-2.5 lg:gap-6 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-1">
                      {menuItems.map((item, index) => (
                         <motion.button
                            key={item.id}
@@ -265,17 +265,17 @@ export default function MobileMenu({ isOpen, onClose, currentSection }: MobileMe
                            animate={{ opacity: 1, x: 0 }}
                            transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 + (index * 0.05), ease: "easeOut" }}
                            onClick={() => handleLinkClick(item)}
-                           className="group relative flex items-center justify-between py-2.5 transition-all duration-500 min-w-0"
+                           className="group relative flex items-center justify-between py-1.5 transition-all duration-500 min-w-0"
                         >
                            <div className="flex items-center gap-4 lg:gap-6 min-w-0">
                               <span className={`
-                                 text-sm lg:text-sm font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/20 w-6 lg:w-6 group-hover:text-[#324D47] transition-colors
+                                 text-[12px] lg:text-sm font-['Neutraface_2_Text:Demi',sans-serif] text-[#ffffff]/20 w-5 lg:w-6 group-hover:text-[#324D47] transition-colors
                               `}>
                                  0{index + 1}
                               </span>
                               
                               <span className={`
-                                 text-[2rem] md:text-4xl font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.05] break-words min-w-0
+                                 text-[1.62rem] md:text-4xl font-['Neutraface_2_Text:Book',sans-serif] tracking-tight transition-all duration-300 text-left leading-[1.05] break-words min-w-0
                                  ${item.highlight ? 'text-[#E70000]' : 'text-[#ffffff]/80 group-hover:text-white group-hover:translate-x-2'}
                               `}>
                                  {item.id === 'academy' ? (
