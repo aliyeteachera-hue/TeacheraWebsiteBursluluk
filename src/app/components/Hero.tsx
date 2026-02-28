@@ -118,6 +118,7 @@ export default function Hero() {
   const shouldReduceMotion = useReducedMotion();
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [enableDesktopEffects, setEnableDesktopEffects] = useState(false);
+  const [enableHeroMotion, setEnableHeroMotion] = useState(false);
   const { open: openLevelAssessment } = useLevelAssessment();
   const { open: openFreeTrial } = useFreeTrial();
 
@@ -127,14 +128,16 @@ export default function Hero() {
 
     const updateVideoState = () => {
       window.clearTimeout(timer);
-      const shouldEnableDesktopEffects = !shouldReduceMotion && mediaQuery.matches;
+      const shouldEnableMotion = !shouldReduceMotion;
+      const shouldEnableDesktopEffects = shouldEnableMotion && mediaQuery.matches;
+      setEnableHeroMotion(shouldEnableMotion);
       setEnableDesktopEffects(shouldEnableDesktopEffects);
 
-      if (!shouldEnableDesktopEffects) {
+      if (!shouldEnableMotion) {
         setShouldLoadVideo(false);
         return;
       }
-      timer = window.setTimeout(() => setShouldLoadVideo(true), 320);
+      timer = window.setTimeout(() => setShouldLoadVideo(true), mediaQuery.matches ? 320 : 180);
     };
 
     updateVideoState();
@@ -166,7 +169,7 @@ export default function Hero() {
         {shouldLoadVideo ? (
           <div className="absolute inset-0 w-full h-full pointer-events-none">
             <iframe 
-              src="https://player.vimeo.com/video/1167812393?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1&background=1&dnt=1&quality=540p" 
+              src="https://player.vimeo.com/video/1167812393?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1&muted=1&loop=1&background=1&playsinline=1&dnt=1&quality=540p" 
               frameBorder="0" 
               allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
               className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 w-[177.77vh] h-[56.25vw] object-cover"
@@ -277,7 +280,7 @@ export default function Hero() {
             <OrbitingArcButton
               arcDuration={8}
               arcColor="#324D47"
-              disableAnimation={!enableDesktopEffects}
+              disableAnimation={!enableHeroMotion}
               className="group px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 border border-[#324D47]/60 backdrop-blur-sm text-[#ffffff] rounded-full text-[11px] sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/20 hover:border-[#324D47] transition-all flex items-center gap-2"
               onClick={() => openFreeTrial('hero_free_trial')}
             >
@@ -307,8 +310,8 @@ export default function Hero() {
         >
           <motion.button
             onClick={scrollToNext}
-            animate={enableDesktopEffects ? { y: [0, 6, 0] } : undefined}
-            transition={enableDesktopEffects ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : undefined}
+            animate={enableHeroMotion ? { y: [0, 6, 0] } : undefined}
+            transition={enableHeroMotion ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : undefined}
             className="flex flex-col items-center gap-1 sm:gap-1.5 md:gap-2 text-[#ffffff]/60 hover:text-[#ffffff] transition-colors group"
           >
             {/* Text — hidden on small screens */}
@@ -318,8 +321,8 @@ export default function Hero() {
             {/* Mouse icon — hidden on small screens */}
             <div className="hidden sm:flex w-5 h-8 md:w-6 md:h-10 border-2 border-[#ffffff]/30 rounded-full items-start justify-center p-1.5 md:p-2 group-hover:border-[#ffffff]/60 transition-colors">
               <motion.div
-                animate={enableDesktopEffects ? { y: [0, 8, 0] } : undefined}
-                transition={enableDesktopEffects ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } : undefined}
+                animate={enableHeroMotion ? { y: [0, 8, 0] } : undefined}
+                transition={enableHeroMotion ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } : undefined}
                 className="w-1 h-1 md:w-1.5 md:h-1.5 bg-[#ffffff]/60 rounded-full"
               />
             </div>
