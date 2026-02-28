@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'motion/react';
 import { useNavigate, useLocation } from 'react-router';
-import { ArrowUpRight } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
@@ -68,13 +68,6 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
     else scrollToSection('home');
   };
 
-  const scrollToSpeakUpForm = () => {
-    const el = document.getElementById('speakup-form');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
@@ -120,15 +113,15 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex items-center gap-2 sm:gap-3 md:gap-3.5"
+                className="flex items-center gap-2 sm:gap-2.5 md:gap-3"
               >
-                <span className={`hidden sm:inline text-white/25 font-['Neutraface_2_Text:Book',sans-serif] transition-all duration-700 ${scrolled ? 'text-[12px] md:text-[16px]' : 'text-[14px] md:text-[20px]'}`}>
-                  &amp;
-                </span>
+                <div className={`flex items-center justify-center rounded-full border border-[#E8D9A7]/45 bg-[#E8D9A7]/15 text-[#E8D9A7] transition-all duration-700 ${scrolled ? 'w-6 h-6' : 'w-7 h-7 md:w-8 md:h-8'}`}>
+                  <Sparkles size={scrolled ? 11 : 12} />
+                </div>
                 <img
                   src={neuLogoImg}
                   alt="Necmettin Erbakan Üniversitesi"
-                  className={`object-contain transition-all duration-700 opacity-85 ${scrolled ? 'h-[17px] sm:h-[22px] md:h-[26px]' : 'h-[21px] sm:h-[27px] md:h-[32px]'}`}
+                  className={`object-contain transition-all duration-700 opacity-90 ${scrolled ? 'h-[18px] sm:h-[22px] md:h-[26px]' : 'h-[22px] sm:h-[27px] md:h-[32px]'}`}
                 />
               </motion.div>
             )}
@@ -137,35 +130,9 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
           {/* ═══ Right: CTAs + Menu ═══ */}
           <div className={`flex items-center shrink-0 ${isSpeakUpPage ? 'gap-2 sm:gap-2.5' : 'gap-2 sm:gap-3.5'}`}>
 
-            {/* ── SpeakUP page: "Hemen Başvur" red CTA ── */}
+            {/* ── SpeakUP page: header CTA removed intentionally ── */}
             {isSpeakUpPage ? (
-              <>
-                {/* Desktop */}
-                <motion.button
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.15 }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={scrollToSpeakUpForm}
-                  className="hidden md:flex items-center gap-2 px-6 py-2 rounded-full bg-[#E70000] border border-[#E70000] text-white text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.14em] cursor-pointer hover:bg-[#c40000] hover:border-[#c40000] transition-all duration-500 shadow-lg shadow-[#E70000]/20 hover:shadow-[#E70000]/35"
-                >
-                  HEMEN BAŞVUR
-                  <ArrowUpRight size={13} />
-                </motion.button>
-
-                {/* Mobile */}
-                <motion.button
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.15 }}
-                  onClick={scrollToSpeakUpForm}
-                  className="md:hidden mobile-speakup-cta-text text-mobile-kicker flex min-h-[44px] items-center gap-1 px-3 sm:px-4 py-2 rounded-full bg-[#E70000] border border-[#E70000] text-white font-['Neutraface_2_Text:Demi',sans-serif] cursor-pointer active:scale-95 transition-all duration-300 whitespace-nowrap shadow-md shadow-[#E70000]/15"
-                >
-                  BAŞVUR
-                  <ArrowUpRight size={10} />
-                </motion.button>
-              </>
+              null
             ) : (
               <>
                 {/* Desktop: Seviye Tespit — ghost */}
@@ -208,7 +175,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
             )}
 
             {/* Divider */}
-            <div className={`w-px bg-white/[0.08] ${isSpeakUpPage ? 'h-6' : 'h-7'}`} />
+            {!isSpeakUpPage && <div className="w-px h-7 bg-white/[0.08]" />}
 
             {/* ═══ Menu Pill ═══ */}
             <motion.button

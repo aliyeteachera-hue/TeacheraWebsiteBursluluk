@@ -1,19 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router';
-import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Maximize2, X } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Maximize2, X, Sparkles } from 'lucide-react';
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+import TeacheraLogo from '../../imports/TeacheraLogo';
+import neuLogoImg from 'figma:asset/21caa0f68b9225ac66749719ebaf62a436372e41.webp';
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
    ═══════════════════════════════════════════════════════════════════════ */
 const HERO_BG = 'https://images.unsplash.com/photo-1582848890404-ed087c1b3f0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080';
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
+const SPEAKUP_VIDEO_EMBED_BASE =
+  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=0&app_id=58479';
 const SPEAKUP_VIDEO_INLINE_SRC =
-  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-inline&app_id=58479&autoplay=1&muted=1&loop=1&playsinline=1&dnt=1&api=1&controls=1&title=0&byline=0&portrait=0&quality=720p';
+  `${SPEAKUP_VIDEO_EMBED_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&muted=1`;
 const SPEAKUP_VIDEO_FULLSCREEN_SRC =
-  'https://player.vimeo.com/video/1168669335?badge=0&autopause=0&player_id=speakup-fullscreen&app_id=58479&autoplay=1&muted=1&loop=1&playsinline=1&dnt=1&api=1&controls=1&title=0&byline=0&portrait=0&quality=1080p';
+  `${SPEAKUP_VIDEO_EMBED_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&muted=1`;
 
 const SESSIONS = [
   { id: 's1', label: '14:00 – 15:20', value: '14:00-15:20' },
@@ -567,16 +571,24 @@ export default function SpeakUpPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.85, duration: 0.5 }}
-                className="flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start"
+                className="flex items-center justify-center lg:justify-start"
               >
-                <button
-                  onClick={scrollToForm}
-                  className="h-[48px] px-8 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5"
-                >
-                  HEMEN BAŞVUR
-                  <ArrowUpRight size={15} />
-                </button>
-
+                <div className="inline-flex items-center gap-2.5 md:gap-3 rounded-full border border-white/15 bg-white/[0.04] px-4 md:px-5 py-2 md:py-2.5 shadow-[0_8px_28px_rgba(0,0,0,0.25)]">
+                  <div
+                    className="w-[92px] md:w-[108px] aspect-[146/29]"
+                    style={{ '--fill-0': '#ffffff' } as React.CSSProperties}
+                  >
+                    <TeacheraLogo />
+                  </div>
+                  <div className="flex items-center justify-center w-6 h-6 md:w-7 md:h-7 rounded-full border border-[#E8D9A7]/45 bg-[#E8D9A7]/15 text-[#E8D9A7]">
+                    <Sparkles size={12} />
+                  </div>
+                  <img
+                    src={neuLogoImg}
+                    alt="Necmettin Erbakan Üniversitesi"
+                    className="h-[18px] md:h-[22px] object-contain opacity-95"
+                  />
+                </div>
               </motion.div>
             </div>
 
