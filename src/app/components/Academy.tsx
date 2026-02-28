@@ -123,15 +123,15 @@ export default function Academy() {
             onClick={goToFeatured}
           >
             <div className="relative rounded-[24px] overflow-hidden bg-[#0a0a10] shadow-lg shadow-[#324D47]/10 hover:shadow-xl hover:shadow-[#324D47]/15 transition-shadow duration-500">
-              <div className="relative h-[260px] sm:h-[320px] md:h-[380px]">
+              <div className="relative h-[260px] sm:h-[320px] md:h-[380px] bg-[#06070C] p-2 md:p-0">
                 <ImageWithFallback
                   src={featured.image}
                   alt={featured.title}
-                  className="w-full h-full object-cover object-center opacity-90 transition-transform duration-[2s] ease-out md:group-hover:scale-[1.04]"
+                  className="w-full h-full object-contain md:object-cover object-center opacity-90 transition-transform duration-[2s] ease-out md:group-hover:scale-[1.04]"
                   loading="lazy"
                   decoding="async"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#00000B]/80 via-[#00000B]/25 to-transparent md:from-[#00000B] md:via-[#00000B]/30 md:to-transparent" />
+                <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-[#00000B] via-[#00000B]/30 to-transparent" />
 
                 <div className="absolute top-4 left-4 flex items-center gap-2">
                   <span className="px-2.5 py-0.5 bg-[#E70000] text-white text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.15em] uppercase rounded-md">
@@ -191,15 +191,15 @@ export default function Academy() {
                 className="group flex flex-col bg-white rounded-[20px] overflow-hidden shadow-[0_4px_24px_-6px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.08)] transition-all duration-300 border border-[#324D47]/[0.04] hover:-translate-y-1 cursor-pointer h-full"
                 onClick={() => navigate(`/academy/${article.slug}`)}
               >
-                <div className="h-[190px] sm:h-40 overflow-hidden relative bg-[#0a0a10]">
+                <div className="h-[190px] sm:h-40 overflow-hidden relative bg-[#0a0a10] p-2 md:p-0">
                   <ImageWithFallback
                     src={article.image}
                     alt={article.title}
-                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out md:group-hover:scale-[1.06]"
+                    className="w-full h-full object-contain md:object-cover object-center transition-transform duration-700 ease-out md:group-hover:scale-[1.06]"
                     loading="lazy"
                     decoding="async"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute top-3 left-3">
                     <span className="bg-white/95 backdrop-blur-md text-[#324D47] text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] px-2.5 py-1 rounded-md tracking-[0.1em] uppercase">
                       {article.categoryLabel}

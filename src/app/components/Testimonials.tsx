@@ -121,7 +121,8 @@ export default function Testimonials() {
   }, [paused, next, shouldReduceMotion, liteMotionMode]);
 
   const t = testimonials[current];
-  const shouldAnimatePartnerMarquee = !shouldReduceMotion && !liteMotionMode;
+  const shouldAnimatePartnerMarquee = !shouldReduceMotion;
+  const partnerMarqueeDuration = liteMotionMode ? 58 : 42;
   const marqueePartners = shouldAnimatePartnerMarquee ? [...partners, ...partners] : partners;
 
   return (
@@ -256,7 +257,7 @@ export default function Testimonials() {
               animate={shouldAnimatePartnerMarquee ? { x: ['0%', '-50%'] } : undefined}
               transition={
                 shouldAnimatePartnerMarquee
-                  ? { repeat: Infinity, ease: 'linear', duration: 42 }
+                  ? { repeat: Infinity, ease: 'linear', duration: partnerMarqueeDuration }
                   : undefined
               }
             >
