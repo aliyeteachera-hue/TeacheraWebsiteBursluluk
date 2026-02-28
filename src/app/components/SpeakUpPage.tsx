@@ -280,7 +280,6 @@ export default function SpeakUpPage() {
   const [inlineUnmuteRequested, setInlineUnmuteRequested] = useState(false);
   const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
   const [showFullscreenSoundPrompt, setShowFullscreenSoundPrompt] = useState(false);
-  const [isApplicationFormOpen, setIsApplicationFormOpen] = useState(false);
   const inlineVideoSrc = `${SPEAKUP_VIDEO_INLINE_BASE}&api=1&playsinline=1&dnt=1&controls=1&title=0&byline=0&portrait=0&autoplay=1&muted=${inlineUnmuteRequested ? 0 : 1}`;
 
   const postToPlayer = (
@@ -387,15 +386,6 @@ export default function SpeakUpPage() {
   };
 
   useEffect(() => {
-    if (!isApplicationFormOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isApplicationFormOpen]);
-
-  useEffect(() => {
     const timerId = window.setTimeout(() => syncAllPlayers(isMuted), 80);
     return () => window.clearTimeout(timerId);
   }, [isMuted]);
@@ -481,10 +471,6 @@ export default function SpeakUpPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const openApplicationForm = () => {
-    setIsApplicationFormOpen(true);
-  };
 
   const scrollToHow = () => {
     howRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -616,13 +602,13 @@ export default function SpeakUpPage() {
                 transition={{ delay: 0.85, duration: 0.5 }}
                 className="flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start"
               >
-                <button
-                  onClick={openApplicationForm}
+                <a
+                  href="#speakup-form"
                   className="h-[48px] px-8 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5"
                 >
                   HEMEN BAŞVUR
                   <ArrowUpRight size={15} />
-                </button>
+                </a>
               </motion.div>
             </div>
 
@@ -1066,19 +1052,9 @@ export default function SpeakUpPage() {
       <section
         ref={formRef}
         id="speakup-form"
-        className={isApplicationFormOpen ? 'fixed inset-0 z-[95] bg-[#00000B]/85 backdrop-blur-sm overflow-y-auto py-8 px-4' : 'py-20 md:py-28 scroll-mt-16'}
+        className="py-20 md:py-28 scroll-mt-16"
       >
-        <div className={`max-w-[700px] mx-auto px-6 md:px-10 ${isApplicationFormOpen ? 'relative bg-white rounded-[22px] py-8 md:py-10 shadow-2xl shadow-black/40' : ''}`}>
-          {isApplicationFormOpen && (
-            <button
-              type="button"
-              onClick={() => setIsApplicationFormOpen(false)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white flex items-center justify-center transition-colors cursor-pointer z-10"
-              aria-label="Başvuru formunu kapat"
-            >
-              <X size={18} />
-            </button>
-          )}
+        <div className="max-w-[700px] mx-auto px-6 md:px-10">
           <Reveal>
             <div className="text-center mb-14">
               <div className="flex items-center gap-3 justify-center mb-6">
@@ -1415,13 +1391,13 @@ export default function SpeakUpPage() {
             <p className="text-white/30 font-['Neutraface_2_Text:Book',sans-serif] text-[14px] leading-relaxed max-w-sm mx-auto mb-10">
               Kontenjanlar sınırlı. Kampüste İngilizce konuşma pratiğine hemen başla.
             </p>
-            <button
-              onClick={openApplicationForm}
+            <a
+              href="#speakup-form"
               className="h-[48px] px-10 rounded-full bg-[#E70000] border border-[#E70000] hover:bg-[#c40000] hover:border-[#c40000] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer hover:shadow-[#E70000]/35 flex items-center gap-2.5 mx-auto"
             >
               HEMEN BAŞVUR
               <ArrowUpRight size={15} />
-            </button>
+            </a>
           </Reveal>
         </div>
       </section>
