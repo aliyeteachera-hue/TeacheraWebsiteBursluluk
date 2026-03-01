@@ -375,6 +375,7 @@ function JourneyStepItem({ step, index, onActivate }: {
 
 /* ─── Main Component ────────────────────────────────────────────────── */
 export default function WhoWeAre() {
+  const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
   const [activeGoal, setActiveGoal] = useState<number | null>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -1429,7 +1430,8 @@ export default function WhoWeAre() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
             {(() => {
               /* ── Yaş grubuna göre dil listesini ALL_PROGRAMS'dan dinamik hesapla ── */
-              const langsByAge = (age: string) =>
+              type ProgramAge = (typeof ALL_PROGRAMS)[number]['ages'][number];
+              const langsByAge = (age: ProgramAge) =>
                 [...new Set(ALL_PROGRAMS.filter(p => p.ages.includes(age) && p.category !== 'exam' && p.category !== 'career').map(p => p.languageLabel))];
               const childLangs = langsByAge('child');
               const teenLangs = langsByAge('teen');

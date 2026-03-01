@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, type Variants } from 'motion/react';
 import {
   ArrowRight,
   ArrowLeft,
@@ -543,14 +543,14 @@ export default function ProgramFinder() {
 
   const progressPercent = showResults ? 100 : Math.round(((currentStep) / TOTAL_STEPS) * 100);
 
-  const cardSpring = {
+  const cardSpring: Variants = {
     initial: { opacity: 0, y: 20, scale: 0.97 },
     animate: (i: number) => ({
       opacity: 1,
       y: 0,
       scale: 1,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 260,
         damping: 22,
         delay: 0.1 + i * 0.08,

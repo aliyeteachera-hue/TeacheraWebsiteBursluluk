@@ -51,18 +51,21 @@ export default function RootLayout() {
     let timeoutId = 0;
     let idleId: number | null = null;
     const onReady = () => setShowDeferredUi(true);
+    const win = window as Window & {
+      requestIdleCallback?: (cb: IdleRequestCallback, options?: IdleRequestOptions) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
 
-    if ('requestIdleCallback' in window) {
-      idleId = (window as Window & { requestIdleCallback: (cb: IdleRequestCallback, options?: IdleRequestOptions) => number })
-        .requestIdleCallback(onReady, { timeout: 1600 });
+    if (typeof win.requestIdleCallback === 'function') {
+      idleId = win.requestIdleCallback(onReady, { timeout: 1600 });
     } else {
       timeoutId = window.setTimeout(onReady, 900);
     }
 
     return () => {
       window.clearTimeout(timeoutId);
-      if (idleId !== null && 'cancelIdleCallback' in window) {
-        (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleId);
+      if (idleId !== null && typeof win.cancelIdleCallback === 'function') {
+        win.cancelIdleCallback(idleId);
       }
     };
   }, []);
