@@ -10,6 +10,7 @@
     "test:watch": "vitest",
     "build": "vite build",
     "dev": "vite",
+    "lighthouse:compare": "node scripts/compare-lighthouse.mjs",
     "video:hero:encode": "bash scripts/encode-hero-videos.sh",
     "video:hero:status": "bash scripts/encode-hero-videos.sh --status"
   },

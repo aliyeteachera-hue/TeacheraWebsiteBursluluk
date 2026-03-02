@@ -100,6 +100,19 @@ pnpm video:hero:status
   - `TURNSTILE_SECRET_KEY`
   - `FORMS_UPSTREAM_TEMPLATE`
 
+### Lighthouse Before/After Compare
+- Amaç: iki Lighthouse JSON raporunu hızlıca kıyaslamak (before vs after).
+
+```bash
+# mobil örneği
+pnpm lighthouse:compare -- /tmp/teachera-before/lh-mobile.json /tmp/teachera-after/lh-mobile.json --label mobile
+
+# desktop örneği
+pnpm lighthouse:compare -- /tmp/teachera-before/lh-desktop.json /tmp/teachera-after/lh-desktop.json --label desktop
+```
+
+- Raporlanan metrikler: Performance Score, LCP, FCP, TBT, INP, Speed Index, JS Transfer, Total Transfer.
+
 ## 📂 Proje Yapısı
 
 ```
