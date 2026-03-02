@@ -6,6 +6,7 @@ import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
 import { usePageScrollLock } from '../lib/scrollLock';
+import { useCoarsePointer } from '../lib/useCoarsePointer';
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
@@ -447,6 +448,7 @@ export default function SpeakUpPage() {
   const [calViewMonth, setCalViewMonth] = useState(CAL_MIN.getMonth());
   const calRef = useRef<HTMLDivElement>(null);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
+  const isCoarsePointer = useCoarsePointer();
   usePageScrollLock(isVideoFullscreen, 'speakup-video-fullscreen');
   usePageScrollLock(isFormModalOpen, 'speakup-form-modal');
 
@@ -747,16 +749,16 @@ export default function SpeakUpPage() {
           <motion.div
             initial={false}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            exit={isCoarsePointer ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: isCoarsePointer ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-[90] bg-[#00000B]/95 flex items-center justify-center p-3"
             onClick={() => setIsVideoFullscreen(false)}
           >
             <motion.div
-              initial={{ opacity: 0, y: 24, scale: 0.95 }}
+              initial={isCoarsePointer ? false : { opacity: 0, y: 24, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 24, scale: 0.95 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              exit={isCoarsePointer ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 24, scale: 0.95 }}
+              transition={{ duration: isCoarsePointer ? 0 : 0.32, ease: [0.22, 1, 0.36, 1] }}
               className="relative h-[92svh] max-h-[92svh] max-w-[96vw] aspect-[9/16] rounded-[22px] overflow-hidden bg-black shadow-2xl shadow-black/60"
               onClick={(event) => event.stopPropagation()}
             >
@@ -1084,8 +1086,8 @@ export default function SpeakUpPage() {
           <motion.div
             initial={false}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            exit={isCoarsePointer ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: isCoarsePointer ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-[92] flex items-start justify-center overflow-y-auto px-4 py-6 md:py-10"
             onClick={(event) => {
               if (event.target === event.currentTarget) closeFormModal();
@@ -1094,9 +1096,9 @@ export default function SpeakUpPage() {
             <div className="absolute inset-0 bg-[#00000B]/82" />
 
             <motion.button
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={isCoarsePointer ? false : { opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+              exit={isCoarsePointer ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
               onClick={closeFormModal}
               className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300 cursor-pointer"
               aria-label="Başvuru formunu kapat"
@@ -1105,10 +1107,10 @@ export default function SpeakUpPage() {
             </motion.button>
 
             <motion.div
-              initial={{ opacity: 0, y: 26, scale: 0.97 }}
+              initial={isCoarsePointer ? false : { opacity: 0, y: 26, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.97 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              exit={isCoarsePointer ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.97 }}
+              transition={{ duration: isCoarsePointer ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="relative z-[93] w-full max-w-[700px] bg-white rounded-[22px] border border-[#324D47]/15 shadow-[0_30px_80px_rgba(0,0,0,0.45)] p-6 md:p-10"
               onClick={(event) => event.stopPropagation()}
             >

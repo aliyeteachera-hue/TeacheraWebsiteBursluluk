@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 
 type ScrollLockSnapshot = {
   bodyOverflow: string;
@@ -98,7 +98,9 @@ export function unlockPageScrollDeferred(lockId: string, delayMs: number) {
 }
 
 export function usePageScrollLock(active: boolean, lockId: string, releaseDelayMs?: number) {
-  useEffect(() => {
+  const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+  useIsomorphicLayoutEffect(() => {
     if (!active) return;
     const isCoarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false;
     const releaseDelay = releaseDelayMs ?? (isCoarsePointer ? 240 : 0);

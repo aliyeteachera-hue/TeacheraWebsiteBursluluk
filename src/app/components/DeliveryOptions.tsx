@@ -165,8 +165,8 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
         <motion.div
           initial={false}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          exit={isCoarsePointer ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: isCoarsePointer ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto"
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
@@ -179,7 +179,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
 
           {/* Close */}
           <motion.button
-            initial={isCoarsePointer ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
+            initial={isCoarsePointer ? false : { opacity: 0, scale: 0.8 }}
             animate={isCoarsePointer ? { opacity: 1 } : { opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
             onClick={onClose}
@@ -191,7 +191,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
 
           {/* Card */}
           <motion.div
-            initial={isCoarsePointer ? { opacity: 0, y: 20 } : { opacity: 0, y: 40, scale: 0.96 }}
+            initial={isCoarsePointer ? false : { opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={isCoarsePointer ? { opacity: 0, y: 16 } : { opacity: 0, y: 30, scale: 0.96 }}
             transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
@@ -203,7 +203,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                 /* ═══ SUCCESS STATE ═══ */
                 <motion.div
                   key="success"
-                  initial={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95, y: 20 }}
+                  initial={isCoarsePointer ? false : { opacity: 0, scale: 0.95, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95, y: 20 }}
                   transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
@@ -246,7 +246,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                 <motion.form
                   key="form"
                   onSubmit={handleSubmit}
-                  initial={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
+                  initial={isCoarsePointer ? false : { opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
                   transition={{ duration: isCoarsePointer ? 0.24 : 0.35 }}

@@ -119,10 +119,10 @@ export function WhatsAppButton() {
         {isExpanded && (
           <motion.div
             className="absolute bottom-full right-0 mb-4 rounded-2xl shadow-2xl overflow-hidden w-80 border border-[#324D47]/10"
-            initial={disableHeavyMotion ? { opacity: 0, y: 12 } : { opacity: 0, y: 20, scale: 0.8 }}
+            initial={disableHeavyMotion ? false : { opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={disableHeavyMotion ? { opacity: 0, y: 8 } : { opacity: 0, y: 20, scale: 0.8 }}
-            transition={{ duration: disableHeavyMotion ? 0.2 : 0.3 }}
+            exit={disableHeavyMotion ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.8 }}
+            transition={{ duration: disableHeavyMotion ? 0 : 0.3 }}
           >
             {/* Header */}
             <div className="p-5 bg-[#324D47] text-[#ffffff] relative overflow-hidden">
