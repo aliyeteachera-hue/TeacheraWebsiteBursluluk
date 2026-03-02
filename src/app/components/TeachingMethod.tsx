@@ -1,6 +1,6 @@
 import { motion, useInView } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
-import { RotateCcw, ArrowRight, Headphones, Mic, Check, Repeat } from 'lucide-react';
+import { RotateCcw, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
 
@@ -50,8 +50,6 @@ const FLOW_STEPS = [
     detail: 'Tekrar ettikçe, düşünmeden konuşursun.',
   },
 ];
-
-const MOBILE_STEP_ICONS = [Headphones, Mic, Check, Repeat] as const;
 
 export default function TeachingMethod() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -143,7 +141,6 @@ export default function TeachingMethod() {
           <div className="space-y-8 md:space-y-0">
             {FLOW_STEPS.map((step, i) => {
               const CustomIcon = step.customIcon;
-              const MobileIcon = MOBILE_STEP_ICONS[i] ?? Headphones;
               const isLeft = i % 2 === 0;
               const isActive = activeStep >= i;
               const iconColor = step.accent === '#324D47' ? '#79B7AA' : step.accent;
@@ -204,11 +201,9 @@ export default function TeachingMethod() {
                               opacity: isActive ? 1 : 0.82,
                             }}
                           >
-                            <MobileIcon
-                              size={18}
-                              strokeWidth={2.2}
-                              className="transition-colors duration-700"
-                              style={{ color: isActive ? iconColor : 'rgba(230,236,240,0.52)' }}
+                            <CustomIcon
+                              color={isActive ? iconColor : 'rgba(230,236,240,0.52)'}
+                              className="w-6 h-6 transition-colors duration-700"
                             />
                           </div>
 
