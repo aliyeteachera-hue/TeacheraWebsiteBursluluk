@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react';
 import { Plus, Minus, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useLevelAssessment } from './LevelAssessmentContext';
+import { useFreeTrial } from './FreeTrialContext';
 
 /* ═══════════════════════════════════════════════════════════════════════
    DATA
@@ -12,7 +13,7 @@ type CategoryId = 'genel' | 'metod' | 'surec';
 interface FAQAction {
   label: string;
   href?: string;
-  type?: 'route' | 'level-assessment';
+  type?: 'route' | 'level-assessment' | 'free-trial';
 }
 
 interface FAQItem {
@@ -44,7 +45,7 @@ const faqs: FAQItem[] = [
     question: 'Ücretsiz deneme seansına katılabilir miyim?',
     answer:
       'Evet. Ücretsiz deneme seansı talebinizi aşağıdaki buton üzerinden hızlıca iletebilirsiniz.',
-    action: { label: 'Ücretsiz Deneme Seansı Al', href: '/iletisim' },
+    action: { label: 'Ücretsiz Deneme Seansı Al', type: 'free-trial' },
   },
   {
     id: 4,
@@ -82,7 +83,7 @@ const faqs: FAQItem[] = [
     question: 'Derslerde Türkçe kullanılmıyor, nasıl anlayacağız?',
     answer:
       'Eğitmenlerimiz metodoloji eğitimlerine tabidir. Derslerde beden dili, illüstrasyonlar ve görsel materyaller yoğun olarak kullanılır. Bu sayede anadil kullanımından uzak durularak "öğrenme engelleri" önlenir.',
-    action: { label: 'Ücretsiz Deneme Seansı Al', href: '/iletisim' },
+    action: { label: 'Ücretsiz Deneme Seansı Al', type: 'free-trial' },
   },
   {
     id: 5,
@@ -97,7 +98,7 @@ const faqs: FAQItem[] = [
     question: 'Eğitmenlerinizin yeterliliğinden nasıl emin olabilirim?',
     answer:
       'Eğitmenlerimiz dil öğretmenliği, metodoloji ve dil bilimi gibi alanlarda eğitim almış, deneyim sahibidir. Ayrıca sürekli olarak bilgi ve becerilerini geliştirmek için iç eğitimlere tabidirler.',
-    action: { label: 'Ücretsiz Deneme Seansı Al', href: '/iletisim' },
+    action: { label: 'Ücretsiz Deneme Seansı Al', type: 'free-trial' },
   },
   {
     id: 7,
@@ -105,7 +106,7 @@ const faqs: FAQItem[] = [
     question: 'Tüm dersler konuşma üzerine mi kurulu?',
     answer:
       "Derslerin %85'i konuşma pratiğiyle geçer. Ancak bu sadece serbest sohbet değil; bilimsel ve sistematik bir yöntemle yapılandırılmış derslerdir. Okuma, yazma, anlama ve konuşma becerileri bir bütün olarak geliştirilir.",
-    action: { label: 'Ücretsiz Deneme Seansı Al', href: '/iletisim' },
+    action: { label: 'Ücretsiz Deneme Seansı Al', type: 'free-trial' },
   },
   // SÜREÇ
   {
@@ -165,6 +166,7 @@ export default function FAQ() {
   const [openId, setOpenId] = useState<number | null>(null);
   const navigate = useNavigate();
   const { open: openLevelAssessment } = useLevelAssessment();
+  const { open: openFreeTrial } = useFreeTrial();
 
   const filtered = useMemo(
     () => faqs.filter((f) => f.category === activeCategory),
@@ -278,6 +280,10 @@ export default function FAQ() {
                               <button
                                 type="button"
                                 onClick={() => {
+                                  if (faq.action?.type === 'free-trial') {
+                                    openFreeTrial('faq_free_trial');
+                                    return;
+                                  }
                                   if (faq.action?.type === 'level-assessment') {
                                     openLevelAssessment('faq_level_assessment');
                                     return;

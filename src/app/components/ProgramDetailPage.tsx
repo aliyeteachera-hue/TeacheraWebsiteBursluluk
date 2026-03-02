@@ -2230,6 +2230,7 @@ function StarsSection() {
 function FAQItem({ question, answer, index, accent, ctaType }: { question: string; answer: string; index: number; accent: string; ctaType?: 'contact' | 'trial' | 'kurumsal' }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { open: openFreeTrial } = useFreeTrial();
   return (
     <Reveal delay={index * 0.06}>
       <div className="rounded-2xl border border-[#09090F]/[0.06] bg-white overflow-hidden transition-all hover:border-[#324D47]/15">
@@ -2258,7 +2259,7 @@ function FAQItem({ question, answer, index, accent, ctaType }: { question: strin
             )}
             {ctaType === 'trial' && (
               <button
-                onClick={() => navigate('/iletisim')}
+                onClick={() => openFreeTrial('program_detail_faq_trial')}
                 className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-wide transition-all hover:brightness-110"
                 style={{ backgroundColor: accent }}
               >
