@@ -84,15 +84,6 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
   useEffect(() => {
     if (!isRendered) return;
 
-    const previousOverflow = document.body.style.overflow;
-    const previousPaddingRight = document.body.style.paddingRight;
-    const scrollbarCompensation = window.innerWidth - document.documentElement.clientWidth;
-
-    document.body.style.overflow = 'hidden';
-    if (scrollbarCompensation > 0) {
-      document.body.style.paddingRight = `${scrollbarCompensation}px`;
-    }
-
     if (isOpen) {
       closeButtonRef.current?.focus();
     }
@@ -155,8 +146,6 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
     window.addEventListener('keydown', onKeyboardControl);
     return () => {
       window.removeEventListener('keydown', onKeyboardControl);
-      document.body.style.overflow = previousOverflow;
-      document.body.style.paddingRight = previousPaddingRight;
     };
   }, [isRendered, isOpen, onClose]);
   
@@ -220,7 +209,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
   return (
         <motion.div
           ref={dialogRef}
-          initial={{ opacity: 0 }}
+          initial={false}
           animate={{ opacity: isOpen ? 1 : 0 }}
           transition={{ duration: isOpen ? 0.22 : 0.18, ease: 'easeOut' }}
           role="dialog"
@@ -230,22 +219,19 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
         >
           {/* BACKGROUND IMAGE & OVERLAY */}
           <div className="absolute inset-0 z-0 pointer-events-none">
-             <motion.img 
-               initial={disableMenuAnimations ? false : { scale: 1.1, opacity: 0 }}
-               animate={disableMenuAnimations ? { opacity: 0.2 } : { scale: 1, opacity: 0.2 }}
-               transition={disableMenuAnimations ? { duration: 0.12 } : { duration: 1.5, ease: "easeOut" }}
+             <img 
                src={imgRectangle279} 
                alt="Background" 
-               className="w-full h-full object-cover grayscale mix-blend-luminosity"
+               className="w-full h-full object-cover grayscale mix-blend-luminosity opacity-20"
              />
              <div className="absolute inset-0 bg-gradient-to-r from-[#00000B] via-[#00000B]/95 to-[#00000B]/90" />
           </div>
 
           {/* CONTENT CONTAINER */}
           <motion.div
-            initial={{ y: 6, opacity: 0.96 }}
-            animate={{ y: isOpen ? 0 : 4, opacity: isOpen ? 1 : 0.98 }}
-            transition={{ duration: isOpen ? 0.3 : 0.2, ease: 'easeOut' }}
+            initial={false}
+            animate={{ y: isOpen ? 0 : 2, opacity: isOpen ? 1 : 0.98 }}
+            transition={{ duration: isOpen ? 0.2 : 0.15, ease: 'easeOut' }}
             className="relative z-10 w-full h-full min-h-0 max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col pt-[calc(env(safe-area-inset-top)+3.4rem)] sm:pt-[calc(env(safe-area-inset-top)+4.1rem)] lg:pt-0"
           >
             

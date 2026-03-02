@@ -52,6 +52,10 @@ const FLOW_STEPS = [
   },
 ];
 
+const REVEAL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const STEP_START_DELAY_MS = 120;
+const STEP_STAGGER_MS = 180;
+
 export default function TeachingMethod() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: '-80px' });
@@ -67,7 +71,7 @@ export default function TeachingMethod() {
     if (!inView) return;
 
     const timers = FLOW_STEPS.map((_, i) => (
-      window.setTimeout(() => setActiveStep(i), 800 + i * 600)
+      window.setTimeout(() => setActiveStep(i), STEP_START_DELAY_MS + i * STEP_STAGGER_MS)
     ));
 
     return () => {
@@ -176,7 +180,7 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, ease: REVEAL_EASE }}
           className="relative"
         >
           <h2
@@ -198,7 +202,7 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ duration: 0.55, delay: 0.08, ease: REVEAL_EASE }}
         >
           <p className="font-['Neutraface_2_Text:Book',sans-serif] text-white/30 text-[13px] md:text-[14px] max-w-[400px] mx-auto leading-[1.8]">
             Her ders boyunca kesintisiz dönen bu döngü,{' '}
@@ -215,7 +219,7 @@ export default function TeachingMethod() {
             <motion.div
               initial={{ scaleY: 0 }}
               animate={inView ? { scaleY: 1 } : {}}
-              transition={{ duration: 2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.95, delay: 0.1, ease: REVEAL_EASE }}
               className="w-full h-full bg-gradient-to-b from-white/[0.03] via-white/[0.08] to-white/[0.03] origin-top"
             />
           </div>
@@ -262,7 +266,7 @@ export default function TeachingMethod() {
                     <motion.div
                       initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
                       animate={isActive ? { opacity: 1, x: 0 } : {}}
-                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ duration: 0.55, ease: REVEAL_EASE }}
                       className={`${isLeft ? 'md:col-start-1' : 'md:col-start-2'} md:py-12`}
                     >
                       <div
@@ -357,7 +361,7 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 3.5 }}
+          transition={{ duration: 0.6, delay: 0.62, ease: REVEAL_EASE }}
           className="mt-16 md:mt-24 text-center"
         >
           <div className="inline-flex items-center gap-3 bg-white/[0.03] backdrop-blur-sm rounded-full px-6 md:px-8 py-3.5 border border-white/[0.06]">
@@ -378,7 +382,7 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 3.8 }}
+          transition={{ duration: 0.55, delay: 0.78, ease: REVEAL_EASE }}
           className="mt-10 text-center"
         >
           <button
