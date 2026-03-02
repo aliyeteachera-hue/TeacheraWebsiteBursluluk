@@ -745,10 +745,10 @@ export default function SpeakUpPage() {
       <AnimatePresence>
         {isVideoFullscreen && (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-[90] bg-[#00000B]/95 flex items-center justify-center p-3"
             onClick={() => setIsVideoFullscreen(false)}
           >
@@ -1082,10 +1082,10 @@ export default function SpeakUpPage() {
       <AnimatePresence>
         {isFormModalOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-[92] flex items-start justify-center overflow-y-auto px-4 py-6 md:py-10"
             onClick={(event) => {
               if (event.target === event.currentTarget) closeFormModal();

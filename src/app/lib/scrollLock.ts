@@ -1,13 +1,8 @@
 import { useEffect } from 'react';
 
 type ScrollLockSnapshot = {
-  scrollY: number;
   bodyOverflow: string;
-  bodyPosition: string;
-  bodyTop: string;
-  bodyWidth: string;
-  bodyLeft: string;
-  bodyRight: string;
+  bodyPaddingRight: string;
   bodyTouchAction: string;
   htmlOverflow: string;
   htmlOverscrollY: string;
@@ -27,25 +22,20 @@ export function lockPageScroll(lockId: string) {
   const htmlStyle = document.documentElement.style;
 
   if (activeLocks.size === 0) {
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
     snapshot = {
-      scrollY: window.scrollY,
       bodyOverflow: bodyStyle.overflow,
-      bodyPosition: bodyStyle.position,
-      bodyTop: bodyStyle.top,
-      bodyWidth: bodyStyle.width,
-      bodyLeft: bodyStyle.left,
-      bodyRight: bodyStyle.right,
+      bodyPaddingRight: bodyStyle.paddingRight,
       bodyTouchAction: bodyStyle.touchAction,
       htmlOverflow: htmlStyle.overflow,
       htmlOverscrollY: htmlStyle.overscrollBehaviorY,
     };
 
     bodyStyle.overflow = 'hidden';
-    bodyStyle.position = 'fixed';
-    bodyStyle.top = `-${window.scrollY}px`;
-    bodyStyle.width = '100%';
-    bodyStyle.left = '0';
-    bodyStyle.right = '0';
+    if (scrollBarWidth > 0) {
+      const currentPadding = Number.parseFloat(window.getComputedStyle(document.body).paddingRight || '0') || 0;
+      bodyStyle.paddingRight = `${currentPadding + scrollBarWidth}px`;
+    }
     bodyStyle.touchAction = 'none';
     htmlStyle.overflow = 'hidden';
     htmlStyle.overscrollBehaviorY = 'none';
@@ -62,21 +52,12 @@ export function unlockPageScroll(lockId: string) {
 
   const bodyStyle = document.body.style;
   const htmlStyle = document.documentElement.style;
-  const restoreScroll = snapshot.bodyPosition !== 'fixed';
 
   bodyStyle.overflow = snapshot.bodyOverflow;
-  bodyStyle.position = snapshot.bodyPosition;
-  bodyStyle.top = snapshot.bodyTop;
-  bodyStyle.width = snapshot.bodyWidth;
-  bodyStyle.left = snapshot.bodyLeft;
-  bodyStyle.right = snapshot.bodyRight;
+  bodyStyle.paddingRight = snapshot.bodyPaddingRight;
   bodyStyle.touchAction = snapshot.bodyTouchAction;
   htmlStyle.overflow = snapshot.htmlOverflow;
   htmlStyle.overscrollBehaviorY = snapshot.htmlOverscrollY;
-
-  if (restoreScroll) {
-    window.scrollTo(0, snapshot.scrollY);
-  }
 
   snapshot = null;
 }
