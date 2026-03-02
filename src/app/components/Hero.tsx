@@ -8,6 +8,7 @@ import homeHeroVideoWebm from '../../assets/video/home-hero.webm';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
 import { useLiteMode } from '../lib/useLiteMode';
+import { detectMobileVideoVariants } from '../lib/videoVariants';
 
 const HERO_LANGUAGE_LINKS = [
   { label: 'İngilizce', slug: 'ingilizce/grup-programi' },
@@ -131,12 +132,29 @@ export default function Hero() {
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const shouldReduceMotion = useReducedMotion();
-  const [shouldLoadVideo, setShouldLoadVideo] = useState(!shouldReduceMotion);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [enableDesktopEffects, setEnableDesktopEffects] = useState(false);
   const [enableHeroMotion, setEnableHeroMotion] = useState(false);
+  const [mobileVideoVariants, setMobileVideoVariants] = useState({ mobileWebm: false, mobileMp4: false });
   const isLiteMode = useLiteMode();
   const { open: openLevelAssessment } = useLevelAssessment();
   const { open: openFreeTrial } = useFreeTrial();
+
+  useEffect(() => {
+    if (shouldReduceMotion || isLiteMode) return;
+    if (!window.matchMedia('(max-width: 1023px)').matches) return;
+
+    let isCancelled = false;
+    void detectMobileVideoVariants('home-hero').then((availability) => {
+      if (!isCancelled) {
+        setMobileVideoVariants(availability);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isLiteMode, shouldReduceMotion]);
 
   useEffect(() => {
     let timer = 0;
@@ -145,7 +163,7 @@ export default function Hero() {
     const updateVideoState = () => {
       window.clearTimeout(timer);
       const shouldEnableMotion = !shouldReduceMotion && !isLiteMode;
-      const shouldEnableVideo = !shouldReduceMotion;
+      const shouldEnableVideo = shouldEnableMotion;
       const shouldEnableDesktopEffects = shouldEnableMotion && mediaQuery.matches;
       setEnableHeroMotion(shouldEnableMotion);
       setEnableDesktopEffects(shouldEnableDesktopEffects);
@@ -154,7 +172,7 @@ export default function Hero() {
         setShouldLoadVideo(false);
         return;
       }
-      timer = window.setTimeout(() => setShouldLoadVideo(true), 80);
+      timer = window.setTimeout(() => setShouldLoadVideo(true), 520);
     };
 
     updateVideoState();
@@ -191,14 +209,15 @@ export default function Hero() {
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="none"
               aria-hidden="true"
-              onLoadedData={(event) => {
-                void event.currentTarget.play().catch(() => {});
-              }}
             >
-              <source src="/video/home-hero-mobile.webm" type="video/webm" media="(max-width: 1023px)" />
-              <source src="/video/home-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
+              {mobileVideoVariants.mobileWebm && (
+                <source src="/video/home-hero-mobile.webm" type="video/webm" media="(max-width: 1023px)" />
+              )}
+              {mobileVideoVariants.mobileMp4 && (
+                <source src="/video/home-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
+              )}
               <source src={homeHeroVideoWebm} type="video/webm" />
               <source src={homeHeroVideo} type="video/mp4" />
             </video>
