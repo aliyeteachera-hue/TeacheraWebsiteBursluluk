@@ -1,4 +1,4 @@
-import { motion, useInView } from 'motion/react';
+import { motion, useInView, useReducedMotion } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
 import { RotateCcw, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -54,13 +54,30 @@ const FLOW_STEPS = [
 
 export default function TeachingMethod() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const inView = useInView(sectionRef, { once: true, margin: '-80px' });
   const [activeStep, setActiveStep] = useState(-1);
   const isLiteMode = useLiteMode();
   const navigate = useNavigate();
+  const useCompactMode = isLiteMode || shouldReduceMotion || isMobileViewport;
 
   useEffect(() => {
-    if (isLiteMode) {
+    const mediaQuery = window.matchMedia('(max-width: 1023px)');
+    const update = () => setIsMobileViewport(mediaQuery.matches);
+
+    update();
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', update);
+      return () => mediaQuery.removeEventListener('change', update);
+    }
+
+    mediaQuery.addListener(update);
+    return () => mediaQuery.removeListener(update);
+  }, []);
+
+  useEffect(() => {
+    if (useCompactMode) {
       setActiveStep(FLOW_STEPS.length - 1);
       return;
     }
@@ -73,9 +90,9 @@ export default function TeachingMethod() {
     return () => {
       timers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, [inView, isLiteMode]);
+  }, [inView, useCompactMode]);
 
-  if (isLiteMode) {
+  if (useCompactMode) {
     return (
       <section id="how-it-works" ref={sectionRef} className="bg-[#09090F] relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />

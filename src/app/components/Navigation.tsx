@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
-import { motion, useScroll, useMotionValueEvent } from 'motion/react';
+import { motion, useScroll, useMotionValueEvent, useReducedMotion } from 'motion/react';
 import { useNavigate, useLocation } from 'react-router';
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
+import { useLiteMode } from '../lib/useLiteMode';
 import neuLogoImg from 'figma:asset/21caa0f68b9225ac66749719ebaf62a436372e41.webp';
 
 interface NavigationProps {
@@ -18,9 +19,11 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
   const location = useLocation();
   const { open: openLevelAssessment } = useLevelAssessment();
   const { open: openFreeTrial } = useFreeTrial();
+  const shouldReduceMotion = useReducedMotion();
+  const isLiteMode = useLiteMode();
 
   const [scrolled, setScrolled] = useState(false);
-  const isAcademyPage = location.pathname === '/academy';
+  const isAcademyPage = location.pathname.startsWith('/academy');
   const isSpeakUpPage = location.pathname === '/speakup';
   const navHeightClass = isSpeakUpPage
     ? scrolled
@@ -43,20 +46,23 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
   });
 
   const scrollToSection = (sectionId: string) => {
+    const isMobileViewport = window.matchMedia('(max-width: 1023px)').matches;
+    const behavior: ScrollBehavior = shouldReduceMotion || isLiteMode || isMobileViewport ? 'auto' : 'smooth';
+
     if (location.pathname !== '/') {
       navigate('/');
       setTimeout(() => {
         const el = document.getElementById(sectionId);
         if (el) {
           const top = el.getBoundingClientRect().top + window.pageYOffset - 80;
-          window.scrollTo({ top, behavior: 'smooth' });
+          window.scrollTo({ top, behavior });
         }
       }, 100);
     } else {
       const el = document.getElementById(sectionId);
       if (el) {
         const top = el.getBoundingClientRect().top + window.pageYOffset - 80;
-        window.scrollTo({ top, behavior: 'smooth' });
+        window.scrollTo({ top, behavior });
       }
     }
     setIsMenuOpen(false);
@@ -97,10 +103,10 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex items-center gap-3 md:gap-4"
+                className="hidden lg:flex items-center gap-3 xl:gap-4"
               >
                 <div className={`w-[1px] bg-white/25 transition-all duration-700 ${scrolled ? 'h-4' : 'h-5 md:h-6'}`} />
-                <span className={`font-['Neutraface_2_Text:Bold',sans-serif] text-transparent bg-clip-text bg-gradient-to-r from-[#E70000] to-[#FF6B6B] tracking-[0.15em] uppercase leading-none transition-all duration-700 ${scrolled ? 'text-[11px] md:text-[13px]' : 'text-[13px] md:text-[16px]'}`}>
+                <span className={`font-['Neutraface_2_Text:Bold',sans-serif] text-transparent bg-clip-text bg-gradient-to-r from-[#E70000] to-[#FF6B6B] tracking-[0.13em] uppercase leading-none transition-all duration-700 ${scrolled ? 'text-[12px] xl:text-[13px]' : 'text-[14px] xl:text-[15px]'}`}>
                   ACADEMY
                 </span>
               </motion.div>

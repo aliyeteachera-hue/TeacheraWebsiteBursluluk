@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ArrowRight, Sparkles, Brain, Briefcase } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import imgKids from "figma:asset/54ddc57446b9fc320bc6d857591548a258173cc6.webp";
 import imgTeens from "figma:asset/d094d8fcdacc4a6a15cd69392d258f9aa4f4b9f9.webp";
 import imgAdults from "figma:asset/383d9acb74488e60f1eacb17519ee5d526ce5f8d.webp";
+import { useLiteMode } from '../lib/useLiteMode';
 
 interface AgeGroup {
   id: string;
@@ -59,7 +60,25 @@ const AGE_TO_FINDER_MAP: Record<string, string> = {
 
 export default function AgeSelection() {
   const [activeId, setActiveId] = useState<string>('adults');
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+  const isLiteMode = useLiteMode();
   const navigate = useNavigate();
+  const useCompactMode = isMobileViewport || shouldReduceMotion || isLiteMode;
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 1023px)');
+    const update = () => setIsMobileViewport(mediaQuery.matches);
+
+    update();
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', update);
+      return () => mediaQuery.removeEventListener('change', update);
+    }
+
+    mediaQuery.addListener(update);
+    return () => mediaQuery.removeListener(update);
+  }, []);
 
   const handleNavigateToFinder = (groupId: string) => {
     const finderAge = AGE_TO_FINDER_MAP[groupId] || 'adult';
@@ -70,8 +89,8 @@ export default function AgeSelection() {
     <section className="relative py-24 md:py-32 bg-[#00000B] overflow-hidden">
       {/* Background Glows */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#E70000] rounded-full mix-blend-screen filter blur-[150px] opacity-[0.03]" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-[#324D47] rounded-full mix-blend-screen filter blur-[150px] opacity-[0.03]" />
+        <div className="hidden md:block absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#E70000] rounded-full mix-blend-screen filter blur-[150px] opacity-[0.03]" />
+        <div className="hidden md:block absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-[#324D47] rounded-full mix-blend-screen filter blur-[150px] opacity-[0.03]" />
       </div>
 
       <div className="max-w-[1440px] mx-auto px-6 lg:px-12 relative z-10">
@@ -119,11 +138,18 @@ export default function AgeSelection() {
             return (
               <motion.div
                 key={group.id}
-                layout
-                onClick={() => setActiveId(group.id)}
+                layout={!useCompactMode}
+                transition={useCompactMode ? { duration: 0.16 } : undefined}
+                onClick={() => {
+                  if (useCompactMode && activeId === group.id) {
+                    handleNavigateToFinder(group.id);
+                    return;
+                  }
+                  setActiveId(group.id);
+                }}
                 className={`
                   relative group cursor-pointer overflow-hidden rounded-[2rem] border border-[#ffffff]/10
-                  transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]
+                  transition-all ${useCompactMode ? 'duration-150 ease-out' : 'duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]'}
                   ${isActive ? 'lg:flex-[3] h-[500px] lg:h-auto' : 'lg:flex-[1] h-[120px] lg:h-auto'}
                 `}
               >
@@ -133,8 +159,14 @@ export default function AgeSelection() {
                     src={group.image}
                     alt={group.title}
                     className={`
-                      w-full h-full object-cover transition-transform duration-1000 ease-out
-                      ${isActive ? 'scale-100 grayscale-0' : 'scale-110 grayscale-[100%] opacity-40 group-hover:scale-105 group-hover:opacity-60'}
+                      w-full h-full object-cover ${useCompactMode ? 'transition-opacity duration-150' : 'transition-transform duration-1000 ease-out'}
+                      ${useCompactMode
+                        ? isActive
+                          ? 'opacity-95'
+                          : 'opacity-45'
+                        : isActive
+                          ? 'scale-100 grayscale-0'
+                          : 'scale-110 grayscale-[100%] opacity-40 group-hover:scale-105 group-hover:opacity-60'}
                     `}
                   />
                   {/* Gradient Overlay */}
@@ -176,10 +208,10 @@ export default function AgeSelection() {
                     {isActive ? (
                       <motion.div
                         key="expanded"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.4, delay: 0.1 }}
+                        initial={useCompactMode ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                        animate={useCompactMode ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                        exit={useCompactMode ? { opacity: 0 } : { opacity: 0, y: 10 }}
+                        transition={useCompactMode ? { duration: 0.16 } : { duration: 0.4, delay: 0.1 }}
                       >
                          {/* Decorative Line */}
                         <div className="w-16 h-1 rounded-full mb-6" style={{ backgroundColor: group.accent }} />

@@ -175,7 +175,11 @@ export default function Hero() {
 
   const scrollToNext = () => {
     const element = document.getElementById('how-it-works');
-    if (element) element.scrollIntoView({ behavior: 'smooth' });
+    if (element) {
+      const isMobileViewport = window.matchMedia('(max-width: 1023px)').matches;
+      const behavior: ScrollBehavior = shouldReduceMotion || isLiteMode || isMobileViewport ? 'auto' : 'smooth';
+      element.scrollIntoView({ behavior });
+    }
   };
 
   return (
@@ -191,14 +195,12 @@ export default function Hero() {
               muted
               loop
               playsInline
-              preload="metadata"
+              preload={isLiteMode ? 'metadata' : 'auto'}
               aria-hidden="true"
               onLoadedData={(event) => {
                 void event.currentTarget.play().catch(() => {});
               }}
             >
-              <source src="/video/home-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
-              <source src="/video/home-hero-mobile.webm" type="video/webm" media="(max-width: 1023px)" />
               <source src={homeHeroVideoWebm} type="video/webm" />
               <source src={homeHeroVideo} type="video/mp4" />
             </video>
