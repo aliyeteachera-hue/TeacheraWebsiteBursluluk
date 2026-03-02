@@ -2,28 +2,24 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { Outlet, useLocation } from 'react-router';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import { Toaster } from 'sonner';
 import Navigation from './Navigation';
+import MobileMenu from './MobileMenu';
 import Footer from './Footer';
-import { LevelAssessmentProvider, useLevelAssessment } from './LevelAssessmentContext';
-import { FreeTrialProvider, useFreeTrial } from './FreeTrialContext';
+import { LevelAssessmentProvider } from './LevelAssessmentContext';
+import { FreeTrialProvider } from './FreeTrialContext';
 import SeoManager from './SeoManager';
+import LevelAssessmentModal from './LevelAssessment';
+import FreeTrialModal from './FreeTrialModal';
 import { initTracking, trackPageView } from '../lib/analytics';
 import { useLiteMode } from '../lib/useLiteMode';
 
-const LazyMobileMenu = lazy(() => import('./MobileMenu'));
-const LazyLevelAssessmentModal = lazy(() => import('./LevelAssessment'));
-const LazyFreeTrialModal = lazy(() => import('./FreeTrialModal'));
 const WhatsAppButton = lazy(() =>
   import('./WhatsAppButton').then((module) => ({ default: module.WhatsAppButton })),
 );
 const CookieConsent = lazy(() => import('./CookieConsent'));
 
-function RootLayoutContent() {
+export default function RootLayout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [hasOpenedMenu, setHasOpenedMenu] = useState(false);
-  const [hasOpenedLevelAssessment, setHasOpenedLevelAssessment] = useState(false);
-  const [hasOpenedFreeTrial, setHasOpenedFreeTrial] = useState(false);
   const [currentSection, setCurrentSection] = useState('home');
   const [showDeferredUi, setShowDeferredUi] = useState(false);
   const currentSectionRef = useRef('home');
@@ -41,8 +37,6 @@ function RootLayoutContent() {
   } | null>(null);
   const location = useLocation();
   const liteMode = useLiteMode();
-  const { isOpen: isLevelAssessmentOpen } = useLevelAssessment();
-  const { isOpen: isFreeTrialOpen } = useFreeTrial();
 
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -80,24 +74,6 @@ function RootLayoutContent() {
     document.documentElement.classList.toggle('teachera-reduce-motion', liteMode);
     return () => document.documentElement.classList.remove('teachera-reduce-motion');
   }, [liteMode]);
-
-  useEffect(() => {
-    if (isMenuOpen) {
-      setHasOpenedMenu(true);
-    }
-  }, [isMenuOpen]);
-
-  useEffect(() => {
-    if (isLevelAssessmentOpen) {
-      setHasOpenedLevelAssessment(true);
-    }
-  }, [isLevelAssessmentOpen]);
-
-  useEffect(() => {
-    if (isFreeTrialOpen) {
-      setHasOpenedFreeTrial(true);
-    }
-  }, [isFreeTrialOpen]);
 
   useEffect(() => {
     const restoreMenuScrollLock = (restoreScrollPosition: boolean) => {
@@ -224,65 +200,43 @@ function RootLayoutContent() {
   const isAuthPage = location.pathname === '/giris';
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="relative bg-white"
-    >
-      <SeoManager />
-      <Navigation
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        currentSection={currentSection}
-      />
+    <FreeTrialProvider>
+      <LevelAssessmentProvider>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative bg-white"
+        >
+          <SeoManager />
+          <Navigation
+            isMenuOpen={isMenuOpen}
+            setIsMenuOpen={setIsMenuOpen}
+            currentSection={currentSection}
+          />
 
-      <Suspense fallback={null}>
-        {(isMenuOpen || hasOpenedMenu) && (
-          <LazyMobileMenu
+          <MobileMenu
             isOpen={isMenuOpen}
             onClose={() => setIsMenuOpen(false)}
             currentSection={currentSection}
           />
-        )}
-      </Suspense>
 
-      <main className="relative">
-        <Outlet />
-      </main>
+          <main className="relative">
+            <Outlet />
+          </main>
 
-      {!isAuthPage && <Footer />}
+          {!isAuthPage && <Footer />}
 
-      <Suspense fallback={null}>
-        {(isLevelAssessmentOpen || hasOpenedLevelAssessment) && <LazyLevelAssessmentModal />}
-        {(isFreeTrialOpen || hasOpenedFreeTrial) && <LazyFreeTrialModal />}
-      </Suspense>
+          <LevelAssessmentModal />
+          <FreeTrialModal />
 
-      <Suspense fallback={null}>
-        {showDeferredUi && <WhatsAppButton />}
-        {showDeferredUi && <CookieConsent />}
-      </Suspense>
+          <Suspense fallback={null}>
+            <WhatsAppButton />
+            {showDeferredUi && <CookieConsent />}
+          </Suspense>
 
-      <Toaster
-        position="bottom-right"
-        expand={false}
-        richColors
-        closeButton
-        toastOptions={{
-          className: 'font-["Neutraface_2_Text:Demi",sans-serif]',
-        }}
-      />
-
-      <SpeedInsights sampleRate={0.5} />
-    </motion.div>
-  );
-}
-
-export default function RootLayout() {
-  return (
-    <FreeTrialProvider>
-      <LevelAssessmentProvider>
-        <RootLayoutContent />
+          <SpeedInsights sampleRate={0.5} />
+        </motion.div>
       </LevelAssessmentProvider>
     </FreeTrialProvider>
   );

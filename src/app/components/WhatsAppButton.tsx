@@ -11,7 +11,6 @@ export function WhatsAppButton() {
   const [isHovered, setIsHovered] = useState(false);
   const [showSoftPrompt, setShowSoftPrompt] = useState(false);
   const [videoFallback, setVideoFallback] = useState(false);
-  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const retryTimeoutRef = useRef<number | null>(null);
@@ -25,7 +24,7 @@ export function WhatsAppButton() {
 
   const attemptVideoPlay = useCallback(() => {
     const video = videoRef.current;
-    if (!video || !shouldLoadVideo || shouldReduceMotion || isExpanded || videoFallback) return;
+    if (!video || shouldReduceMotion || isExpanded || videoFallback) return;
 
     const maybePromise = video.play();
     if (maybePromise && typeof maybePromise.catch === 'function') {
@@ -39,17 +38,7 @@ export function WhatsAppButton() {
         }, 380);
       });
     }
-  }, [isExpanded, shouldLoadVideo, shouldReduceMotion, videoFallback]);
-
-  useEffect(() => {
-    if (shouldReduceMotion) {
-      setShouldLoadVideo(false);
-      return;
-    }
-
-    const timer = window.setTimeout(() => setShouldLoadVideo(true), 1800);
-    return () => window.clearTimeout(timer);
-  }, [shouldReduceMotion]);
+  }, [isExpanded, shouldReduceMotion, videoFallback]);
 
   useEffect(() => {
     if (shouldReduceMotion) {
@@ -78,7 +67,7 @@ export function WhatsAppButton() {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !shouldLoadVideo || shouldReduceMotion) return;
+    if (!video || shouldReduceMotion) return;
 
     if (isExpanded) {
       clearRetryTimer();
@@ -88,7 +77,7 @@ export function WhatsAppButton() {
 
     attemptVideoPlay();
     return () => clearRetryTimer();
-  }, [attemptVideoPlay, isExpanded, shouldLoadVideo, shouldReduceMotion]);
+  }, [attemptVideoPlay, isExpanded, shouldReduceMotion]);
 
   useEffect(() => {
     const onVisibilityChange = () => {
@@ -199,14 +188,8 @@ export function WhatsAppButton() {
       </AnimatePresence>
 
       <motion.button
-        onClick={() => {
-          setShouldLoadVideo(true);
-          setIsExpanded(!isExpanded);
-        }}
-        onMouseEnter={() => {
-          setShouldLoadVideo(true);
-          setIsHovered(true);
-        }}
+        onClick={() => setIsExpanded(!isExpanded)}
+        onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="relative w-16 h-16 rounded-full shadow-xl overflow-hidden cursor-pointer border border-[#324D47]/20"
         animate={!shouldReduceMotion && !isExpanded ? { y: [0, -2, 0], scale: [1, 1.015, 1] } : undefined}
@@ -214,12 +197,12 @@ export function WhatsAppButton() {
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.96 }}
       >
-        {videoFallback || !shouldLoadVideo ? (
+        {videoFallback ? (
           <img
             src={whatsappImage}
             alt="WhatsApp Destek"
             className="w-full h-full object-cover"
-            loading="lazy"
+            loading="eager"
             decoding="async"
           />
         ) : (
@@ -230,7 +213,7 @@ export function WhatsAppButton() {
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
             poster={whatsappImage}
             aria-label="WhatsApp Destek"
             onCanPlay={attemptVideoPlay}
