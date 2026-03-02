@@ -197,8 +197,8 @@ export default function Hero() {
                 void event.currentTarget.play().catch(() => {});
               }}
             >
-              <source src="/video/home-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
               <source src="/video/home-hero-mobile.webm" type="video/webm" media="(max-width: 1023px)" />
+              <source src="/video/home-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
               <source src={homeHeroVideoWebm} type="video/webm" />
               <source src={homeHeroVideo} type="video/mp4" />
             </video>

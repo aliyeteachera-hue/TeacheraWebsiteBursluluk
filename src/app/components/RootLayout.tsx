@@ -9,6 +9,7 @@ import { LevelAssessmentProvider, useLevelAssessment } from './LevelAssessmentCo
 import { FreeTrialProvider, useFreeTrial } from './FreeTrialContext';
 import SeoManager from './SeoManager';
 import { initTracking, trackPageView } from '../lib/analytics';
+import { useLiteMode } from '../lib/useLiteMode';
 
 const LazyMobileMenu = lazy(() => import('./MobileMenu'));
 const LazyLevelAssessmentModal = lazy(() => import('./LevelAssessment'));
@@ -39,6 +40,7 @@ function RootLayoutContent() {
     htmlOverscrollY: string;
   } | null>(null);
   const location = useLocation();
+  const liteMode = useLiteMode();
   const { isOpen: isLevelAssessmentOpen } = useLevelAssessment();
   const { isOpen: isFreeTrialOpen } = useFreeTrial();
 
@@ -73,6 +75,11 @@ function RootLayoutContent() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('teachera-reduce-motion', liteMode);
+    return () => document.documentElement.classList.remove('teachera-reduce-motion');
+  }, [liteMode]);
 
   useEffect(() => {
     if (isMenuOpen) {

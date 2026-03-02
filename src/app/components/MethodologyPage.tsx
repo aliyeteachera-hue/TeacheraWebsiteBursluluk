@@ -110,8 +110,8 @@ function HeroSection() {
               void event.currentTarget.play().catch(() => {});
             }}
           >
-            <source src="/video/methodology-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
             <source src="/video/methodology-hero-mobile.webm" type="video/webm" media="(max-width: 1023px)" />
+            <source src="/video/methodology-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
             <source src={methodologyHeroVideoWebm} type="video/webm" />
             <source src={methodologyHeroVideo} type="video/mp4" />
           </video>
