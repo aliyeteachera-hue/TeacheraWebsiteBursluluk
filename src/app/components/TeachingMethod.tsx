@@ -143,6 +143,7 @@ export default function TeachingMethod() {
               const CustomIcon = step.customIcon;
               const isLeft = i % 2 === 0;
               const isActive = activeStep >= i;
+              const iconColor = step.accent === '#324D47' ? '#79B7AA' : step.accent;
 
               return (
                 <div key={step.num} className="relative">
@@ -169,7 +170,7 @@ export default function TeachingMethod() {
                           boxShadow: `0 0 30px ${step.glowColor}`,
                         }}
                       >
-                        <CustomIcon color={isActive ? step.accent : 'rgba(255,255,255,0.15)'} className="w-6 h-6 transition-colors duration-700" />
+                        <CustomIcon color={isActive ? iconColor : 'rgba(227,236,240,0.5)'} className="w-6 h-6 transition-colors duration-700" />
                       </div>
                     </motion.div>
                   </div>
@@ -199,7 +200,7 @@ export default function TeachingMethod() {
                             className="md:hidden w-11 h-11 rounded-xl flex items-center justify-center"
                             style={{ backgroundColor: step.accent + '15' }}
                           >
-                            <CustomIcon color={step.accent} className="w-6 h-6" />
+                            <CustomIcon color={iconColor} className="w-6 h-6" />
                           </motion.div>
 
                           <div className="flex items-center gap-3 flex-1">

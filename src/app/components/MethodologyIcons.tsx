@@ -10,7 +10,7 @@ interface IconProps {
 // Concept: "Absorption". Sound waves entering a focal point (the learner's mind).
 // Style: Concentric arcs with a gradient fade, pointing to a glowing core.
 export function ListenIcon({ color, className }: IconProps) {
-  const id = React.useId();
+  const id = React.useId().replace(/:/g, '');
   return (
     <svg viewBox="0 0 100 100" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -67,7 +67,7 @@ export function ListenIcon({ color, className }: IconProps) {
 // Concept: "Projection". Voice waveform expanding outwards from a core.
 // Style: Vertical bars representing voice data, enclosed in a subtle bubble.
 export function SpeakIcon({ color, className }: IconProps) {
-  const id = React.useId();
+  const id = React.useId().replace(/:/g, '');
   return (
     <svg viewBox="0 0 100 100" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -118,7 +118,7 @@ export function SpeakIcon({ color, className }: IconProps) {
 // Concept: "Precision". A checkmark appearing on a grid/target.
 // Style: Sharp, clean strokes with a "verified" badge feel.
 export function CorrectIcon({ color, className }: IconProps) {
-  const id = React.useId();
+  const id = React.useId().replace(/:/g, '');
   return (
     <svg viewBox="0 0 100 100" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -165,7 +165,7 @@ export function CorrectIcon({ color, className }: IconProps) {
 // Concept: "Neuroplasticity". Infinite loop with neural nodes.
 // Style: Smooth figure-8 with connecting dots.
 export function RepeatIcon({ color, className }: IconProps) {
-  const id = React.useId();
+  const id = React.useId().replace(/:/g, '');
   return (
     <svg viewBox="0 0 100 100" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
       <defs>
