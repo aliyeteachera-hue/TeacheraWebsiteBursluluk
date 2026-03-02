@@ -7,7 +7,7 @@ import {
 import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
-import { notifyError } from '../lib/notifications';
+import { notifyError, notifySuccess } from '../lib/notifications';
 
 /* ─── DATA ──────────────────────────────────────────────────────────────── */
 const languages = [
@@ -143,6 +143,7 @@ function CallbackForm() {
       return;
     }
 
+    notifySuccess('Talebiniz alındı. En kısa sürede sizi arayacağız.');
     setSubmitted(true);
   };
 

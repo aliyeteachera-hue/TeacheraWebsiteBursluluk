@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { Outlet, useLocation } from 'react-router';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { Toaster } from 'sonner';
 import Navigation from './Navigation';
 import MobileMenu from './MobileMenu';
 import Footer from './Footer';
@@ -229,6 +230,15 @@ export default function RootLayout() {
 
           <LevelAssessmentModal />
           <FreeTrialModal />
+          <Toaster
+            richColors
+            position="top-center"
+            closeButton
+            toastOptions={{
+              className:
+                "font-['Neutraface_2_Text:Book',sans-serif]",
+            }}
+          />
 
           <Suspense fallback={null}>
             <WhatsAppButton />

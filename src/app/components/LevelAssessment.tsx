@@ -8,7 +8,7 @@ import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { savePlacementExamLead } from './exam/placementExamSession';
-import { notifyError } from '../lib/notifications';
+import { notifyError, notifySuccess } from '../lib/notifications';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -85,6 +85,7 @@ export default function LevelAssessmentModal() {
       return;
     }
 
+    notifySuccess('Bilgileriniz alındı. Sınava yönlendiriliyorsunuz.');
     savePlacementExamLead({
       fullName: formData.fullName,
       phone: `+90 ${formData.phone}`,

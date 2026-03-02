@@ -1,12 +1,14 @@
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { useRef, useEffect, useState, type ReactNode } from 'react';
 import { ChevronDown, Play } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import Group1000004255 from '../../imports/Group1000004255';
 import homeHeroVideo from '../../assets/video/home-hero.mp4';
 import homeHeroVideoWebm from '../../assets/video/home-hero.webm';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
 import { useLiteMode } from '../lib/useLiteMode';
+import { trackEvent } from '../lib/analytics';
 
 /* ─── Orbiting Arc Button ───────────────────────────────────────────────── */
 function OrbitingArcButton({
@@ -113,9 +115,20 @@ function OrbitingArcButton({
   );
 }
 
+const HERO_LANGUAGE_LINKS = [
+  { name: 'İngilizce', path: '/egitimlerimiz/ingilizce/grup-programi' },
+  { name: 'İspanyolca', path: '/egitimlerimiz/ispanyolca/grup-programi' },
+  { name: 'Almanca', path: '/egitimlerimiz/almanca/grup-programi' },
+  { name: 'İtalyanca', path: '/egitimlerimiz/italyanca/grup-programi' },
+  { name: 'Fransızca', path: '/egitimlerimiz/fransizca/grup-programi' },
+  { name: 'Rusça', path: '/egitimlerimiz/rusca/grup-programi' },
+  { name: 'Arapça', path: '/egitimlerimiz/arapca/grup-programi' },
+] as const;
+
 /* ─── Hero ──────────────────────────────────────────────────────────────── */
 export default function Hero() {
   const { scrollY } = useScroll();
+  const navigate = useNavigate();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const shouldReduceMotion = useReducedMotion();
@@ -125,6 +138,15 @@ export default function Hero() {
   const isLiteMode = useLiteMode();
   const { open: openLevelAssessment } = useLevelAssessment();
   const { open: openFreeTrial } = useFreeTrial();
+
+  const handleLanguageBadgeClick = (languageName: string, path: string) => {
+    trackEvent('hero_language_cta_click', {
+      cta_label: languageName,
+      cta_destination: path,
+      cta_location: 'hero_language_badges',
+    });
+    navigate(path);
+  };
 
   useEffect(() => {
     let timer = 0;
@@ -235,17 +257,19 @@ export default function Hero() {
 
             {/* Language badges */}
             <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5 md:gap-2 mb-2 sm:mb-3 md:mb-4">
-              {['İngilizce', 'İspanyolca', 'Almanca', 'İtalyanca', 'Fransızca', 'Rusça', 'Arapça'].map((lang, i) => (
-                <motion.span
-                  key={lang}
+              {HERO_LANGUAGE_LINKS.map((language, i) => (
+                <motion.button
+                  key={language.name}
                   initial={{ opacity: 0, scale: 0.7, y: 12 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 1.1 + i * 0.1, type: 'spring', bounce: 0.35 }}
-                  className="inline-flex items-center px-2.5 py-1 sm:px-2.5 sm:py-0.5 md:px-3 md:py-1 rounded-full border border-[#ffffff]/25 bg-[#ffffff]/8 backdrop-blur-sm text-[#ffffff]/82 text-mobile-meta sm:text-sm md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/12 hover:border-[#ffffff]/40 hover:text-[#ffffff] transition-all cursor-default"
+                  className="inline-flex items-center px-2.5 py-1 sm:px-2.5 sm:py-0.5 md:px-3 md:py-1 rounded-full border border-[#ffffff]/25 bg-[#ffffff]/8 backdrop-blur-sm text-[#ffffff]/82 text-mobile-meta sm:text-sm md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/12 hover:border-[#ffffff]/40 hover:text-[#ffffff] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E70000]/55"
+                  onClick={() => handleLanguageBadgeClick(language.name, language.path)}
+                  aria-label={`${language.name} grup programına git`}
                   whileHover={{ scale: 1.07, y: -2 }}
                 >
-                  {lang}
-                </motion.span>
+                  {language.name}
+                </motion.button>
               ))}
             </div>
 

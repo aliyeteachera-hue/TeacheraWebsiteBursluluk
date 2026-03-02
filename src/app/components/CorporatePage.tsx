@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
-import { notifyError } from '../lib/notifications';
+import { notifyError, notifySuccess } from '../lib/notifications';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -232,6 +232,7 @@ function CorporateForm() {
       return;
     }
 
+    notifySuccess('Kurumsal teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
     setSubmitted(true);
   };
 

@@ -67,6 +67,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
   const location = useLocation();
   const { open: openLevelAssessment } = useLevelAssessment();
   const disableMenuAnimations = true;
+  const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const currentPath = location.pathname;
   const [isRendered, setIsRendered] = useState(isOpen);
@@ -96,15 +97,64 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
       closeButtonRef.current?.focus();
     }
 
-    const onEscape = (event: KeyboardEvent) => {
+    const resolveFocusableElements = () => {
+      if (!dialogRef.current) return [];
+
+      const selector = [
+        'a[href]',
+        'button:not([disabled])',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])',
+      ].join(',');
+
+      const nodes: HTMLElement[] = Array.from(dialogRef.current.querySelectorAll(selector));
+      return nodes.filter((node) => {
+        if (node.getAttribute('aria-hidden') === 'true') return false;
+        if (node.tabIndex < 0) return false;
+        return node.getClientRects().length > 0;
+      });
+    };
+
+    const onKeyboardControl = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isOpen) {
+        event.preventDefault();
         onClose();
+        return;
+      }
+
+      if (event.key !== 'Tab' || !isOpen) return;
+
+      const focusableElements = resolveFocusableElements();
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        closeButtonRef.current?.focus();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement as HTMLElement | null;
+      const focusInsideDialog = activeElement ? dialogRef.current?.contains(activeElement) : false;
+
+      if (event.shiftKey) {
+        if (!focusInsideDialog || activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+        return;
+      }
+
+      if (!focusInsideDialog || activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
       }
     };
 
-    window.addEventListener('keydown', onEscape);
+    window.addEventListener('keydown', onKeyboardControl);
     return () => {
-      window.removeEventListener('keydown', onEscape);
+      window.removeEventListener('keydown', onKeyboardControl);
       document.body.style.overflow = previousOverflow;
       document.body.style.paddingRight = previousPaddingRight;
     };
@@ -169,6 +219,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
 
   return (
         <motion.div
+          ref={dialogRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: isOpen ? 1 : 0 }}
           transition={{ duration: isOpen ? 0.22 : 0.18, ease: 'easeOut' }}
@@ -316,7 +367,10 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                   <nav className="flex flex-col justify-between lg:justify-start gap-2 sm:gap-2.5 lg:gap-5 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:thin] [scrollbar-color:rgba(84,122,112,0.95)_transparent] [scrollbar-gutter:stable] [touch-action:pan-y] [-webkit-overflow-scrolling:touch] pr-0.5 sm:pr-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#547A70]/90">
                      {menuItems.map((item, index) => (
                         (() => {
-                          const isActiveRoute = item.isRoute && item.href === currentPath;
+                          const isActiveRoute = Boolean(
+                            item.isRoute &&
+                              (item.href === currentPath || (item.href !== '/' && currentPath.startsWith(`${item.href}/`))),
+                          );
                           return (
                         <motion.button
                            key={item.id}
@@ -325,7 +379,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                            transition={disableMenuAnimations ? { duration: 0 } : { delay: 0.2 + (index * 0.05), ease: "easeOut" }}
                            onClick={() => handleLinkClick(item)}
                            className="group relative overflow-hidden rounded-[18px] flex items-center justify-between py-2 sm:py-2.5 px-1.5 transition-all duration-500 min-w-0"
-                           aria-current={item.isRoute && item.href === currentPath ? 'page' : undefined}
+                           aria-current={isActiveRoute ? 'page' : undefined}
                         >
                            {isActiveRoute ? (
                              <motion.span

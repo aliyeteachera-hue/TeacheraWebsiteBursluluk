@@ -20,7 +20,7 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
   const { open: openFreeTrial } = useFreeTrial();
 
   const [scrolled, setScrolled] = useState(false);
-  const isAcademyPage = location.pathname === '/academy';
+  const isAcademyPage = location.pathname === '/academy' || location.pathname.startsWith('/academy/');
   const isSpeakUpPage = location.pathname === '/speakup';
   const navHeightClass = isSpeakUpPage
     ? scrolled
@@ -33,9 +33,13 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
     ? scrolled
       ? 'w-[98px] sm:w-[108px] md:w-[122px]'
       : 'w-[110px] sm:w-[124px] md:w-[142px]'
-    : scrolled
-      ? 'w-[98px] sm:w-[122px] md:w-[128px]'
-      : 'w-[108px] sm:w-[138px] md:w-[146px]';
+    : isAcademyPage
+      ? scrolled
+        ? 'w-[94px] sm:w-[116px] md:w-[128px]'
+        : 'w-[102px] sm:w-[132px] md:w-[146px]'
+      : scrolled
+        ? 'w-[98px] sm:w-[122px] md:w-[128px]'
+        : 'w-[108px] sm:w-[138px] md:w-[146px]';
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const next = latest > 40;
@@ -97,11 +101,14 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex items-center gap-3 md:gap-4"
+                className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0"
               >
                 <div className={`w-[1px] bg-white/25 transition-all duration-700 ${scrolled ? 'h-4' : 'h-5 md:h-6'}`} />
-                <span className={`font-['Neutraface_2_Text:Bold',sans-serif] text-transparent bg-clip-text bg-gradient-to-r from-[#E70000] to-[#FF6B6B] tracking-[0.15em] uppercase leading-none transition-all duration-700 ${scrolled ? 'text-[11px] md:text-[13px]' : 'text-[13px] md:text-[16px]'}`}>
-                  ACADEMY
+                <span className="sm:hidden inline-block w-1.5 h-1.5 rounded-full bg-[#E70000]" />
+                <span
+                  className={`hidden sm:inline font-['Neutraface_2_Text:Bold',sans-serif] text-transparent bg-clip-text bg-gradient-to-r from-[#E70000] to-[#FF6B6B] tracking-[0.14em] uppercase leading-none transition-all duration-700 ${scrolled ? 'text-[11px] md:text-[13px]' : 'text-[12px] md:text-[16px]'}`}
+                >
+                  Academy
                 </span>
               </motion.div>
             )}
