@@ -8,7 +8,7 @@ type ScrollLockSnapshot = {
   htmlOverscrollY: string;
 };
 
-const activeLocks = new Set<string>();
+const activeLocks = new Map<string, { lockTouch: boolean }>();
 const pendingUnlockTimers = new Map<string, number>();
 let snapshot: ScrollLockSnapshot | null = null;
 
@@ -16,7 +16,7 @@ function hasDom() {
   return typeof window !== 'undefined' && typeof document !== 'undefined';
 }
 
-export function lockPageScroll(lockId: string) {
+export function lockPageScroll(lockId: string, lockTouch = true) {
   if (!hasDom() || activeLocks.has(lockId)) return;
   const pendingTimer = pendingUnlockTimers.get(lockId);
   if (pendingTimer !== undefined) {
@@ -43,16 +43,18 @@ export function lockPageScroll(lockId: string) {
       const currentPadding = Number.parseFloat(window.getComputedStyle(document.body).paddingRight || '0') || 0;
       bodyStyle.paddingRight = `${currentPadding + scrollBarWidth}px`;
     }
-    // Mobile'de touchAction/html overflow kilidi ani repaint/flicker yaratabildiği için
-    // kilidi minimumda tutuyoruz. Desktop'ta mevcut davranışı koruyoruz.
-    if (!isCoarsePointer) {
+    // Mobile Safari'de html overflow/touch-action kilidi ani repaint/flicker yaratabildiği için
+    // coarse pointer ortamında kilidi minimumda tutuyoruz.
+    if (!isCoarsePointer && lockTouch) {
       bodyStyle.touchAction = 'none';
+    }
+    if (!isCoarsePointer) {
       htmlStyle.overflow = 'hidden';
       htmlStyle.overscrollBehaviorY = 'none';
     }
   }
 
-  activeLocks.add(lockId);
+  activeLocks.set(lockId, { lockTouch });
 }
 
 export function unlockPageScroll(lockId: string) {
@@ -97,14 +99,19 @@ export function unlockPageScrollDeferred(lockId: string, delayMs: number) {
   pendingUnlockTimers.set(lockId, timer);
 }
 
-export function usePageScrollLock(active: boolean, lockId: string, releaseDelayMs?: number) {
+export function usePageScrollLock(
+  active: boolean,
+  lockId: string,
+  releaseDelayMs?: number,
+  lockTouch = true,
+) {
   const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
   useIsomorphicLayoutEffect(() => {
     if (!active) return;
     const isCoarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false;
-    const releaseDelay = releaseDelayMs ?? (isCoarsePointer ? 240 : 0);
-    lockPageScroll(lockId);
+    const releaseDelay = releaseDelayMs ?? (isCoarsePointer ? 220 : 140);
+    lockPageScroll(lockId, lockTouch);
     return () => unlockPageScrollDeferred(lockId, releaseDelay);
-  }, [active, lockId, releaseDelayMs]);
+  }, [active, lockId, releaseDelayMs, lockTouch]);
 }

@@ -19,6 +19,21 @@ export default defineConfig({
     },
   },
 
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('/motion/') || id.includes('framer-motion')) return 'motion-vendor';
+          if (id.includes('@radix-ui')) return 'radix-vendor';
+          if (id.includes('@mui') || id.includes('@emotion')) return 'mui-vendor';
+          if (id.includes('react-router')) return 'router-vendor';
+          return 'vendor';
+        },
+      },
+    },
+  },
+
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
 })

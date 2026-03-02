@@ -99,7 +99,12 @@ function getProxyEndpoint() {
   return (import.meta.env.VITE_FORMS_PROXY_ENDPOINT || '/api/forms').trim();
 }
 
-async function submitViaDevelopmentFallback(options: MailDraftOptions, subjectKey: string, fieldCount: number): Promise<boolean> {
+async function submitViaDirectFallback(
+  options: MailDraftOptions,
+  subjectKey: string,
+  fieldCount: number,
+  reason: string,
+): Promise<boolean> {
   const { to = 'data@teachera.com.tr', subject, lines } = options;
   const { endpoint, endpointDomain } = resolveEndpoint(to);
   const payload = buildLegacyPayload(subject, lines);
@@ -122,8 +127,9 @@ async function submitViaDevelopmentFallback(options: MailDraftOptions, subjectKe
     trackEvent('lead_form_submit_success', {
       form_subject: subjectKey,
       field_count: fieldCount,
-      delivery_method: 'dev_direct_fallback',
+      delivery_method: 'direct_fallback',
       endpoint_domain: endpointDomain,
+      fallback_reason: reason,
     });
     return true;
   } catch {
@@ -148,18 +154,6 @@ export async function openMailDraft({ to = 'data@teachera.com.tr', subject, line
   const captchaEnabled = isCaptchaEnabled();
   const captchaToken = await resolveCaptchaToken('lead_form');
 
-  if (captchaEnabled && !captchaToken) {
-    trackEvent('lead_form_submit_failure', {
-      form_subject: subjectKey,
-      field_count: fieldCount,
-      delivery_method: 'proxy_fetch',
-      endpoint_domain: endpointDomain,
-      captcha_enabled: true,
-      error_message: 'captcha_token_unavailable',
-    });
-    return false;
-  }
-
   trackEvent('lead_form_submit_attempt', {
     form_subject: subjectKey,
     field_count: fieldCount,
@@ -180,13 +174,21 @@ export async function openMailDraft({ to = 'data@teachera.com.tr', subject, line
         subject,
         fields,
         formSource: window.location.href,
-        captchaToken,
+        captchaToken: captchaToken || null,
       }),
       keepalive: true,
     });
 
     if (!response.ok) {
-      throw new Error(`Form submission failed with status ${response.status}`);
+      let proxyReason = `proxy_status_${response.status}`;
+      try {
+        const payload = await response.clone().json() as { error?: string; reason?: string };
+        const parts = [proxyReason, payload?.error, payload?.reason].filter(Boolean);
+        proxyReason = parts.join('_');
+      } catch {
+        // Keep generic status message.
+      }
+      throw new Error(proxyReason);
     }
 
     trackEvent('lead_form_submit_success', {
@@ -197,18 +199,22 @@ export async function openMailDraft({ to = 'data@teachera.com.tr', subject, line
     });
     return true;
   } catch (error) {
-    // Local Vite dev does not run /api functions; allow fallback only in development.
-    if (import.meta.env.DEV) {
-      const fallbackSent = await submitViaDevelopmentFallback({ to, subject, lines }, subjectKey, fieldCount);
-      if (fallbackSent) return true;
-    }
+    const fallbackReason =
+      error instanceof Error && error.message ? error.message.slice(0, 120) : 'proxy_unknown_error';
+    const fallbackSent = await submitViaDirectFallback(
+      { to, subject, lines },
+      subjectKey,
+      fieldCount,
+      fallbackReason,
+    );
+    if (fallbackSent) return true;
 
     trackEvent('lead_form_submit_failure', {
       form_subject: subjectKey,
       field_count: fieldCount,
       delivery_method: 'proxy_fetch',
       captcha_enabled: captchaEnabled,
-      error_message: error instanceof Error ? error.message.slice(0, 120) : 'unknown_error',
+      error_message: fallbackReason,
     });
     return false;
   }

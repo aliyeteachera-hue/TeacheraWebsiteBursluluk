@@ -36,6 +36,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import heartImg from 'figma:asset/7d33c418a182fc076257cfeeb01ba43b5692e3f6.webp';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
+import { useMotionTiming } from '../lib/uiMotion';
 
 /* ═══════════════════════════════════════════════════════════════════════
    HERO IMAGES — vintage / cinematic
@@ -1699,12 +1700,13 @@ function getGeneralContent(p: ProgramItem, lang: string): CategoryContent {
 function Reveal({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
+  const motionTiming = useMotionTiming();
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 28 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: motionTiming.base, delay, ease: motionTiming.easeOut }}
       className={className}
     >
       {children}

@@ -314,6 +314,22 @@ html.teachera-reduce-motion [class*='blur-'] {
     line-height: 1.58;
   }
 
+  /* Keep heavy glass effects on mobile under control to reduce repaint cost. */
+  .backdrop-blur-2xl {
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
+
+  .backdrop-blur-xl {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+
   /* Lift very small utility text sizes for touch-first readability */
   .text-\[8px\] {
     font-size: 11px !important;

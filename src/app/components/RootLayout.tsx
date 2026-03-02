@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { motion } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { Outlet, useLocation } from 'react-router';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Toaster } from 'sonner';
@@ -24,23 +24,10 @@ export default function RootLayout() {
   const [currentSection, setCurrentSection] = useState('home');
   const [showDeferredUi, setShowDeferredUi] = useState(false);
   const currentSectionRef = useRef('home');
-  const menuScrollLockStateRef = useRef<{
-    scrollY: number;
-    bodyOverflow: string;
-    bodyPosition: string;
-    bodyTop: string;
-    bodyWidth: string;
-    bodyLeft: string;
-    bodyRight: string;
-    bodyTouchAction: string;
-    htmlOverflow: string;
-    htmlOverscrollY: string;
-  } | null>(null);
   const location = useLocation();
   const liteMode = useLiteMode();
 
   useEffect(() => {
-    document.documentElement.style.scrollBehavior = 'smooth';
     document.documentElement.lang = 'tr';
   }, []);
 
@@ -75,67 +62,6 @@ export default function RootLayout() {
     document.documentElement.classList.toggle('teachera-reduce-motion', liteMode);
     return () => document.documentElement.classList.remove('teachera-reduce-motion');
   }, [liteMode]);
-
-  useEffect(() => {
-    const restoreMenuScrollLock = (restoreScrollPosition: boolean) => {
-      const saved = menuScrollLockStateRef.current;
-      if (!saved) return;
-
-      const bodyStyle = document.body.style;
-      const htmlStyle = document.documentElement.style;
-      bodyStyle.overflow = saved.bodyOverflow;
-      bodyStyle.position = saved.bodyPosition;
-      bodyStyle.top = saved.bodyTop;
-      bodyStyle.width = saved.bodyWidth;
-      bodyStyle.left = saved.bodyLeft;
-      bodyStyle.right = saved.bodyRight;
-      bodyStyle.touchAction = saved.bodyTouchAction;
-      htmlStyle.overflow = saved.htmlOverflow;
-      htmlStyle.overscrollBehaviorY = saved.htmlOverscrollY;
-
-      if (restoreScrollPosition) {
-        window.scrollTo(0, saved.scrollY);
-      }
-
-      menuScrollLockStateRef.current = null;
-    };
-
-    if (isMenuOpen) {
-      const bodyStyle = document.body.style;
-      const htmlStyle = document.documentElement.style;
-      const scrollY = window.scrollY;
-      const isCoarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false;
-
-      menuScrollLockStateRef.current = {
-        scrollY,
-        bodyOverflow: bodyStyle.overflow,
-        bodyPosition: bodyStyle.position,
-        bodyTop: bodyStyle.top,
-        bodyWidth: bodyStyle.width,
-        bodyLeft: bodyStyle.left,
-        bodyRight: bodyStyle.right,
-        bodyTouchAction: bodyStyle.touchAction,
-        htmlOverflow: htmlStyle.overflow,
-        htmlOverscrollY: htmlStyle.overscrollBehaviorY,
-      };
-
-      bodyStyle.overflow = 'hidden';
-      if (isCoarsePointer) {
-        bodyStyle.touchAction = 'none';
-      } else {
-        bodyStyle.position = 'fixed';
-        bodyStyle.top = `-${scrollY}px`;
-        bodyStyle.width = '100%';
-        bodyStyle.left = '0';
-        bodyStyle.right = '0';
-        htmlStyle.overflow = 'hidden';
-        htmlStyle.overscrollBehaviorY = 'none';
-      }
-      return () => restoreMenuScrollLock(true);
-    } else {
-      restoreMenuScrollLock(true);
-    }
-  }, [isMenuOpen]);
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -208,12 +134,7 @@ export default function RootLayout() {
   return (
     <FreeTrialProvider>
       <LevelAssessmentProvider>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="relative bg-white"
-        >
+        <div className="relative min-h-screen bg-[#00000B]">
           <SeoManager />
           <Navigation
             isMenuOpen={isMenuOpen}
@@ -221,11 +142,15 @@ export default function RootLayout() {
             currentSection={currentSection}
           />
 
-          <MobileMenu
-            isOpen={isMenuOpen}
-            onClose={() => setIsMenuOpen(false)}
-            currentSection={currentSection}
-          />
+          <AnimatePresence mode="wait" initial={false}>
+            {isMenuOpen ? (
+              <MobileMenu
+                key="mobile-menu"
+                onClose={() => setIsMenuOpen(false)}
+                currentSection={currentSection}
+              />
+            ) : null}
+          </AnimatePresence>
 
           <main className="relative">
             <Outlet />
@@ -251,7 +176,7 @@ export default function RootLayout() {
           </Suspense>
 
           <SpeedInsights sampleRate={0.5} />
-        </motion.div>
+        </div>
       </LevelAssessmentProvider>
     </FreeTrialProvider>
   );

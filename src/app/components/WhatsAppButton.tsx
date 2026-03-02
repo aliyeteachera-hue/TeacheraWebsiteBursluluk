@@ -5,7 +5,6 @@ import whatsappImage from 'figma:asset/9694b181704f98419b88c2856e9838e3f6edf1aa.
 import whatsappLoopVideo from '../../assets/video/whatsapp-loop.mp4';
 import whatsappLoopVideoWebm from '../../assets/video/whatsapp-loop.webm';
 import { trackEvent } from '../lib/analytics';
-import { useCoarsePointer } from '../lib/useCoarsePointer';
 
 export function WhatsAppButton() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -13,8 +12,7 @@ export function WhatsAppButton() {
   const [showSoftPrompt, setShowSoftPrompt] = useState(false);
   const [videoFallback, setVideoFallback] = useState(false);
   const shouldReduceMotion = useReducedMotion();
-  const isCoarsePointer = useCoarsePointer();
-  const disableHeavyMotion = shouldReduceMotion || isCoarsePointer;
+  const disableHeavyMotion = shouldReduceMotion;
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const retryTimeoutRef = useRef<number | null>(null);
 
@@ -83,12 +81,6 @@ export function WhatsAppButton() {
   }, [attemptVideoPlay, disableHeavyMotion, isExpanded]);
 
   useEffect(() => {
-    if (isCoarsePointer) {
-      setVideoFallback(true);
-    }
-  }, [isCoarsePointer]);
-
-  useEffect(() => {
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         attemptVideoPlay();
@@ -146,12 +138,14 @@ export function WhatsAppButton() {
             <div className="p-5 bg-[#F4EBD1]">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-[#324D47]/15 shrink-0">
-                  <img
+                  <motion.img
                     src={whatsappImage}
                     alt="Muazzez - Müşteri Temsilcisi"
                     className="w-full h-full object-cover"
                     loading="lazy"
                     decoding="async"
+                    animate={disableHeavyMotion ? undefined : { scale: [1, 1.035, 1], y: [0, -1, 0] }}
+                    transition={disableHeavyMotion ? undefined : { duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
                   />
                 </div>
                 <div>
@@ -207,12 +201,14 @@ export function WhatsAppButton() {
         whileTap={disableHeavyMotion ? undefined : { scale: 0.96 }}
       >
         {disableHeavyMotion || videoFallback ? (
-          <img
+          <motion.img
             src={whatsappImage}
             alt="WhatsApp Destek"
             className="w-full h-full object-cover"
             loading="eager"
             decoding="async"
+            animate={disableHeavyMotion || isExpanded ? undefined : { scale: [1, 1.04, 1], y: [0, -1.5, 0] }}
+            transition={disableHeavyMotion || isExpanded ? undefined : { duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
           />
         ) : (
           <video

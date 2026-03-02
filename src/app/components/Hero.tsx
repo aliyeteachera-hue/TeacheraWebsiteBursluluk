@@ -9,6 +9,7 @@ import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
 import { useLiteMode } from '../lib/useLiteMode';
 import { trackEvent } from '../lib/analytics';
+import { useMotionTiming } from '../lib/uiMotion';
 
 /* ─── Orbiting Arc Button ───────────────────────────────────────────────── */
 function OrbitingArcButton({
@@ -138,6 +139,7 @@ export default function Hero() {
   const isLiteMode = useLiteMode();
   const { open: openLevelAssessment } = useLevelAssessment();
   const { open: openFreeTrial } = useFreeTrial();
+  const motionTiming = useMotionTiming();
 
   const handleLanguageBadgeClick = (languageName: string, path: string) => {
     trackEvent('hero_language_cta_click', {
@@ -223,7 +225,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: motionTiming.slow, delay: 0.1 }}
           className="text-center max-w-4xl w-full"
         >
           <h1 className="sr-only">
@@ -234,7 +236,7 @@ export default function Hero() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: motionTiming.slow, delay: 0.2 }}
             className="w-full max-w-[280px] sm:max-w-[400px] md:max-w-[507px] h-auto mx-auto mb-4 sm:mb-6 md:mb-8 px-2 sm:px-4"
             style={{ '--fill-0': '#EEEBF5' } as React.CSSProperties}
           >
@@ -247,7 +249,7 @@ export default function Hero() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1 }}
+            transition={{ duration: motionTiming.base, delay: 0.35 }}
             className="max-w-2xl mx-auto mb-5 sm:mb-8 md:mb-12 text-center"
           >
             {/* Top line */}
@@ -262,11 +264,16 @@ export default function Hero() {
                   key={language.name}
                   initial={{ opacity: 0, scale: 0.7, y: 12 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 1.1 + i * 0.1, type: 'spring', bounce: 0.35 }}
+                  transition={{
+                    duration: motionTiming.base,
+                    delay: 0.42 + i * motionTiming.stagger,
+                    type: 'spring',
+                    bounce: 0.25,
+                  }}
                   className="inline-flex items-center px-2.5 py-1 sm:px-2.5 sm:py-0.5 md:px-3 md:py-1 rounded-full border border-[#ffffff]/25 bg-[#ffffff]/8 backdrop-blur-sm text-[#ffffff]/82 text-mobile-meta sm:text-sm md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/12 hover:border-[#ffffff]/40 hover:text-[#ffffff] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E70000]/55"
                   onClick={() => handleLanguageBadgeClick(language.name, language.path)}
                   aria-label={`${language.name} grup programına git`}
-                  whileHover={{ scale: 1.07, y: -2 }}
+                  whileHover={enableHeroMotion ? { scale: 1.07, y: -2 } : undefined}
                 >
                   {language.name}
                 </motion.button>
@@ -277,7 +284,7 @@ export default function Hero() {
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.75 }}
+              transition={{ duration: motionTiming.base, delay: 0.65 }}
               className="inline-flex flex-col items-center gap-1"
             >
               <p className="text-[#EEEBF5]/82 text-[15px] sm:text-[15px] md:text-base lg:text-lg font-['Neutraface_2_Text:Book',sans-serif]">
@@ -289,7 +296,7 @@ export default function Hero() {
                     className="absolute left-0 -bottom-px h-px w-full"
                     initial={{ scaleX: 0, opacity: 0 }}
                     animate={{ scaleX: 1, opacity: 1 }}
-                    transition={{ duration: 1.2, delay: 2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    transition={{ duration: motionTiming.slow, delay: 0.72, ease: [0.25, 0.46, 0.45, 0.94] }}
                     style={{
                       transformOrigin: 'left center',
                       background: 'linear-gradient(to right, transparent, rgba(231,0,0,0.45) 20%, #E70000 50%, rgba(231,0,0,0.45) 80%, transparent)',
@@ -305,7 +312,7 @@ export default function Hero() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
+            transition={{ duration: motionTiming.base, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-2.5 sm:gap-4 md:gap-5 justify-center items-center"
           >
             {/* Primary – Transparent + Subtle Orbiting Arc */}
@@ -322,7 +329,7 @@ export default function Hero() {
 
             {/* Secondary – Plain Transparent */}
             <motion.button
-              whileHover={{ scale: 1.02 }}
+              whileHover={enableHeroMotion ? { scale: 1.02 } : undefined}
               whileTap={{ scale: 0.98 }}
               className="group min-h-[44px] px-4 sm:px-5 md:px-6 py-2.5 sm:py-2 md:py-2.5 border border-[#ffffff]/40 backdrop-blur-sm text-[#ffffff] rounded-full text-mobile-meta sm:text-sm md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/5 hover:border-[#ffffff]/60 transition-all"
               onClick={() => openLevelAssessment('hero_level_assessment')}

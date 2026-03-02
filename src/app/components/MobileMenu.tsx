@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Instagram, Linkedin, Facebook, Youtube, ArrowRight, User, X, Phone } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router';
 import imgRectangle279 from "figma:asset/884befb1e78a75b64de1fe6d23317da411da15ba.webp";
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { useLevelAssessment } from './LevelAssessmentContext';
+import { useOverlayLifecycle } from '../lib/overlayLifecycle';
 
 /* ── X (Twitter) Icon ── */
 function XIcon({ size = 20, className = '' }: { size?: number; className?: string }) {
@@ -27,7 +28,6 @@ function XIcon({ size = 20, className = '' }: { size?: number; className?: strin
 }
 
 interface MobileMenuProps {
-  isOpen: boolean;
   onClose: () => void;
   currentSection: string;
 }
@@ -60,9 +60,7 @@ const SOCIAL_LINKS = [
 
 const LOGIN_URL = 'https://teachera.dlpro.eu/';
 const PHONE_HREF = 'tel:03322368066';
-const MENU_EXIT_DURATION_MS = 220;
-
-export default function MobileMenu({ isOpen, onClose, currentSection: _currentSection }: MobileMenuProps) {
+export default function MobileMenu({ onClose, currentSection: _currentSection }: MobileMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { open: openLevelAssessment } = useLevelAssessment();
@@ -70,23 +68,10 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const currentPath = location.pathname;
-  const [isRendered, setIsRendered] = useState(isOpen);
+  useOverlayLifecycle(true, 'mobile-menu');
 
   useEffect(() => {
-    if (isOpen) {
-      setIsRendered(true);
-      return;
-    }
-    const timer = window.setTimeout(() => setIsRendered(false), MENU_EXIT_DURATION_MS);
-    return () => window.clearTimeout(timer);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isRendered) return;
-
-    if (isOpen) {
-      closeButtonRef.current?.focus();
-    }
+    closeButtonRef.current?.focus();
 
     const resolveFocusableElements = () => {
       if (!dialogRef.current) return [];
@@ -109,13 +94,13 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
     };
 
     const onKeyboardControl = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
+      if (event.key === 'Escape') {
         event.preventDefault();
         onClose();
         return;
       }
 
-      if (event.key !== 'Tab' || !isOpen) return;
+      if (event.key !== 'Tab') return;
 
       const focusableElements = resolveFocusableElements();
       if (focusableElements.length === 0) {
@@ -147,7 +132,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
     return () => {
       window.removeEventListener('keydown', onKeyboardControl);
     };
-  }, [isRendered, isOpen, onClose]);
+  }, [onClose]);
   
   const handleLinkClick = (item: MenuItem) => {
     if (item.isRoute) {
@@ -204,14 +189,9 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
     window.open(LOGIN_URL, '_blank', 'noopener,noreferrer');
   };
 
-  if (!isRendered) return null;
-
   return (
-        <motion.div
+        <div
           ref={dialogRef}
-          initial={false}
-          animate={{ opacity: isOpen ? 1 : 0 }}
-          transition={{ duration: isOpen ? 0.22 : 0.18, ease: 'easeOut' }}
           role="dialog"
           aria-modal="true"
           aria-label="Mobil menü"
@@ -219,19 +199,18 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
         >
           {/* BACKGROUND IMAGE & OVERLAY */}
           <div className="absolute inset-0 z-0 pointer-events-none">
-             <img 
-               src={imgRectangle279} 
-               alt="Background" 
-               className="w-full h-full object-cover grayscale mix-blend-luminosity opacity-20"
+             <img
+               src={imgRectangle279}
+               alt="Background"
+               className="w-full h-full object-cover opacity-[0.16]"
+               loading="eager"
+               decoding="sync"
              />
-             <div className="absolute inset-0 bg-gradient-to-r from-[#00000B] via-[#00000B]/95 to-[#00000B]/90" />
+             <div className="absolute inset-0 bg-gradient-to-r from-[#00000B] via-[#00000B] to-[#00000B]" />
           </div>
 
           {/* CONTENT CONTAINER */}
-          <motion.div
-            initial={false}
-            animate={{ y: isOpen ? 0 : 2, opacity: isOpen ? 1 : 0.98 }}
-            transition={{ duration: isOpen ? 0.2 : 0.15, ease: 'easeOut' }}
+          <div
             className="relative z-10 w-full h-full min-h-0 max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col pt-[calc(env(safe-area-inset-top)+3.4rem)] sm:pt-[calc(env(safe-area-inset-top)+4.1rem)] lg:pt-0"
           >
             
@@ -466,7 +445,7 @@ export default function MobileMenu({ isOpen, onClose, currentSection: _currentSe
                   </div>
                </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
   );
 }

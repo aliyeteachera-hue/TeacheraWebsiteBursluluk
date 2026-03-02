@@ -9,6 +9,7 @@ import methodologyHeroVideoWebm from '../../assets/video/methodology-hero.webm';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
 import Group1000004255 from '../../imports/Group1000004255';
 import TeachingMethod from './TeachingMethod';
+import { useMotionTiming } from '../lib/uiMotion';
 
 /* ═══════════════════════════════════════════════════════════════════════
    DATA
@@ -59,12 +60,13 @@ const CYCLE_STEPS = [
 function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
+  const motionTiming = useMotionTiming();
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 30 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: motionTiming.slow, delay, ease: motionTiming.easeOut }}
       className={className}
     >
       {children}

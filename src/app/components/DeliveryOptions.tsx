@@ -13,7 +13,7 @@ import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { useLiteMode } from '../lib/useLiteMode';
 import { notifyError, notifySuccess } from '../lib/notifications';
-import { usePageScrollLock } from '../lib/scrollLock';
+import { useOverlayLifecycle } from '../lib/overlayLifecycle';
 import { useCoarsePointer } from '../lib/useCoarsePointer';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
@@ -94,7 +94,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   const selectedLang = LANGUAGES.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-  usePageScrollLock(isOpen, 'delivery-appointment-modal', isCoarsePointer ? 0 : undefined);
+  useOverlayLifecycle(isOpen, 'delivery-appointment');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -165,9 +165,9 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
         <motion.div
           initial={false}
           animate={{ opacity: 1 }}
-          exit={isCoarsePointer ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: isCoarsePointer ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto"
+          exit={{ opacity: 1 }}
+          transition={{ duration: 0 }}
+          className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#00000B]"
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           {/* Background — aynı FreeTrialModal bg */}

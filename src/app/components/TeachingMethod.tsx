@@ -1,8 +1,9 @@
 import { motion, useInView } from 'motion/react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { RotateCcw, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
+import { useMotionTiming } from '../lib/uiMotion';
 
 const FLOW_STEPS = [
   {
@@ -53,21 +54,11 @@ const FLOW_STEPS = [
 
 export default function TeachingMethod() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(sectionRef, { once: true, margin: '-80px' });
-  const [activeStep, setActiveStep] = useState(-1);
+  const inView = useInView(sectionRef, { once: true, amount: 0.28 });
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (inView) {
-      const timers = FLOW_STEPS.map((_, i) => (
-        window.setTimeout(() => setActiveStep(i), 800 + i * 600)
-      ));
-
-      return () => {
-        timers.forEach((timer) => window.clearTimeout(timer));
-      };
-    }
-  }, [inView]);
+  const motionTiming = useMotionTiming();
+  const stepStagger =
+    motionTiming.profile === 'lite' ? 0.08 : motionTiming.profile === 'balanced' ? 0.14 : 0.18;
 
   return (
     <section id="how-it-works" ref={sectionRef} className="bg-[#09090F] relative overflow-hidden">
@@ -142,7 +133,7 @@ export default function TeachingMethod() {
             {FLOW_STEPS.map((step, i) => {
               const CustomIcon = step.customIcon;
               const isLeft = i % 2 === 0;
-              const isActive = activeStep >= i;
+              const isActive = inView;
               const iconColor = step.accent === '#324D47' ? '#79B7AA' : step.accent;
 
               return (
@@ -152,7 +143,12 @@ export default function TeachingMethod() {
                     <motion.div
                       initial={{ scale: 0, opacity: 0 }}
                       animate={isActive ? { scale: 1, opacity: 1 } : {}}
-                      transition={{ duration: 0.5, type: 'spring', stiffness: 300 }}
+                      transition={{
+                        duration: motionTiming.base,
+                        type: 'spring',
+                        stiffness: 300,
+                        delay: i * stepStagger,
+                      }}
                       className="relative"
                     >
                       {/* Glow ring */}
@@ -180,7 +176,11 @@ export default function TeachingMethod() {
                     <motion.div
                       initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
                       animate={isActive ? { opacity: 1, x: 0 } : {}}
-                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{
+                        duration: motionTiming.slow,
+                        ease: motionTiming.easeOut,
+                        delay: i * stepStagger,
+                      }}
                       className={`${isLeft ? 'md:col-start-1' : 'md:col-start-2'} md:py-12`}
                     >
                       <div
@@ -251,7 +251,10 @@ export default function TeachingMethod() {
                         <motion.div
                           initial={{ scaleX: 0 }}
                           animate={isActive ? { scaleX: 1 } : {}}
-                          transition={{ duration: 0.6, delay: 0.3 }}
+                          transition={{
+                            duration: motionTiming.base,
+                            delay: i * stepStagger + motionTiming.fast,
+                          }}
                           className="h-px w-12 origin-left mb-3"
                           style={{ backgroundColor: step.accent + '30' }}
                         />
@@ -279,7 +282,10 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 3.5 }}
+          transition={{
+            duration: motionTiming.slow,
+            delay: Math.min(0.45 + FLOW_STEPS.length * stepStagger, 1),
+          }}
           className="mt-16 md:mt-24 text-center"
         >
           <div className="inline-flex items-center gap-3 bg-white/[0.03] backdrop-blur-sm rounded-full px-6 md:px-8 py-3.5 border border-white/[0.06]">
@@ -300,7 +306,10 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 3.8 }}
+          transition={{
+            duration: motionTiming.base,
+            delay: Math.min(0.65 + FLOW_STEPS.length * stepStagger, 1.15),
+          }}
           className="mt-10 text-center"
         >
           <button

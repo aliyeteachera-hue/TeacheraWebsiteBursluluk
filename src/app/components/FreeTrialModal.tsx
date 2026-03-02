@@ -10,7 +10,7 @@ import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
-import { usePageScrollLock } from '../lib/scrollLock';
+import { useOverlayLifecycle } from '../lib/overlayLifecycle';
 import { useCoarsePointer } from '../lib/useCoarsePointer';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
@@ -85,7 +85,7 @@ export default function FreeTrialModal() {
   const selectedLang = availableLanguages.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-  usePageScrollLock(isOpen, 'free-trial-modal', isCoarsePointer ? 0 : undefined);
+  useOverlayLifecycle(isOpen, 'free-trial');
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -172,9 +172,9 @@ export default function FreeTrialModal() {
         <motion.div
           initial={false}
           animate={{ opacity: 1 }}
-          exit={isCoarsePointer ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: isCoarsePointer ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto"
+          exit={{ opacity: 1 }}
+          transition={{ duration: 0 }}
+          className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#00000B]"
           onClick={(e) => { if (e.target === e.currentTarget) close(); }}
         >
           {/* Background */}

@@ -20,6 +20,7 @@ import {
 import { useNavigate, useSearchParams } from 'react-router';
 import { useFreeTrial } from './FreeTrialContext';
 import { useLevelAssessment } from './LevelAssessmentContext';
+import { useMotionTiming } from '../lib/uiMotion';
 
 /* ═══════════════════════════════════════════════════════════════════════
    TYPES & DATA
@@ -344,7 +345,7 @@ function StepQuestion({ step, hasSelection }: { step: number; hasSelection: bool
       <motion.h3
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, delay: 0.05 }}
+        transition={{ duration: 0.28, delay: 0 }}
         className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#09090F] text-[1.15rem] md:text-[1.35rem] leading-snug tracking-tight"
       >
         {STEP_QUESTIONS[step]}
@@ -352,7 +353,7 @@ function StepQuestion({ step, hasSelection }: { step: number; hasSelection: bool
       <motion.p
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.12 }}
+        transition={{ duration: 0.24, delay: 0.04 }}
         className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/50 text-[13px] mt-1.5 leading-relaxed"
       >
         {STEP_DESCRIPTIONS[step]}
@@ -364,7 +365,7 @@ function StepQuestion({ step, hasSelection }: { step: number; hasSelection: bool
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.25, delay: 0.6 }}
+            transition={{ duration: 0.22, delay: 0.18 }}
             className="flex items-center gap-2 mt-3"
           >
             <motion.span
@@ -426,6 +427,7 @@ export default function ProgramFinder() {
   const { open: openFreeTrial } = useFreeTrial();
   const { open: openLevelAssessment } = useLevelAssessment();
   const resultsRef = useRef<HTMLDivElement>(null);
+  const motionTiming = useMotionTiming();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [age, setAge] = useState<AgeGroup | null>(null);
@@ -455,6 +457,8 @@ export default function ProgramFinder() {
   }, [searchParams, setSearchParams]);
 
   const TOTAL_STEPS = 4;
+  const stepAdvanceDelayMs =
+    motionTiming.profile === 'lite' ? 120 : motionTiming.profile === 'balanced' ? 190 : 230;
 
   const stepHasSelection = [
     age !== null,
@@ -478,13 +482,13 @@ export default function ProgramFinder() {
       triggerCelebration();
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
+      }, stepAdvanceDelayMs);
     }
-  }, []);
+  }, [stepAdvanceDelayMs]);
 
   const handleAgeSelect = (ageId: AgeGroup) => {
     setAge(ageId);
-    setTimeout(() => advanceStep(1), 450);
+    setTimeout(() => advanceStep(1), stepAdvanceDelayMs);
   };
 
   const handleLanguageSelect = (langId: string) => {
@@ -492,20 +496,20 @@ export default function ProgramFinder() {
     // Çocuk veya genç seçildiyse amaç otomatik 'conversation' atanır, format adımına geçilir
     if (age === 'child' || age === 'teen') {
       setGoal('conversation');
-      setTimeout(() => advanceStep(3), 450);
+      setTimeout(() => advanceStep(3), stepAdvanceDelayMs);
     } else {
-      setTimeout(() => advanceStep(2), 450);
+      setTimeout(() => advanceStep(2), stepAdvanceDelayMs);
     }
   };
 
   const handleGoalSelect = (goalId: GoalType) => {
     setGoal(goalId);
-    setTimeout(() => advanceStep(3), 450);
+    setTimeout(() => advanceStep(3), stepAdvanceDelayMs);
   };
 
   const handleFormatSelect = (formatId: FormatType | 'any') => {
     setFormat(formatId);
-    setTimeout(() => advanceStep(4), 400);
+    setTimeout(() => advanceStep(4), stepAdvanceDelayMs);
   };
 
   const goBack = () => {
@@ -553,7 +557,7 @@ export default function ProgramFinder() {
         type: 'spring' as const,
         stiffness: 260,
         damping: 22,
-        delay: 0.1 + i * 0.08,
+        delay: 0.04 + i * motionTiming.stagger,
       },
     }),
   };

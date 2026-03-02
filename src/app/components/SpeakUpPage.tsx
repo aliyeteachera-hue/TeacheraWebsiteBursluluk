@@ -5,7 +5,7 @@ import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, Chevro
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
-import { usePageScrollLock } from '../lib/scrollLock';
+import { useOverlayLifecycle } from '../lib/overlayLifecycle';
 import { useCoarsePointer } from '../lib/useCoarsePointer';
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -449,8 +449,8 @@ export default function SpeakUpPage() {
   const calRef = useRef<HTMLDivElement>(null);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-  usePageScrollLock(isVideoFullscreen, 'speakup-video-fullscreen', isCoarsePointer ? 0 : undefined);
-  usePageScrollLock(isFormModalOpen, 'speakup-form-modal', isCoarsePointer ? 0 : undefined);
+  useOverlayLifecycle(isVideoFullscreen, 'speakup-video');
+  useOverlayLifecycle(isFormModalOpen, 'speakup-form');
 
   /* Close calendar on outside click */
   useEffect(() => {
@@ -1086,9 +1086,9 @@ export default function SpeakUpPage() {
           <motion.div
             initial={false}
             animate={{ opacity: 1 }}
-            exit={isCoarsePointer ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: isCoarsePointer ? 0 : 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[92] flex items-start justify-center overflow-y-auto px-4 py-6 md:py-10"
+            exit={{ opacity: 1 }}
+            transition={{ duration: 0 }}
+            className="fixed inset-0 z-[92] flex items-start justify-center overflow-y-auto px-4 py-6 md:py-10 bg-[#00000B]"
             onClick={(event) => {
               if (event.target === event.currentTarget) closeFormModal();
             }}
