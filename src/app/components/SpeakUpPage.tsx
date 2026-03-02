@@ -5,6 +5,7 @@ import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, Chevro
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
+import { usePageScrollLock } from '../lib/scrollLock';
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
@@ -402,9 +403,6 @@ export default function SpeakUpPage() {
   useEffect(() => {
     if (!isVideoFullscreen) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
     const keyHandler = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setIsVideoFullscreen(false);
     };
@@ -419,7 +417,6 @@ export default function SpeakUpPage() {
     return () => {
       window.clearTimeout(timerId);
       setShowFullscreenSoundPrompt(false);
-      document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', keyHandler);
       if (isInlineVideoStarted) {
         postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
@@ -450,6 +447,8 @@ export default function SpeakUpPage() {
   const [calViewMonth, setCalViewMonth] = useState(CAL_MIN.getMonth());
   const calRef = useRef<HTMLDivElement>(null);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
+  usePageScrollLock(isVideoFullscreen, 'speakup-video-fullscreen');
+  usePageScrollLock(isFormModalOpen, 'speakup-form-modal');
 
   /* Close calendar on outside click */
   useEffect(() => {
@@ -501,16 +500,12 @@ export default function SpeakUpPage() {
   useEffect(() => {
     if (!isFormModalOpen) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
     const keyHandler = (event: KeyboardEvent) => {
       if (event.key === 'Escape') closeFormModal();
     };
     document.addEventListener('keydown', keyHandler);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', keyHandler);
     };
   }, [isFormModalOpen]);
@@ -754,7 +749,7 @@ export default function SpeakUpPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[90] bg-[#00000B]/95 backdrop-blur-sm flex items-center justify-center p-3"
+            className="fixed inset-0 z-[90] bg-[#00000B]/95 flex items-center justify-center p-3"
             onClick={() => setIsVideoFullscreen(false)}
           >
             <motion.div
@@ -1096,7 +1091,7 @@ export default function SpeakUpPage() {
               if (event.target === event.currentTarget) closeFormModal();
             }}
           >
-            <div className="absolute inset-0 bg-[#00000B]/80 backdrop-blur-[2px]" />
+            <div className="absolute inset-0 bg-[#00000B]/82" />
 
             <motion.button
               initial={{ opacity: 0, scale: 0.9 }}

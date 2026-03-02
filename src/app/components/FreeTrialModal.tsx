@@ -10,6 +10,7 @@ import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
+import { usePageScrollLock } from '../lib/scrollLock';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -82,6 +83,7 @@ export default function FreeTrialModal() {
   const availableLanguages = getLanguagesForAge(formData.age);
   const selectedLang = availableLanguages.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
+  usePageScrollLock(isOpen, 'free-trial-modal');
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -91,12 +93,6 @@ export default function FreeTrialModal() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-
-  useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -183,7 +179,7 @@ export default function FreeTrialModal() {
           <div className="fixed inset-0 pointer-events-none">
             <img src={imgBg} alt="" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,11,0.5)] via-[rgba(50,77,71,0.35)] to-[rgba(0,0,11,0.65)]" />
-            <div className="absolute inset-0 bg-[#00000B]/15 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-[#00000B]/18" />
           </div>
 
           {/* Close */}
