@@ -104,6 +104,7 @@ export default function RootLayout() {
       const bodyStyle = document.body.style;
       const htmlStyle = document.documentElement.style;
       const scrollY = window.scrollY;
+      const isCoarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false;
 
       menuScrollLockStateRef.current = {
         scrollY,
@@ -119,13 +120,17 @@ export default function RootLayout() {
       };
 
       bodyStyle.overflow = 'hidden';
-      bodyStyle.position = 'fixed';
-      bodyStyle.top = `-${scrollY}px`;
-      bodyStyle.width = '100%';
-      bodyStyle.left = '0';
-      bodyStyle.right = '0';
-      htmlStyle.overflow = 'hidden';
-      htmlStyle.overscrollBehaviorY = 'none';
+      if (isCoarsePointer) {
+        bodyStyle.touchAction = 'none';
+      } else {
+        bodyStyle.position = 'fixed';
+        bodyStyle.top = `-${scrollY}px`;
+        bodyStyle.width = '100%';
+        bodyStyle.left = '0';
+        bodyStyle.right = '0';
+        htmlStyle.overflow = 'hidden';
+        htmlStyle.overscrollBehaviorY = 'none';
+      }
       return () => restoreMenuScrollLock(true);
     } else {
       restoreMenuScrollLock(true);

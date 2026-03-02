@@ -5,6 +5,7 @@ import whatsappImage from 'figma:asset/9694b181704f98419b88c2856e9838e3f6edf1aa.
 import whatsappLoopVideo from '../../assets/video/whatsapp-loop.mp4';
 import whatsappLoopVideoWebm from '../../assets/video/whatsapp-loop.webm';
 import { trackEvent } from '../lib/analytics';
+import { useCoarsePointer } from '../lib/useCoarsePointer';
 
 export function WhatsAppButton() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -12,6 +13,8 @@ export function WhatsAppButton() {
   const [showSoftPrompt, setShowSoftPrompt] = useState(false);
   const [videoFallback, setVideoFallback] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const isCoarsePointer = useCoarsePointer();
+  const disableHeavyMotion = shouldReduceMotion || isCoarsePointer;
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const retryTimeoutRef = useRef<number | null>(null);
 
@@ -24,7 +27,7 @@ export function WhatsAppButton() {
 
   const attemptVideoPlay = useCallback(() => {
     const video = videoRef.current;
-    if (!video || shouldReduceMotion || isExpanded || videoFallback) return;
+    if (!video || disableHeavyMotion || isExpanded || videoFallback) return;
 
     const maybePromise = video.play();
     if (maybePromise && typeof maybePromise.catch === 'function') {
@@ -38,10 +41,10 @@ export function WhatsAppButton() {
         }, 380);
       });
     }
-  }, [isExpanded, shouldReduceMotion, videoFallback]);
+  }, [disableHeavyMotion, isExpanded, videoFallback]);
 
   useEffect(() => {
-    if (shouldReduceMotion) {
+    if (disableHeavyMotion) {
       setShowSoftPrompt(false);
       return;
     }
@@ -63,11 +66,11 @@ export function WhatsAppButton() {
       clearInterval(cycleTimer);
       if (hideTimer) clearTimeout(hideTimer);
     };
-  }, [isExpanded, isHovered, shouldReduceMotion]);
+  }, [disableHeavyMotion, isExpanded, isHovered]);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || shouldReduceMotion) return;
+    if (!video || disableHeavyMotion) return;
 
     if (isExpanded) {
       clearRetryTimer();
@@ -77,7 +80,13 @@ export function WhatsAppButton() {
 
     attemptVideoPlay();
     return () => clearRetryTimer();
-  }, [attemptVideoPlay, isExpanded, shouldReduceMotion]);
+  }, [attemptVideoPlay, disableHeavyMotion, isExpanded]);
+
+  useEffect(() => {
+    if (isCoarsePointer) {
+      setVideoFallback(true);
+    }
+  }, [isCoarsePointer]);
 
   useEffect(() => {
     const onVisibilityChange = () => {
@@ -110,10 +119,10 @@ export function WhatsAppButton() {
         {isExpanded && (
           <motion.div
             className="absolute bottom-full right-0 mb-4 rounded-2xl shadow-2xl overflow-hidden w-80 border border-[#324D47]/10"
-            initial={{ opacity: 0, y: 20, scale: 0.8 }}
+            initial={disableHeavyMotion ? { opacity: 0, y: 12 } : { opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
+            exit={disableHeavyMotion ? { opacity: 0, y: 8 } : { opacity: 0, y: 20, scale: 0.8 }}
+            transition={{ duration: disableHeavyMotion ? 0.2 : 0.3 }}
           >
             {/* Header */}
             <div className="p-5 bg-[#324D47] text-[#ffffff] relative overflow-hidden">
@@ -192,12 +201,12 @@ export function WhatsAppButton() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="relative w-16 h-16 rounded-full shadow-xl overflow-hidden cursor-pointer border border-[#324D47]/20"
-        animate={!shouldReduceMotion && !isExpanded ? { y: [0, -2, 0], scale: [1, 1.015, 1] } : undefined}
-        transition={!shouldReduceMotion && !isExpanded ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
-        whileHover={{ scale: 1.06 }}
-        whileTap={{ scale: 0.96 }}
+        animate={!disableHeavyMotion && !isExpanded ? { y: [0, -2, 0], scale: [1, 1.015, 1] } : undefined}
+        transition={!disableHeavyMotion && !isExpanded ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut' } : undefined}
+        whileHover={disableHeavyMotion ? undefined : { scale: 1.06 }}
+        whileTap={disableHeavyMotion ? undefined : { scale: 0.96 }}
       >
-        {videoFallback ? (
+        {disableHeavyMotion || videoFallback ? (
           <img
             src={whatsappImage}
             alt="WhatsApp Destek"
@@ -234,15 +243,15 @@ export function WhatsAppButton() {
         <div className="absolute bottom-1 right-1 w-4 h-4 bg-[#ffffff] rounded-full flex items-center justify-center shadow">
           <motion.div
             className="w-2.5 h-2.5 bg-[#324D47] rounded-full"
-            animate={!shouldReduceMotion ? { scale: [1, 1.25, 1], opacity: [1, 0.65, 1] } : undefined}
-            transition={!shouldReduceMotion ? { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } : undefined}
+            animate={!disableHeavyMotion ? { scale: [1, 1.25, 1], opacity: [1, 0.65, 1] } : undefined}
+            transition={!disableHeavyMotion ? { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } : undefined}
           />
         </div>
       </motion.button>
 
       {!isExpanded && (
         <motion.div
-          className="md:hidden pointer-events-none absolute right-full mr-2.5 top-1/2 -translate-y-1/2 bg-[#00000B]/88 backdrop-blur-[2px] text-[#ffffff] px-2.5 py-1 rounded-lg whitespace-nowrap border border-white/10"
+          className="md:hidden pointer-events-none absolute right-full mr-2.5 top-1/2 -translate-y-1/2 bg-[#00000B]/88 text-[#ffffff] px-2.5 py-1 rounded-lg whitespace-nowrap border border-white/10"
           initial={{ opacity: 0, x: 6, scale: 0.98 }}
           animate={{ opacity: 0.95, x: 0, scale: 1 }}
           transition={{ duration: 0.28, ease: 'easeOut' }}
@@ -255,7 +264,7 @@ export function WhatsAppButton() {
       <AnimatePresence>
         {(isHovered || showSoftPrompt) && !isExpanded && (
           <motion.div
-            className="hidden md:block pointer-events-none absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-[#00000B]/88 backdrop-blur-[2px] text-[#ffffff] px-3.5 py-1.5 rounded-lg whitespace-nowrap border border-white/10"
+            className="hidden md:block pointer-events-none absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-[#00000B]/88 text-[#ffffff] px-3.5 py-1.5 rounded-lg whitespace-nowrap border border-white/10"
             initial={{ opacity: 0, x: 8, scale: 0.98 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 8, scale: 0.98 }}

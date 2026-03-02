@@ -11,6 +11,7 @@ import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
 import { usePageScrollLock } from '../lib/scrollLock';
+import { useCoarsePointer } from '../lib/useCoarsePointer';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -83,6 +84,7 @@ export default function FreeTrialModal() {
   const availableLanguages = getLanguagesForAge(formData.age);
   const selectedLang = availableLanguages.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
+  const isCoarsePointer = useCoarsePointer();
   usePageScrollLock(isOpen, 'free-trial-modal');
 
   useEffect(() => {
@@ -184,8 +186,8 @@ export default function FreeTrialModal() {
 
           {/* Close */}
           <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={isCoarsePointer ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
+            animate={isCoarsePointer ? { opacity: 1 } : { opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
             onClick={close}
             className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-12 h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300"
@@ -196,10 +198,10 @@ export default function FreeTrialModal() {
 
           {/* Card */}
           <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.96 }}
+            initial={isCoarsePointer ? { opacity: 0, y: 20 } : { opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.96 }}
-            transition={{ duration: 0.45, ease: [0.25, 1, 0.5, 1] }}
+            exit={isCoarsePointer ? { opacity: 0, y: 16 } : { opacity: 0, y: 30, scale: 0.96 }}
+            transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
             className="relative z-[91] w-full max-w-[620px] mx-4 my-12 md:my-20"
             onClick={(e) => e.stopPropagation()}
           >
@@ -209,6 +211,7 @@ export default function FreeTrialModal() {
                   key="success"
                   selectedDate={selectedDate}
                   selectedTime={selectedTime}
+                  isCoarsePointer={isCoarsePointer}
                   onReset={() => setSubmitted(false)}
                   onClose={close}
                 />
@@ -216,11 +219,11 @@ export default function FreeTrialModal() {
                 <motion.form
                   key="form"
                   onSubmit={handleSubmit}
-                  initial={{ opacity: 0, scale: 0.97 }}
+                  initial={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{ duration: 0.35 }}
-                  className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
+                  exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
+                  transition={{ duration: isCoarsePointer ? 0.24 : 0.35 }}
+                  className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
                 >
                   {/* Glass shine */}
                   <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
@@ -614,20 +617,21 @@ function MiniCalendar({
 
 /* ─── SUCCESS STATE ─────────────────────────────────────────────────────── */
 function SuccessState({
-  selectedDate, selectedTime, onReset, onClose,
+  selectedDate, selectedTime, isCoarsePointer, onReset, onClose,
 }: {
   selectedDate: Date | null; selectedTime: string;
+  isCoarsePointer: boolean;
   onReset: () => void; onClose: () => void;
 }) {
   const timeLabel = timeSlots.find(t => t.id === selectedTime)?.label;
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
+      initial={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-      className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
+      exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95 }}
+      transition={{ duration: isCoarsePointer ? 0.28 : 0.5, ease: [0.25, 1, 0.5, 1] }}
+      className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
     >
       <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
 

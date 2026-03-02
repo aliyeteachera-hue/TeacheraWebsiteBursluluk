@@ -13,6 +13,8 @@ import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { useLiteMode } from '../lib/useLiteMode';
 import { notifyError, notifySuccess } from '../lib/notifications';
+import { usePageScrollLock } from '../lib/scrollLock';
+import { useCoarsePointer } from '../lib/useCoarsePointer';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -91,6 +93,8 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
 
   const selectedLang = LANGUAGES.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
+  const isCoarsePointer = useCoarsePointer();
+  usePageScrollLock(isOpen, 'delivery-appointment-modal');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -99,12 +103,6 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
   useEffect(() => {
@@ -165,10 +163,10 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={false}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto"
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
@@ -176,13 +174,13 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
           <div className="fixed inset-0 pointer-events-none">
             <img src={imgBg} alt="" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,11,0.5)] via-[rgba(50,77,71,0.35)] to-[rgba(0,0,11,0.65)]" />
-            <div className="absolute inset-0 bg-[#00000B]/15 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-[#00000B]/18" />
           </div>
 
           {/* Close */}
           <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={isCoarsePointer ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
+            animate={isCoarsePointer ? { opacity: 1 } : { opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
             onClick={onClose}
             className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-12 h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300 cursor-pointer"
@@ -193,10 +191,10 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
 
           {/* Card */}
           <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.96 }}
+            initial={isCoarsePointer ? { opacity: 0, y: 20 } : { opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.96 }}
-            transition={{ duration: 0.45, ease: [0.25, 1, 0.5, 1] }}
+            exit={isCoarsePointer ? { opacity: 0, y: 16 } : { opacity: 0, y: 30, scale: 0.96 }}
+            transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
             className="relative z-[91] w-full max-w-[620px] mx-4 my-12 md:my-20"
             onClick={(e) => e.stopPropagation()}
           >
@@ -205,11 +203,11 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                 /* ═══ SUCCESS STATE ═══ */
                 <motion.div
                   key="success"
-                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  initial={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                  transition={{ duration: 0.45, ease: [0.25, 1, 0.5, 1] }}
-                  className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
+                  exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95, y: 20 }}
+                  transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
+                  className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
                 >
                   <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
                   <div className="relative z-10 p-10 py-16 flex flex-col items-center text-center">
@@ -248,11 +246,11 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                 <motion.form
                   key="form"
                   onSubmit={handleSubmit}
-                  initial={{ opacity: 0, scale: 0.97 }}
+                  initial={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{ duration: 0.35 }}
-                  className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
+                  exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
+                  transition={{ duration: isCoarsePointer ? 0.24 : 0.35 }}
+                  className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
                 >
                   {/* Glass shine */}
                   <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />

@@ -130,7 +130,7 @@ export default function CookieConsent() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[998] lg:hidden"
+              className="fixed inset-0 bg-black/45 z-[998] lg:hidden"
               onClick={() => setShowDetails(false)}
             />
           )}
