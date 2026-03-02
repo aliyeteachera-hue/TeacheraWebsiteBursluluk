@@ -94,7 +94,7 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   const selectedLang = LANGUAGES.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-  usePageScrollLock(isOpen, 'delivery-appointment-modal');
+  usePageScrollLock(isOpen, 'delivery-appointment-modal', isCoarsePointer ? 0 : undefined);
 
   useEffect(() => {
     if (!isOpen) return;

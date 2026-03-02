@@ -38,7 +38,7 @@ export default function LevelAssessmentModal() {
   const ageRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
   const isCoarsePointer = useCoarsePointer();
-  usePageScrollLock(isOpen, 'level-assessment-modal');
+  usePageScrollLock(isOpen, 'level-assessment-modal', isCoarsePointer ? 0 : undefined);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

@@ -85,7 +85,7 @@ export default function FreeTrialModal() {
   const selectedLang = availableLanguages.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-  usePageScrollLock(isOpen, 'free-trial-modal');
+  usePageScrollLock(isOpen, 'free-trial-modal', isCoarsePointer ? 0 : undefined);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

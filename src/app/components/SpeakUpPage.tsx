@@ -449,8 +449,8 @@ export default function SpeakUpPage() {
   const calRef = useRef<HTMLDivElement>(null);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-  usePageScrollLock(isVideoFullscreen, 'speakup-video-fullscreen');
-  usePageScrollLock(isFormModalOpen, 'speakup-form-modal');
+  usePageScrollLock(isVideoFullscreen, 'speakup-video-fullscreen', isCoarsePointer ? 0 : undefined);
+  usePageScrollLock(isFormModalOpen, 'speakup-form-modal', isCoarsePointer ? 0 : undefined);
 
   /* Close calendar on outside click */
   useEffect(() => {
