@@ -1,6 +1,6 @@
 import { motion, useInView } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
-import { RotateCcw, ArrowRight } from 'lucide-react';
+import { RotateCcw, ArrowRight, Headphones, Mic, Check, Repeat } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
 
@@ -50,6 +50,8 @@ const FLOW_STEPS = [
     detail: 'Tekrar ettikçe, düşünmeden konuşursun.',
   },
 ];
+
+const MOBILE_STEP_ICONS = [Headphones, Mic, Check, Repeat] as const;
 
 export default function TeachingMethod() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -141,6 +143,7 @@ export default function TeachingMethod() {
           <div className="space-y-8 md:space-y-0">
             {FLOW_STEPS.map((step, i) => {
               const CustomIcon = step.customIcon;
+              const MobileIcon = MOBILE_STEP_ICONS[i] ?? Headphones;
               const isLeft = i % 2 === 0;
               const isActive = activeStep >= i;
               const iconColor = step.accent === '#324D47' ? '#79B7AA' : step.accent;
@@ -193,15 +196,21 @@ export default function TeachingMethod() {
                       >
                         {/* Mobile icon + number */}
                         <div className="flex items-center gap-4 mb-5">
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={isActive ? { scale: 1 } : {}}
-                            transition={{ duration: 0.4, type: 'spring', delay: 0.2 }}
-                            className="md:hidden w-11 h-11 rounded-xl flex items-center justify-center"
-                            style={{ backgroundColor: step.accent + '15' }}
+                          <div
+                            className="md:hidden w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-700"
+                            style={{
+                              backgroundColor: isActive ? `${step.accent}18` : 'rgba(255,255,255,0.05)',
+                              border: `1px solid ${isActive ? `${step.accent}2B` : 'rgba(255,255,255,0.08)'}`,
+                              opacity: isActive ? 1 : 0.82,
+                            }}
                           >
-                            <CustomIcon color={iconColor} className="w-6 h-6" />
-                          </motion.div>
+                            <MobileIcon
+                              size={18}
+                              strokeWidth={2.2}
+                              className="transition-colors duration-700"
+                              style={{ color: isActive ? iconColor : 'rgba(230,236,240,0.52)' }}
+                            />
+                          </div>
 
                           <div className="flex items-center gap-3 flex-1">
                             <span
