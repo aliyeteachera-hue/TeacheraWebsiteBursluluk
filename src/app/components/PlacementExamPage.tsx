@@ -11,6 +11,7 @@ import {
 } from './exam/placementExamData';
 import { openMailDraft, openMailDraftOnUnload } from './formMailto';
 import { readPlacementExamLead, type PlacementExamLead } from './exam/placementExamSession';
+import { useLevelAssessment } from './LevelAssessmentContext';
 
 interface RenderQuestion {
   id: string;
@@ -220,6 +221,7 @@ function buildResultLines(snapshot: ExamSnapshot, lead: PlacementExamLead | null
 export default function PlacementExamPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { isOpen: isLevelAssessmentOpen, open: openLevelAssessment } = useLevelAssessment();
 
   const [selectedAge, setSelectedAge] = useState(searchParams.get('age') ?? '');
   const [selectedLanguage, setSelectedLanguage] = useState(searchParams.get('lang') ?? '');
@@ -230,7 +232,7 @@ export default function PlacementExamPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [activeBank, setActiveBank] = useState<PlacementExamBank | null>(null);
-  const [lead, setLead] = useState<PlacementExamLead | null>(null);
+  const [lead, setLead] = useState<PlacementExamLead | null>(() => readPlacementExamLead());
   const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus | null>(null);
   const [isSendingResult, setIsSendingResult] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
@@ -257,6 +259,7 @@ export default function PlacementExamPage() {
   const reportSentRef = useRef(false);
   const timerSubmissionTriggeredRef = useRef(false);
   const startedAtRef = useRef<number | null>(null);
+  const leadPromptedRef = useRef(false);
   const snapshotRef = useRef<ExamSnapshot>({
     questions: [],
     answers: {},
@@ -283,8 +286,29 @@ export default function PlacementExamPage() {
 
   useEffect(() => {
     document.title = 'Seviye Tespit Sınavı | Teachera';
-    setLead(readPlacementExamLead());
   }, []);
+
+  useEffect(() => {
+    if (!lead && !isLevelAssessmentOpen && !leadPromptedRef.current) {
+      leadPromptedRef.current = true;
+      openLevelAssessment('placement_exam_direct_access');
+    }
+  }, [lead, isLevelAssessmentOpen, openLevelAssessment]);
+
+  useEffect(() => {
+    if (isLevelAssessmentOpen) return;
+
+    const latestLead = readPlacementExamLead();
+    if (!latestLead) return;
+
+    setLead(latestLead);
+    if (!selectedAge && latestLead.age) {
+      setSelectedAge(latestLead.age);
+    }
+    if (!selectedLanguage && latestLead.language) {
+      setSelectedLanguage(latestLead.language);
+    }
+  }, [isLevelAssessmentOpen, selectedAge, selectedLanguage]);
 
   useEffect(() => {
     if (!selectedAge && !selectedLanguage) return;
@@ -372,6 +396,11 @@ export default function PlacementExamPage() {
   }, [isStarted, isSubmitted, questions.length, remainingSeconds]);
 
   const startExam = () => {
+    if (!lead) {
+      openLevelAssessment('placement_exam_start_without_lead');
+      return;
+    }
+
     if (!activeBankInfo || !activeBankInfo.available) return;
 
     const nextQuestions = buildQuestions(activeBankInfo.bank);
@@ -435,7 +464,38 @@ export default function PlacementExamPage() {
       </section>
 
       <section className="max-w-[1100px] mx-auto px-6 lg:px-12 py-10 md:py-14">
-        {!isStarted && (
+        {!lead && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-3xl border border-[#324D47]/20 bg-white/85 p-6 md:p-8 shadow-[0_14px_30px_rgba(0,0,11,0.06)]"
+          >
+            <h2 className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#0a0a10] text-[1.5rem] mb-3">
+              Sınava Başlamadan Önce
+            </h2>
+            <p className="text-[#324D47]/80 text-[14px] leading-relaxed font-['Neutraface_2_Text:Book',sans-serif]">
+              Seviye tespit sınavını başlatmak için önce kısa bilgi formunu doldurmanız gerekiyor.
+            </p>
+
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => openLevelAssessment('placement_exam_gate_cta')}
+                className="h-[44px] px-6 rounded-full bg-[#00000B] hover:bg-[#68232E] text-white text-[12px] tracking-[0.1em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer"
+              >
+                FORMU DOLDUR
+                <ArrowRight size={14} />
+              </button>
+              <button
+                onClick={() => navigate('/iletisim')}
+                className="h-[44px] px-6 rounded-full border border-[#324D47]/25 text-[#324D47] hover:bg-[#324D47]/10 text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors inline-flex items-center"
+              >
+                DANIŞMANA SOR
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {lead && !isStarted && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -527,7 +587,7 @@ export default function PlacementExamPage() {
           </motion.div>
         )}
 
-        {isStarted && questions.length > 0 && (
+        {lead && isStarted && questions.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
             {!isSubmitted && (
               <div className="rounded-2xl border border-[#324D47]/15 bg-white/80 p-4 md:p-5 space-y-3">

@@ -1,6 +1,7 @@
 import { createBrowserRouter, redirect } from 'react-router';
 import type { ComponentType } from 'react';
 import RootLayout from './components/RootLayout';
+import { REDIRECT_ROUTE_MAP, SEO_LANDING_ROUTE_PATHS } from './routeManifest';
 
 type ComponentModule = { default: ComponentType<any> };
 
@@ -27,10 +28,11 @@ export const router = createBrowserRouter([
       { path: 'metodoloji', lazy: lazyComponent(() => import('./components/MethodologyPage')) },
       { path: 'seviye-tespit-sinavi', lazy: lazyComponent(() => import('./components/PlacementExamPage')) },
       { path: 'speakup', lazy: lazyComponent(() => import('./components/SpeakUpPage')) },
-      { path: 'konya-ingilizce-kursu', loader: () => redirect('/egitimlerimiz/ingilizce/grup-programi') },
-      { path: 'konya-speaking-club', lazy: lazyComponent(() => import('./components/KonyaSeoLandingPage')) },
-      { path: 'konya-online-dil-kursu', lazy: lazyComponent(() => import('./components/KonyaSeoLandingPage')) },
-      { path: 'turkiye-online-dil-kursu', lazy: lazyComponent(() => import('./components/KonyaSeoLandingPage')) },
+      { path: 'konya-ingilizce-kursu', loader: () => redirect(REDIRECT_ROUTE_MAP['konya-ingilizce-kursu']) },
+      ...SEO_LANDING_ROUTE_PATHS.map((path) => ({
+        path,
+        lazy: lazyComponent(() => import('./components/KonyaSeoLandingPage')),
+      })),
       { path: 'is-firsatlari', lazy: lazyComponent(() => import('./components/JobOpportunitiesPage')) },
       { path: 'musteri-temsilcisi-ol', lazy: lazyComponent(() => import('./components/CustomerRepresentativePage')) },
       { path: 'elci-ol', lazy: lazyComponent(() => import('./components/AmbassadorPage')) },

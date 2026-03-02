@@ -1,23 +1,18 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { useState, useMemo, useRef, useEffect } from 'react';
-import { Plus, Minus, ArrowRight, User, Phone, Mail, Calendar, Globe, ChevronDown, Check, Send, Sparkles, Play } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Plus, Minus, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import { ageRanges, getLanguagesForAge } from './ageLanguageMap';
-import { openMailDraft } from './formMailto';
-import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
-import { savePlacementExamLead } from './exam/placementExamSession';
+import { useLevelAssessment } from './LevelAssessmentContext';
 
 /* ═══════════════════════════════════════════════════════════════════════
    DATA
    ═══════════════════════════════════════════════════════════════════════ */
 type CategoryId = 'genel' | 'metod' | 'surec';
 
-type FAQActionType = 'free-trial' | 'level-test';
-
 interface FAQAction {
   label: string;
-  type: FAQActionType;
-  inline?: boolean; // true → form açık gelir, false → butona basınca açılır
+  href?: string;
+  type?: 'route' | 'level-assessment';
 }
 
 interface FAQItem {
@@ -48,16 +43,16 @@ const faqs: FAQItem[] = [
     category: 'genel',
     question: 'Ücretsiz deneme seansına katılabilir miyim?',
     answer:
-      'Evet. Aşağıdaki formu doldurarak ücretsiz seansımıza katılabilirsiniz. Size özel bir kullanıcı adı oluşturulacak ve e-posta adresinize gönderilecektir.',
-    action: { label: 'Ücretsiz Deneme Seansı Al', type: 'free-trial', inline: true },
+      'Evet. Ücretsiz deneme seansı talebinizi aşağıdaki buton üzerinden hızlıca iletebilirsiniz.',
+    action: { label: 'Ücretsiz Deneme Seansı Al', href: '/iletisim' },
   },
   {
     id: 4,
     category: 'genel',
     question: 'Seviyemizi nasıl öğrenebiliriz?',
     answer:
-      'Aşağıdaki formu doldurarak yazılı sınavı hemen başlatabilir ve seviyenizi öğrenebilirsiniz. Kesin sonuç sözlü mülakat sonrası belirlenir.',
-    action: { label: 'Seviye Tespit Sınavına Başla', type: 'level-test', inline: true },
+      'Aşağıdaki butondan yazılı seviye tespit sınavını hemen başlatabilir ve seviyenizi öğrenebilirsiniz. Kesin sonuç sözlü mülakat sonrası belirlenir.',
+    action: { label: 'Seviye Tespit Sınavına Başla', type: 'level-assessment' },
   },
   {
     id: 15,
@@ -87,7 +82,7 @@ const faqs: FAQItem[] = [
     question: 'Derslerde Türkçe kullanılmıyor, nasıl anlayacağız?',
     answer:
       'Eğitmenlerimiz metodoloji eğitimlerine tabidir. Derslerde beden dili, illüstrasyonlar ve görsel materyaller yoğun olarak kullanılır. Bu sayede anadil kullanımından uzak durularak "öğrenme engelleri" önlenir.',
-    action: { label: 'Ücretsiz Deneme Seansı Al', type: 'free-trial' },
+    action: { label: 'Ücretsiz Deneme Seansı Al', href: '/iletisim' },
   },
   {
     id: 5,
@@ -102,7 +97,7 @@ const faqs: FAQItem[] = [
     question: 'Eğitmenlerinizin yeterliliğinden nasıl emin olabilirim?',
     answer:
       'Eğitmenlerimiz dil öğretmenliği, metodoloji ve dil bilimi gibi alanlarda eğitim almış, deneyim sahibidir. Ayrıca sürekli olarak bilgi ve becerilerini geliştirmek için iç eğitimlere tabidirler.',
-    action: { label: 'Ücretsiz Deneme Seansı Al', type: 'free-trial' },
+    action: { label: 'Ücretsiz Deneme Seansı Al', href: '/iletisim' },
   },
   {
     id: 7,
@@ -110,7 +105,7 @@ const faqs: FAQItem[] = [
     question: 'Tüm dersler konuşma üzerine mi kurulu?',
     answer:
       "Derslerin %85'i konuşma pratiğiyle geçer. Ancak bu sadece serbest sohbet değil; bilimsel ve sistematik bir yöntemle yapılandırılmış derslerdir. Okuma, yazma, anlama ve konuşma becerileri bir bütün olarak geliştirilir.",
-    action: { label: 'Ücretsiz Deneme Seansı Al', type: 'free-trial' },
+    action: { label: 'Ücretsiz Deneme Seansı Al', href: '/iletisim' },
   },
   // SÜREÇ
   {
@@ -163,310 +158,13 @@ const faqs: FAQItem[] = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════════════
-   INLINE FORM — Compact form embedded inside FAQ accordion
-   ═══════════════════════════════════════════════════════════════════════ */
-const inputBase =
-  "w-full h-[40px] bg-[#09090F]/[0.02] rounded-full px-4 text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#09090F]/25 outline-none border border-[#09090F]/[0.05] cursor-not-allowed";
-
-function InlineForm({ type, faqId }: { type: FAQActionType; faqId: number }) {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({ fullName: '', phone: '', email: '', age: '', language: '' });
-  const [ageOpen, setAgeOpen] = useState(false);
-  const [langOpen, setLangOpen] = useState(false);
-  const ageRef = useRef<HTMLDivElement>(null);
-  const langRef = useRef<HTMLDivElement>(null);
-
-  /* close dropdowns on outside click */
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ageRef.current && !ageRef.current.contains(e.target as Node)) setAgeOpen(false);
-      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const availableLanguages = formData.age ? getLanguagesForAge(formData.age) : [];
-  const selectedLanguageLabel = availableLanguages.find((language) => language.id === formData.language)?.name || '';
-  const isPhoneValid = isValidTrMobilePhone(formData.phone);
-  const allFilled = formData.fullName && isPhoneValid && formData.age && formData.language;
-
-  const handleSubmit = async () => {
-    if (!allFilled) return;
-
-    if (type === 'level-test') {
-      const sent = await openMailDraft({
-        subject: 'Seviye Tespit Talebi',
-        lines: [
-          `Ad Soyad: ${formData.fullName}`,
-          `Telefon: +90 ${formData.phone}`,
-          `E-posta: ${formData.email || '-'}`,
-          `Yas Araligi: ${formData.age}`,
-          `Dil: ${selectedLanguageLabel || formData.language}`,
-          `Kaynak: FAQ Inline Form #${faqId}`,
-        ],
-      });
-
-      if (!sent) {
-        window.alert('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
-        return;
-      }
-
-      savePlacementExamLead({
-        fullName: formData.fullName,
-        phone: `+90 ${formData.phone}`,
-        email: formData.email,
-        age: formData.age,
-        language: formData.language,
-        source: `faq_inline_form_${faqId}`,
-      });
-
-      navigate(`/seviye-tespit-sinavi?age=${encodeURIComponent(formData.age)}&lang=${encodeURIComponent(formData.language)}`);
-      return;
-    }
-
-    const sent = await openMailDraft({
-      subject: 'Ücretsiz Deneme Seansı Talebi',
-      lines: [
-        `Ad Soyad: ${formData.fullName}`,
-        `Telefon: +90 ${formData.phone}`,
-        `E-posta: ${formData.email || '-'}`,
-        `Yas Araligi: ${formData.age}`,
-        `Dil: ${selectedLanguageLabel || formData.language}`,
-        `Kaynak: FAQ Inline Form #${faqId}`,
-      ],
-    });
-
-    if (sent) {
-      window.alert('Talebiniz alındı. En kısa sürede sizinle iletişime geçeceğiz.');
-      setFormData({ fullName: '', phone: '', email: '', age: '', language: '' });
-    } else {
-      window.alert('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
-    }
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.1 }}
-      className="mt-5 p-5 bg-white rounded-2xl border border-[#09090F]/[0.04] shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
-    >
-      {/* title row */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-5 h-5 rounded-full bg-[#324D47]/10 flex items-center justify-center">
-          {type === 'free-trial' ? <Play size={9} className="text-[#324D47] ml-0.5" /> : <Sparkles size={9} className="text-[#324D47]" />}
-        </div>
-        <span className="text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#324D47] tracking-[0.08em]">
-          {type === 'free-trial' ? 'DENEME SEANSI FORMU' : 'SEVIYE TESPIT SINAVI'}
-        </span>
-      </div>
-
-      {/* fields grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-        {/* Full Name */}
-        <div className="relative">
-          <User size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#09090F]/15" />
-          <input
-            type="text"
-            placeholder="Ad Soyad"
-            value={formData.fullName}
-            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-            className={`${inputBase} !pl-10 !cursor-text !text-[#09090F]/70 focus:border-[#324D47]/30`}
-          />
-        </div>
-
-        {/* Phone */}
-        <div className="relative">
-          <Phone size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#09090F]/15" />
-          <input
-            type="tel"
-            placeholder="Telefon"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: normalizeTrMobileInput(e.target.value) })}
-            inputMode="numeric"
-            maxLength={13}
-            pattern={TR_MOBILE_PATTERN}
-            title={TR_MOBILE_TITLE}
-            className={`${inputBase} !pl-10 !cursor-text !text-[#09090F]/70 focus:border-[#324D47]/30`}
-          />
-        </div>
-
-        {/* Email */}
-        <div className="relative">
-          <Mail size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#09090F]/15" />
-          <input
-            type="email"
-            placeholder="E-posta"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className={`${inputBase} !pl-10 !cursor-text !text-[#09090F]/70 focus:border-[#324D47]/30`}
-          />
-        </div>
-
-        {/* Age Range — custom dropdown */}
-        <div className="relative" ref={ageRef}>
-          <Calendar size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#09090F]/15 z-10" />
-          <button
-            type="button"
-            onClick={() => { setAgeOpen(!ageOpen); setLangOpen(false); }}
-            className={`${inputBase} !pl-10 !cursor-pointer text-left flex items-center justify-between ${formData.age ? '!text-[#09090F]/70' : ''}`}
-          >
-            <span className="truncate">{formData.age || 'Yaş Aralığı'}</span>
-            <ChevronDown size={13} className={`text-[#09090F]/20 transition-transform duration-200 ${ageOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          <AnimatePresence>
-            {ageOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.15 }}
-                className="absolute z-30 top-[calc(100%+4px)] left-0 right-0 bg-white rounded-xl border border-[#09090F]/[0.06] shadow-lg py-1 max-h-[180px] overflow-y-auto"
-              >
-                {ageRanges.map((range) => (
-                  <button
-                    key={range}
-                    type="button"
-                    onClick={() => {
-                      setFormData({ ...formData, age: range, language: '' });
-                      setAgeOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2 text-[12px] font-['Neutraface_2_Text:Book',sans-serif] transition-colors cursor-pointer ${
-                      formData.age === range
-                        ? 'text-[#324D47] bg-[#324D47]/[0.04]'
-                        : 'text-[#09090F]/50 hover:bg-[#09090F]/[0.02]'
-                    }`}
-                  >
-                    <span className="flex items-center justify-between">
-                      {range}
-                      {formData.age === range && <Check size={12} className="text-[#324D47]" />}
-                    </span>
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Language — custom dropdown */}
-        <div className="relative sm:col-span-2" ref={langRef}>
-          <Globe size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#09090F]/15 z-10" />
-          <button
-            type="button"
-            onClick={() => {
-              if (!formData.age) return;
-              setLangOpen(!langOpen);
-              setAgeOpen(false);
-            }}
-            className={`${inputBase} !pl-10 text-left flex items-center justify-between ${!formData.age ? 'opacity-50' : '!cursor-pointer'} ${formData.language ? '!text-[#09090F]/70' : ''}`}
-          >
-            <span className="truncate">{formData.language || (formData.age ? 'Dil Seçin' : 'Önce yaş aralığı seçin')}</span>
-            <ChevronDown size={13} className={`text-[#09090F]/20 transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          <AnimatePresence>
-            {langOpen && availableLanguages.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.15 }}
-                className="absolute z-30 top-[calc(100%+4px)] left-0 right-0 bg-white rounded-xl border border-[#09090F]/[0.06] shadow-lg py-1 max-h-[180px] overflow-y-auto"
-              >
-                {availableLanguages.map((lang) => (
-                  <button
-                    key={lang.id}
-                    type="button"
-                    onClick={() => {
-                      setFormData({ ...formData, language: lang.id });
-                      setLangOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2 text-[12px] font-['Neutraface_2_Text:Book',sans-serif] transition-colors cursor-pointer ${
-                      formData.language === lang.id
-                        ? 'text-[#324D47] bg-[#324D47]/[0.04]'
-                        : 'text-[#09090F]/50 hover:bg-[#09090F]/[0.02]'
-                    }`}
-                  >
-                    <span className="flex items-center justify-between">
-                      {lang.name}
-                      {formData.language === lang.id && <Check size={12} className="text-[#324D47]" />}
-                    </span>
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* submit */}
-      <button
-        type="button"
-        onClick={handleSubmit}
-        disabled={!allFilled}
-        className={`w-full h-[42px] rounded-full text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em] flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${
-          allFilled
-            ? 'bg-[#324D47] text-white hover:bg-[#3d5e56]'
-            : 'bg-[#09090F]/[0.04] text-[#09090F]/20 cursor-not-allowed'
-        }`}
-      >
-        <Send size={12} />
-        {type === 'free-trial' ? 'Deneme Seansı Talep Et' : 'Sınava Başla'}
-      </button>
-    </motion.div>
-  );
-}
-
-/* ─── FAQ ACTION AREA — wrapper that handles inline vs toggle mode ────── */
-function FAQActionArea({ action, faqId }: { action: FAQAction; faqId: number }) {
-  const [showForm, setShowForm] = useState(false);
-
-  // inline: true → form doğrudan gösterilir
-  if (action.inline) {
-    return <InlineForm type={action.type} faqId={faqId} />;
-  }
-
-  // inline: false → toggle buton
-  return (
-    <div className="mt-4">
-      <button
-        type="button"
-        onClick={() => setShowForm(!showForm)}
-        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.04em] transition-all duration-300 cursor-pointer border ${
-          showForm
-            ? 'bg-[#324D47] text-white border-[#324D47]'
-            : 'bg-white text-[#324D47] border-[#324D47]/20 hover:border-[#324D47]/40'
-        }`}
-      >
-        {showForm ? <Minus size={10} /> : <Plus size={10} />}
-        {action.label}
-      </button>
-
-      <AnimatePresence>
-        {showForm && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.33, 1, 0.68, 1] }}
-          >
-            <InlineForm type={action.type} faqId={faqId} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
    COMPONENT
    ═══════════════════════════════════════════════════════════════════════ */
 export default function FAQ() {
   const [activeCategory, setActiveCategory] = useState<CategoryId>('genel');
   const [openId, setOpenId] = useState<number | null>(null);
   const navigate = useNavigate();
+  const { open: openLevelAssessment } = useLevelAssessment();
 
   const filtered = useMemo(
     () => faqs.filter((f) => f.category === activeCategory),
@@ -575,9 +273,25 @@ export default function FAQ() {
                             {faq.answer}
                           </p>
 
-                          {/* Inline Form */}
                           {faq.action && (
-                            <FAQActionArea action={faq.action} faqId={faq.id} />
+                            <div className="mt-4">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (faq.action?.type === 'level-assessment') {
+                                    openLevelAssessment('faq_level_assessment');
+                                    return;
+                                  }
+                                  if (faq.action?.href) {
+                                    navigate(faq.action.href);
+                                  }
+                                }}
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-[#324D47]/20 text-[#324D47] hover:border-[#324D47]/40 hover:bg-[#324D47]/[0.03] font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-wide transition-all"
+                              >
+                                <ArrowRight size={13} />
+                                {faq.action.label}
+                              </button>
+                            </div>
                           )}
                         </div>
                       </motion.div>

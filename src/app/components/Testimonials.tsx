@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import EraSlogan from './EraSlogan';
@@ -72,6 +72,8 @@ export default function Testimonials() {
   const [paused, setPaused] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const liteMotionMode = useLiteMode();
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
   /* progress counts 0 → 100 for the active dot bar */
   const [progress, setProgress] = useState(0);
 
@@ -85,6 +87,36 @@ export default function Testimonials() {
     () => goTo(current === testimonials.length - 1 ? 0 : current + 1),
     [current, goTo],
   );
+
+  const onSwipeStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+    touchStartXRef.current = touch.clientX;
+    touchStartYRef.current = touch.clientY;
+    setPaused(true);
+  };
+
+  const onSwipeEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) {
+      setPaused(false);
+      return;
+    }
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartXRef.current;
+    const deltaY = touch.clientY - touchStartYRef.current;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+    const horizontalThreshold = 42;
+
+    if (absX > horizontalThreshold && absX > absY * 1.2) {
+      if (deltaX < 0) next();
+      else prev();
+    }
+
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+    setPaused(false);
+  };
 
   /* Autoplay tick — low-frequency progress + slide advance */
   useEffect(() => {
@@ -156,7 +188,12 @@ export default function Testimonials() {
         </div>
 
         {/* ── Testimonial ── */}
-        <div className="relative min-h-[160px] md:min-h-[140px]">
+        <div
+          className="relative min-h-[160px] md:min-h-[140px] [touch-action:pan-y]"
+          onTouchStart={onSwipeStart}
+          onTouchEnd={onSwipeEnd}
+          onTouchCancel={() => setPaused(false)}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={t.id}

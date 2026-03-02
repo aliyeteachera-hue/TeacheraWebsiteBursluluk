@@ -102,7 +102,6 @@ function HeroSection() {
             className="absolute inset-0 w-full h-full object-cover"
             autoPlay
             muted
-            defaultMuted
             loop
             playsInline
             preload="metadata"

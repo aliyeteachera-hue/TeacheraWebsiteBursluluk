@@ -332,7 +332,7 @@ export default function Footer() {
                     aria-label={social.label}
                     className="w-8 h-8 rounded-full border border-[#324D47]/40 hover:border-[#324D47] hover:bg-[#324D47]/20 flex items-center justify-center text-[#324D47] hover:text-[#6A9B8F] transition-all duration-300"
                   >
-                    {social.isX ? (
+                    {'isX' in social && social.isX ? (
                       <XIcon size={13} />
                     ) : social.Icon ? (
                       <social.Icon size={14} />

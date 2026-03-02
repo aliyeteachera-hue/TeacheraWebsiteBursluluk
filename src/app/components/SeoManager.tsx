@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
-type SeoMeta = {
+export type SeoMeta = {
   title: string;
   description: string;
   keywords: string[];
@@ -178,7 +178,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
   arapca: 'Arapça',
 };
 
-function toKeywordCase(value: string) {
+export function toKeywordCase(value: string) {
   return value
     .split('-')
     .map((part) => part.trim())
@@ -186,7 +186,7 @@ function toKeywordCase(value: string) {
     .join(' ');
 }
 
-function isKnownPath(pathname: string) {
+export function isKnownPath(pathname: string) {
   if (STATIC_ROUTE_META[pathname]) {
     return true;
   }
@@ -234,7 +234,7 @@ function upsertJsonLdScript(id: string, payload: unknown) {
   script.textContent = JSON.stringify(payload);
 }
 
-function resolveMeta(pathname: string): SeoMeta {
+export function resolveMeta(pathname: string): SeoMeta {
   if (STATIC_ROUTE_META[pathname]) {
     return STATIC_ROUTE_META[pathname];
   }
@@ -289,7 +289,14 @@ export default function SeoManager() {
     const canonicalPath = knownPath ? pathname || '/' : '/';
     const canonicalUrl = `${SITE_URL}${canonicalPath}`;
     const isAuthPage = pathname === '/giris';
-    const robotsValue = isAuthPage ? 'noindex,nofollow,noarchive' : knownPath ? DEFAULT_ROBOTS : 'noindex,follow,noarchive';
+    const isLegalDetailPage = /^\/hukuki\/[^/]+$/.test(pathname);
+    const robotsValue = isAuthPage
+      ? 'noindex,nofollow,noarchive'
+      : isLegalDetailPage
+        ? 'noindex,follow,noarchive'
+        : knownPath
+          ? DEFAULT_ROBOTS
+          : 'noindex,follow,noarchive';
 
     document.title = meta.title;
 
@@ -316,7 +323,7 @@ export default function SeoManager() {
     upsertLinkTag('alternate', canonicalUrl, 'tr-TR');
     upsertLinkTag('alternate', canonicalUrl, 'x-default');
 
-    upsertJsonLdScript('teachera-website-jsonld', {
+    upsertJsonLdScript('teachera-site-jsonld', {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: 'Teachera Dil Okulu',

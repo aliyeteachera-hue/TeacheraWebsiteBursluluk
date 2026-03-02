@@ -1,3 +1,5 @@
+import { safeLocalStorageGet } from './storage';
+
 export const COOKIE_CONSENT_KEY = 'teachera_cookie_consent';
 export const CONSENT_UPDATED_EVENT = 'teachera:consent-updated';
 
@@ -157,7 +159,7 @@ function hasConsent(requirement: ConsentRequirement): boolean {
 
 export function getConsentPreferences(): CookiePreferences {
   if (typeof window === 'undefined') return fallbackPreferences;
-  return parseConsent(window.localStorage.getItem(COOKIE_CONSENT_KEY));
+  return parseConsent(safeLocalStorageGet(COOKIE_CONSENT_KEY));
 }
 
 export function applyConsentMode(preferences: CookiePreferences = getConsentPreferences()) {

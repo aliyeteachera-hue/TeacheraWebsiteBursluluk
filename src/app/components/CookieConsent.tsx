@@ -8,6 +8,7 @@ import {
   trackPageView,
   type CookiePreferences,
 } from '../lib/analytics';
+import { safeLocalStorageGet, safeLocalStorageSet } from '../lib/storage';
 
 const defaultPreferences: CookiePreferences = {
   necessary: true,
@@ -29,7 +30,7 @@ export default function CookieConsent() {
   const [preferences, setPreferences] = useState<CookiePreferences>(defaultPreferences);
 
   useEffect(() => {
-    const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
+    const consent = safeLocalStorageGet(COOKIE_CONSENT_KEY);
     if (!consent) {
       const timer = setTimeout(() => setIsVisible(true), 2800);
       return () => clearTimeout(timer);
@@ -49,7 +50,7 @@ export default function CookieConsent() {
   }, []);
 
   const saveConsent = (next: CookiePreferences, action: 'accept_all' | 'accept_selected' | 'reject_optional') => {
-    localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(next));
+    safeLocalStorageSet(COOKIE_CONSENT_KEY, JSON.stringify(next));
     notifyConsentUpdated(next);
     trackEvent(
       'cookie_consent_updated',

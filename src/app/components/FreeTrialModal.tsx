@@ -9,6 +9,7 @@ import { ageRanges, getLanguagesForAge } from './ageLanguageMap';
 import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+import { notifyError } from '../lib/notifications';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -136,7 +137,7 @@ export default function FreeTrialModal() {
         `Ad Soyad: ${formData.fullName}`,
         `Telefon: +90 ${formData.phone}`,
         `E-posta: ${formData.email || '-'}`,
-        `Yas Araligi: ${ageRanges.find((age) => age.id === formData.age)?.label || formData.age}`,
+        `Yas Araligi: ${ageRanges.find((age) => age === formData.age) || formData.age}`,
         `Dil: ${getLanguagesForAge(formData.age).find((language) => language.id === formData.language)?.name || formData.language}`,
         `Seans Tarihi: ${selectedDate ? formatDate(selectedDate) : '-'}`,
         `Saat Araligi: ${timeSlots.find((slot) => slot.id === selectedTime)?.label || selectedTime || '-'}`,
@@ -145,7 +146,7 @@ export default function FreeTrialModal() {
     });
 
     if (!sent) {
-      window.alert('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      notifyError('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
       return;
     }
 

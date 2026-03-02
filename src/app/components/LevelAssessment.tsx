@@ -8,6 +8,7 @@ import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { savePlacementExamLead } from './exam/placementExamSession';
+import { notifyError } from '../lib/notifications';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -80,7 +81,7 @@ export default function LevelAssessmentModal() {
     });
 
     if (!sent) {
-      window.alert('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      notifyError('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
       return;
     }
 

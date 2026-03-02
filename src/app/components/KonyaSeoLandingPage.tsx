@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { ArrowRight, CheckCircle2, MapPin, MonitorSmartphone, Users } from 'lucide-react';
 import { trackSeoLandingCta } from '../lib/analytics';
+import { useLevelAssessment } from './LevelAssessmentContext';
 
 type LandingContent = {
   title: string;
@@ -164,6 +165,7 @@ function upsertJsonLd(id: string, payload: unknown) {
 export default function KonyaSeoLandingPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { open: openLevelAssessment } = useLevelAssessment();
   const isTurkeyPage = location.pathname === '/turkiye-online-dil-kursu';
 
   const content = useMemo(
@@ -240,6 +242,10 @@ export default function KonyaSeoLandingPage() {
       destination: href,
       position,
     });
+    if (href === '/seviye-tespit-sinavi') {
+      openLevelAssessment(`seo_landing_${position}_level_assessment`);
+      return;
+    }
     navigate(href);
   };
 

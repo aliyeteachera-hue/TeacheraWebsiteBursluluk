@@ -961,7 +961,6 @@ ProgramCard.displayName = 'ProgramCard';
    MAIN COMPONENT
    ═══════════════════════════════════════════════════════════════════════ */
 export { ALL_PROGRAMS };
-export type { ProgramItem };
 
 export default function AllPrograms() {
   const navigate = useNavigate();

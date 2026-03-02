@@ -1,4 +1,5 @@
 import { trackEvent } from '../lib/analytics';
+import { isCaptchaEnabled, resolveCaptchaToken } from '../lib/captcha';
 
 export interface MailDraftOptions {
   to?: string;
@@ -6,7 +7,7 @@ export interface MailDraftOptions {
   lines: string[];
 }
 
-function applyRecipientToConfiguredEndpoint(configured: string, to: string) {
+export function applyRecipientToConfiguredEndpoint(configured: string, to: string) {
   const trimmed = configured.trim();
   if (!trimmed) return `https://formsubmit.co/ajax/${to}`;
 
@@ -64,9 +65,9 @@ function resolveEndpoint(to: string) {
   return { endpoint, endpointDomain };
 }
 
-function buildPayload(subject: string, lines: string[]) {
+export function buildFields(lines: string[]) {
   const cleanLines = lines.filter(Boolean);
-  const fields = Object.fromEntries(
+  return Object.fromEntries(
     cleanLines.map((line, index) => {
       const separatorIndex = line.indexOf(':');
       if (separatorIndex === -1) return [`field_${index + 1}`, line];
@@ -76,6 +77,10 @@ function buildPayload(subject: string, lines: string[]) {
       return [key, value];
     }),
   );
+}
+
+export function buildLegacyPayload(subject: string, lines: string[]) {
+  const fields = buildFields(lines);
 
   return {
     _subject: subject,
@@ -86,23 +91,18 @@ function buildPayload(subject: string, lines: string[]) {
   };
 }
 
-function toSubjectKey(subject: string) {
-  return subject.toLowerCase().replace(/\s+/g, '_').slice(0, 80);
+export function toSubjectKey(subject: string) {
+  return subject.trim().toLowerCase().replace(/\s+/g, '_').slice(0, 80);
 }
 
-export async function openMailDraft({ to = 'data@teachera.com.tr', subject, lines }: MailDraftOptions): Promise<boolean> {
-  if (typeof window === 'undefined') return false;
+function getProxyEndpoint() {
+  return (import.meta.env.VITE_FORMS_PROXY_ENDPOINT || '/api/forms').trim();
+}
 
+async function submitViaDevelopmentFallback(options: MailDraftOptions, subjectKey: string, fieldCount: number): Promise<boolean> {
+  const { to = 'data@teachera.com.tr', subject, lines } = options;
   const { endpoint, endpointDomain } = resolveEndpoint(to);
-  const payload = buildPayload(subject, lines);
-  const subjectKey = toSubjectKey(subject);
-
-  trackEvent('lead_form_submit_attempt', {
-    form_subject: subjectKey,
-    field_count: lines.filter(Boolean).length,
-    endpoint_domain: endpointDomain,
-    delivery_method: 'fetch',
-  });
+  const payload = buildLegacyPayload(subject, lines);
 
   try {
     const response = await fetch(endpoint, {
@@ -116,20 +116,98 @@ export async function openMailDraft({ to = 'data@teachera.com.tr', subject, line
     });
 
     if (!response.ok) {
+      throw new Error(`dev_fallback_status_${response.status}`);
+    }
+
+    trackEvent('lead_form_submit_success', {
+      form_subject: subjectKey,
+      field_count: fieldCount,
+      delivery_method: 'dev_direct_fallback',
+      endpoint_domain: endpointDomain,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function openMailDraft({ to = 'data@teachera.com.tr', subject, lines }: MailDraftOptions): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+
+  const fields = buildFields(lines);
+  const proxyEndpoint = getProxyEndpoint();
+  const endpointDomain = (() => {
+    try {
+      return new URL(proxyEndpoint, window.location.origin).hostname;
+    } catch {
+      return 'invalid_proxy_endpoint';
+    }
+  })();
+  const fieldCount = lines.filter(Boolean).length;
+  const subjectKey = toSubjectKey(subject);
+  const captchaEnabled = isCaptchaEnabled();
+  const captchaToken = await resolveCaptchaToken('lead_form');
+
+  if (captchaEnabled && !captchaToken) {
+    trackEvent('lead_form_submit_failure', {
+      form_subject: subjectKey,
+      field_count: fieldCount,
+      delivery_method: 'proxy_fetch',
+      endpoint_domain: endpointDomain,
+      captcha_enabled: true,
+      error_message: 'captcha_token_unavailable',
+    });
+    return false;
+  }
+
+  trackEvent('lead_form_submit_attempt', {
+    form_subject: subjectKey,
+    field_count: fieldCount,
+    endpoint_domain: endpointDomain,
+    delivery_method: 'proxy_fetch',
+    captcha_enabled: captchaEnabled,
+  });
+
+  try {
+    const response = await fetch(proxyEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        to,
+        subject,
+        fields,
+        formSource: window.location.href,
+        captchaToken,
+      }),
+      keepalive: true,
+    });
+
+    if (!response.ok) {
       throw new Error(`Form submission failed with status ${response.status}`);
     }
 
     trackEvent('lead_form_submit_success', {
       form_subject: subjectKey,
-      field_count: lines.filter(Boolean).length,
-      delivery_method: 'fetch',
+      field_count: fieldCount,
+      delivery_method: 'proxy_fetch',
+      captcha_enabled: captchaEnabled,
     });
     return true;
   } catch (error) {
+    // Local Vite dev does not run /api functions; allow fallback only in development.
+    if (import.meta.env.DEV) {
+      const fallbackSent = await submitViaDevelopmentFallback({ to, subject, lines }, subjectKey, fieldCount);
+      if (fallbackSent) return true;
+    }
+
     trackEvent('lead_form_submit_failure', {
       form_subject: subjectKey,
-      field_count: lines.filter(Boolean).length,
-      delivery_method: 'fetch',
+      field_count: fieldCount,
+      delivery_method: 'proxy_fetch',
+      captcha_enabled: captchaEnabled,
       error_message: error instanceof Error ? error.message.slice(0, 120) : 'unknown_error',
     });
     return false;
@@ -139,16 +217,40 @@ export async function openMailDraft({ to = 'data@teachera.com.tr', subject, line
 export function openMailDraftOnUnload({ to = 'data@teachera.com.tr', subject, lines }: MailDraftOptions): boolean {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
   if (typeof navigator.sendBeacon !== 'function') return false;
+  if (isCaptchaEnabled()) {
+    trackEvent('lead_form_submit_failure', {
+      form_subject: toSubjectKey(subject),
+      field_count: lines.filter(Boolean).length,
+      delivery_method: 'proxy_beacon',
+      captcha_enabled: true,
+      error_message: 'beacon_blocked_by_captcha_requirement',
+    });
+    return false;
+  }
 
-  const { endpoint, endpointDomain } = resolveEndpoint(to);
-  const payload = buildPayload(subject, lines);
+  const endpoint = getProxyEndpoint();
+  const endpointDomain = (() => {
+    try {
+      return new URL(endpoint, window.location.origin).hostname;
+    } catch {
+      return 'invalid_proxy_endpoint';
+    }
+  })();
+  const payload = {
+    to,
+    subject,
+    fields: buildFields(lines),
+    formSource: window.location.href,
+    captchaToken: null,
+  };
   const subjectKey = toSubjectKey(subject);
 
   trackEvent('lead_form_submit_attempt', {
     form_subject: subjectKey,
     field_count: lines.filter(Boolean).length,
     endpoint_domain: endpointDomain,
-    delivery_method: 'beacon',
+    delivery_method: 'proxy_beacon',
+    captcha_enabled: false,
   });
 
   try {
@@ -158,7 +260,8 @@ export function openMailDraftOnUnload({ to = 'data@teachera.com.tr', subject, li
     trackEvent(queued ? 'lead_form_submit_success' : 'lead_form_submit_failure', {
       form_subject: subjectKey,
       field_count: lines.filter(Boolean).length,
-      delivery_method: 'beacon',
+      delivery_method: 'proxy_beacon',
+      captcha_enabled: false,
       error_message: queued ? undefined : 'navigator_send_beacon_rejected',
     });
 
@@ -167,7 +270,8 @@ export function openMailDraftOnUnload({ to = 'data@teachera.com.tr', subject, li
     trackEvent('lead_form_submit_failure', {
       form_subject: subjectKey,
       field_count: lines.filter(Boolean).length,
-      delivery_method: 'beacon',
+      delivery_method: 'proxy_beacon',
+      captcha_enabled: false,
       error_message: error instanceof Error ? error.message.slice(0, 120) : 'unknown_error',
     });
     return false;

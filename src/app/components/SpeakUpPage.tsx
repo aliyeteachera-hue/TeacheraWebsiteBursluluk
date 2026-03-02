@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Maximize2, X } from 'lucide-react';
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+import { notifyError } from '../lib/notifications';
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
@@ -533,7 +534,7 @@ export default function SpeakUpPage() {
     });
 
     if (!sent) {
-      window.alert('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      notifyError('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
       return;
     }
 

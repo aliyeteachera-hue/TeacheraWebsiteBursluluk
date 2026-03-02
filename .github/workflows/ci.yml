@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   quality:
-    name: Lint, Test, Build
+    name: Lint, Typecheck, Test, Build
     runs-on: ubuntu-latest
 
     steps:
@@ -35,6 +35,9 @@ jobs:
 
       - name: Lint
         run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
 
       - name: Test
         run: pnpm test
