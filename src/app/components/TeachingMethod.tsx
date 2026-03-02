@@ -3,7 +3,6 @@ import { useRef, useState, useEffect } from 'react';
 import { RotateCcw, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
-import { useLiteMode } from '../lib/useLiteMode';
 
 const FLOW_STEPS = [
   {
@@ -14,7 +13,7 @@ const FLOW_STEPS = [
     customIcon: ListenIcon,
     accent: '#324D47',
     glowColor: 'rgba(50,77,71,0.15)',
-    body: 'Native Speaker eğitmen yeni bir yapı ya da kavramı sistemli şekilde tanıtır. Ardından o yapıyı kullanmanı gerektiren soru gelir — beklemez, başlatır.',
+    body: 'Native Speaker eğitmen yeni bir yapı ya da kavramı sistemli şekilde tanıtır. Ardından o yapıyı kullanmanı gerektiren soru gelir.',
     detail: 'Duyduğun an, öğrenme başlar.',
   },
   {
@@ -25,7 +24,7 @@ const FLOW_STEPS = [
     customIcon: SpeakIcon,
     accent: '#E70000',
     glowColor: 'rgba(231,0,0,0.12)',
-    body: 'Yeni öğrendiğin yapı, daha soğumadan… Native Speaker eğitmenin yönlendirmesiyle tam ve doğru cümle kurarsın. Bilgi "içeride" kalmaz; dışarı çıkar.',
+    body: 'Yeni öğrendiğin yapı, daha soğumadan… eğitmenin yönlendirmesiyle tam ve doğru cümle kurarsın. Bilgi içeride kalmaz; dışarı çıkar.',
     detail: 'Bilmek yetmez, söylemek gerekir.',
   },
   {
@@ -36,7 +35,7 @@ const FLOW_STEPS = [
     customIcon: CorrectIcon,
     accent: '#324D47',
     glowColor: 'rgba(50,77,71,0.15)',
-    body: 'Hata yaptıysan korkma. En ufak hata bile yanlış olarak yerleşmeden anında düzeltilir. Yanlışı tekrar ettirmeyiz; doğrusunu kurdururuz.',
+    body: 'Hata yaptıysan korkma. En ufak hata bile yanlış olarak yerleşmeden anında düzeltilir. Doğrusunu kurdururuz.',
     detail: 'Hata yapılır, yerleşmesine izin verilmez.',
   },
   {
@@ -47,114 +46,28 @@ const FLOW_STEPS = [
     customIcon: RepeatCustomIcon,
     accent: '#E70000',
     glowColor: 'rgba(231,0,0,0.12)',
-    body: 'Bu döngü, seri bir "soru bombardımanı" gibi devam eder. Tekrar sayısı artar; düşünme süresi azalır. Bir süre sonra cümleler… refleks olur.',
+    body: 'Döngü, seri bir soru bombardımanı gibi devam eder. Tekrar sayısı artar; düşünme süresi azalır. Cümleler refleks olur.',
     detail: 'Tekrar ettikçe, düşünmeden konuşursun.',
   },
 ];
-
-const REVEAL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-const STEP_START_DELAY_MS = 120;
-const STEP_STAGGER_MS = 180;
 
 export default function TeachingMethod() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: '-80px' });
   const [activeStep, setActiveStep] = useState(-1);
-  const isLiteMode = useLiteMode();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isLiteMode) {
-      setActiveStep(FLOW_STEPS.length - 1);
-      return;
+    if (inView) {
+      const timers = FLOW_STEPS.map((_, i) => (
+        window.setTimeout(() => setActiveStep(i), 800 + i * 600)
+      ));
+
+      return () => {
+        timers.forEach((timer) => window.clearTimeout(timer));
+      };
     }
-    if (!inView) return;
-
-    const timers = FLOW_STEPS.map((_, i) => (
-      window.setTimeout(() => setActiveStep(i), STEP_START_DELAY_MS + i * STEP_STAGGER_MS)
-    ));
-
-    return () => {
-      timers.forEach((timer) => window.clearTimeout(timer));
-    };
-  }, [inView, isLiteMode]);
-
-  if (isLiteMode) {
-    return (
-      <section id="how-it-works" ref={sectionRef} className="bg-[#09090F] relative overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-
-        <div className="pt-16 pb-8 text-center px-6">
-          <h2 className="font-['Luxury:Gold',sans-serif] text-[0.82rem] tracking-[0.28em] mb-4 text-[#F4EBD1]/90">
-            TEACHERA TEACHING METHOD
-          </h2>
-          <p className="font-['Neutraface_2_Text:Book',sans-serif] text-white/45 text-[13px] max-w-[420px] mx-auto leading-[1.7]">
-            Daha akıcı bir mobil deneyim için sadeleştirilmiş görünüm.
-          </p>
-        </div>
-
-        <div className="max-w-[760px] mx-auto px-5 pb-12">
-          <div className="space-y-4">
-            {FLOW_STEPS.map((step) => {
-              const CustomIcon = step.customIcon;
-              return (
-                <article
-                  key={step.num}
-                  className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5"
-                  style={{ boxShadow: `inset 0 1px 0 ${step.accent}20` }}
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ backgroundColor: `${step.accent}20` }}
-                    >
-                      <CustomIcon color={step.accent} className="w-5 h-5" />
-                    </div>
-                    <div className="flex items-end gap-2">
-                      <span className="font-['Neutraface_2_Text:Bold',sans-serif] text-white/45 text-lg">
-                        {step.num}
-                      </span>
-                      <span
-                        className="font-['Neutraface_2_Text:Demi',sans-serif] text-[11px] tracking-[0.18em] uppercase"
-                        style={{ color: step.accent }}
-                      >
-                        {step.tag}
-                      </span>
-                    </div>
-                  </div>
-                  <h3 className="font-['Neutraface_2_Text:Bold',sans-serif] text-white text-[1.12rem] mb-2">
-                    {step.headline}
-                  </h3>
-                  <p className="font-['Neutraface_2_Text:Book',sans-serif] text-white/62 text-[14px] leading-[1.7] mb-2.5">
-                    {step.body}
-                  </p>
-                  <p
-                    className="font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] italic"
-                    style={{ color: `${step.accent}CC` }}
-                  >
-                    {step.detail}
-                  </p>
-                </article>
-              );
-            })}
-          </div>
-
-          <div className="mt-8 text-center">
-            <button
-              onClick={() => navigate('/metodoloji')}
-              className="group inline-flex items-center gap-2 bg-white/[0.04] border border-white/[0.1] rounded-full px-6 py-2.5 cursor-pointer"
-            >
-              <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-white/80 text-[13px]">
-                Metodolojimizi Keşfet
-              </span>
-              <ArrowRight size={14} className="text-white/70" />
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  }, [inView]);
 
   return (
     <section id="how-it-works" ref={sectionRef} className="bg-[#09090F] relative overflow-hidden">
@@ -180,7 +93,7 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: REVEAL_EASE }}
+          transition={{ duration: 1 }}
           className="relative"
         >
           <h2
@@ -202,7 +115,7 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.55, delay: 0.08, ease: REVEAL_EASE }}
+          transition={{ duration: 0.8, delay: 0.15 }}
         >
           <p className="font-['Neutraface_2_Text:Book',sans-serif] text-white/30 text-[13px] md:text-[14px] max-w-[400px] mx-auto leading-[1.8]">
             Her ders boyunca kesintisiz dönen bu döngü,{' '}
@@ -219,7 +132,7 @@ export default function TeachingMethod() {
             <motion.div
               initial={{ scaleY: 0 }}
               animate={inView ? { scaleY: 1 } : {}}
-              transition={{ duration: 0.95, delay: 0.1, ease: REVEAL_EASE }}
+              transition={{ duration: 2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="w-full h-full bg-gradient-to-b from-white/[0.03] via-white/[0.08] to-white/[0.03] origin-top"
             />
           </div>
@@ -266,7 +179,7 @@ export default function TeachingMethod() {
                     <motion.div
                       initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
                       animate={isActive ? { opacity: 1, x: 0 } : {}}
-                      transition={{ duration: 0.55, ease: REVEAL_EASE }}
+                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                       className={`${isLeft ? 'md:col-start-1' : 'md:col-start-2'} md:py-12`}
                     >
                       <div
@@ -361,7 +274,7 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.62, ease: REVEAL_EASE }}
+          transition={{ duration: 0.8, delay: 3.5 }}
           className="mt-16 md:mt-24 text-center"
         >
           <div className="inline-flex items-center gap-3 bg-white/[0.03] backdrop-blur-sm rounded-full px-6 md:px-8 py-3.5 border border-white/[0.06]">
@@ -382,7 +295,7 @@ export default function TeachingMethod() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.55, delay: 0.78, ease: REVEAL_EASE }}
+          transition={{ duration: 0.8, delay: 3.8 }}
           className="mt-10 text-center"
         >
           <button
