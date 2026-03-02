@@ -4,6 +4,7 @@ import { RotateCcw, ArrowRight, Play, MessageCircle, BookOpen } from 'lucide-rea
 import { useNavigate } from 'react-router';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
+import { useLiteMode } from '../lib/useLiteMode';
 import methodologyHeroVideo from '../../assets/video/methodology-hero.mp4';
 import methodologyHeroVideoWebm from '../../assets/video/methodology-hero.webm';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
@@ -80,7 +81,9 @@ function HeroSection() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const shouldReduceMotion = useReducedMotion();
+  const isLiteMode = useLiteMode();
   const [shouldLoadVideo, setShouldLoadVideo] = useState(!shouldReduceMotion);
+  const [enableScrollEffects, setEnableScrollEffects] = useState(false);
 
   useEffect(() => {
     if (shouldReduceMotion) {
@@ -91,6 +94,22 @@ function HeroSection() {
     const timer = window.setTimeout(() => setShouldLoadVideo(true), 80);
     return () => window.clearTimeout(timer);
   }, [shouldReduceMotion]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const update = () => {
+      setEnableScrollEffects(mediaQuery.matches && !shouldReduceMotion && !isLiteMode);
+    };
+
+    update();
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', update);
+      return () => mediaQuery.removeEventListener('change', update);
+    }
+
+    mediaQuery.addListener(update);
+    return () => mediaQuery.removeListener(update);
+  }, [isLiteMode, shouldReduceMotion]);
 
   return (
     <section ref={ref} className="relative h-auto min-h-[80vh] md:min-h-[88vh] overflow-hidden">
@@ -104,14 +123,12 @@ function HeroSection() {
             muted
             loop
             playsInline
-            preload="metadata"
+            preload={isLiteMode ? 'metadata' : 'auto'}
             aria-hidden="true"
             onLoadedData={(event) => {
               void event.currentTarget.play().catch(() => {});
             }}
           >
-            <source src="/video/methodology-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
-            <source src="/video/methodology-hero-mobile.webm" type="video/webm" media="(max-width: 1023px)" />
             <source src={methodologyHeroVideoWebm} type="video/webm" />
             <source src={methodologyHeroVideo} type="video/mp4" />
           </video>
@@ -129,7 +146,7 @@ function HeroSection() {
       {/* Content */}
       <motion.div
         className="relative z-20 min-h-[80vh] md:min-h-[88vh] flex flex-col items-center justify-center text-center px-6 py-16"
-        style={{ opacity: heroOpacity }}
+        style={enableScrollEffects ? { opacity: heroOpacity } : undefined}
       >
         <motion.div
           initial={{ opacity: 0, y: 40 }}

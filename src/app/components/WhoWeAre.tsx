@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, AnimatePresence, useInView, useMotionValueEvent } from 'motion/react';
+import { motion, useScroll, useTransform, AnimatePresence, useInView, useMotionValueEvent, useReducedMotion } from 'motion/react';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { MapPin, Mail, Clock, BookOpen, Sparkles, GraduationCap, Languages, ArrowRight, ArrowUpRight, Play, Globe, Monitor, Users, Wifi, ChevronRight, Briefcase } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -9,6 +9,7 @@ import imgHero from "figma:asset/2060cbe8e93368901498b0f200d4a7cd60ff1640.webp";
 import { useNavigate } from 'react-router';
 import { languages, LANGUAGE_GROUP_PROGRAM_SLUGS } from './Programs';
 import { ALL_PROGRAMS } from './AllPrograms';
+import { useLiteMode } from '../lib/useLiteMode';
 
 /* ─── Animated Counter ──────────────────────────────────────────────── */
 function AnimatedNumber({ value, suffix = '' }: { value: number; suffix?: string }) {
@@ -377,10 +378,13 @@ function JourneyStepItem({ step, index, onActivate }: {
 export default function WhoWeAre() {
   const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+  const isLiteMode = useLiteMode();
   const [activeGoal, setActiveGoal] = useState<number | null>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [scrollDrivenStep, setScrollDrivenStep] = useState<number>(0);
   const [userOverride, setUserOverride] = useState(false);
+  const [enableScrollEffects, setEnableScrollEffects] = useState(false);
   const { open: openFreeTrial } = useFreeTrial();
   const { open: openLevelAssessment } = useLevelAssessment();
   const [journeyReached, setJourneyReached] = useState(0);
@@ -393,14 +397,34 @@ export default function WhoWeAre() {
     target: timelineRef,
     offset: ['start 0.85', 'end 0.3'],
   });
+  const timelineStepCount = 4;
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const timelineWidth = useTransform(timelineProgress, [0, 1], ['0%', '100%']);
+  const timelineFill = enableScrollEffects
+    ? timelineWidth
+    : `${((activeStep + 1) / timelineStepCount) * 100}%`;
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const update = () => {
+      setEnableScrollEffects(mediaQuery.matches && !shouldReduceMotion && !isLiteMode);
+    };
+
+    update();
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', update);
+      return () => mediaQuery.removeEventListener('change', update);
+    }
+
+    mediaQuery.addListener(update);
+    return () => mediaQuery.removeListener(update);
+  }, [isLiteMode, shouldReduceMotion]);
 
   // Auto-drive activeStep based on scroll progress
   useMotionValueEvent(timelineProgress, 'change', (latest) => {
-    const stepCount = 4;
-    const newStep = Math.min(Math.floor(latest * stepCount), stepCount - 1);
+    if (!enableScrollEffects) return;
+    const newStep = Math.min(Math.floor(latest * timelineStepCount), timelineStepCount - 1);
     setScrollDrivenStep(Math.max(0, newStep));
     if (!userOverride) {
       setActiveStep(Math.max(0, newStep));
@@ -462,7 +486,7 @@ export default function WhoWeAre() {
       {/* ── 1. HERO ────────────────────────────────────────────────────────── */}
       <section ref={heroRef} className="relative h-auto min-h-[80vh] md:min-h-[88vh] overflow-hidden">
         {/* Parallax background */}
-        <motion.div className="absolute inset-0" style={{ y: heroY }}>
+        <motion.div className="absolute inset-0" style={enableScrollEffects ? { y: heroY } : undefined}>
           <div className="absolute inset-0 bg-gradient-to-b from-[#00000B]/75 via-[#00000B]/45 to-[#00000B]/90 z-10" />
           <ImageWithFallback
             src={imgHero}
@@ -474,7 +498,7 @@ export default function WhoWeAre() {
         {/* Content */}
         <motion.div
           className="relative z-20 min-h-[80vh] md:min-h-[88vh] flex flex-col items-center justify-center text-center px-6 py-16"
-          style={{ opacity: heroOpacity }}
+          style={enableScrollEffects ? { opacity: heroOpacity } : undefined}
         >
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -885,7 +909,7 @@ export default function WhoWeAre() {
               <motion.div
                 className="absolute top-0 left-0 h-[2px] rounded-full origin-left"
                 style={{
-                  width: timelineWidth,
+                  width: timelineFill,
                   background: 'linear-gradient(90deg, #324D47, #70C0AE)',
                 }}
               />
@@ -1030,7 +1054,7 @@ export default function WhoWeAre() {
               <motion.div
                 className="absolute left-[5px] top-0 w-[2px] origin-top"
                 style={{
-                  height: timelineWidth,
+                  height: timelineFill,
                   background: 'linear-gradient(180deg, #324D47, #70C0AE)',
                 }}
               />
