@@ -91,7 +91,7 @@ export default function AgeSelection() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="text-3xl md:text-5xl lg:text-6xl font-['Neutraface_2_Text:Bold',sans-serif] text-[#ffffff] mb-6 leading-tight"
           >
             Yaşını seç. Sana uygun dili,<br/>
@@ -102,7 +102,7 @@ export default function AgeSelection() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="text-[#ffffff]/60 font-['Neutraface_2_Text:Book',sans-serif] text-lg max-w-2xl mx-auto"
           >
             Yaş grubu sadece bir sayı değil; öğrenme refleksinin karakteridir.
@@ -121,9 +121,13 @@ export default function AgeSelection() {
                 key={group.id}
                 layout
                 onClick={() => setActiveId(group.id)}
+                transition={{
+                  layout: { duration: 0.42, ease: [0.22, 1, 0.36, 1] },
+                  default: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+                }}
                 className={`
                   relative group cursor-pointer overflow-hidden rounded-[2rem] border border-[#ffffff]/10
-                  transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]
+                  transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
                   ${isActive ? 'lg:flex-[3] h-[500px] lg:h-auto' : 'lg:flex-[1] h-[120px] lg:h-auto'}
                 `}
               >
@@ -133,14 +137,14 @@ export default function AgeSelection() {
                     src={group.image}
                     alt={group.title}
                     className={`
-                      w-full h-full object-cover transition-transform duration-1000 ease-out
+                      w-full h-full object-cover transition-transform duration-500 ease-out
                       ${isActive ? 'scale-100 grayscale-0' : 'scale-110 grayscale-[100%] opacity-40 group-hover:scale-105 group-hover:opacity-60'}
                     `}
                   />
                   {/* Gradient Overlay */}
                   <div 
                     className={`
-                      absolute inset-0 transition-opacity duration-500
+                      absolute inset-0 transition-opacity duration-300
                       ${isActive ? 'bg-gradient-to-t from-[#000000] via-[#000000]/60 to-transparent opacity-90' : 'bg-[#00000B]/80 group-hover:bg-[#00000B]/60'}
                     `}
                   />
@@ -150,10 +154,10 @@ export default function AgeSelection() {
                 <div className="relative z-10 h-full p-6 md:p-8 lg:p-10 flex flex-col justify-end">
                   
                   {/* Icon & Title (Always Visible but transforms) */}
-                  <div className={`transition-all duration-500 ${isActive ? 'mb-auto' : 'flex items-center gap-4 lg:block lg:mb-0'}`}>
+                  <div className={`transition-all duration-300 ${isActive ? 'mb-auto' : 'flex items-center gap-4 lg:block lg:mb-0'}`}>
                     <div 
                       className={`
-                        w-12 h-12 rounded-full flex items-center justify-center mb-0 lg:mb-4 transition-all duration-500
+                        w-12 h-12 rounded-full flex items-center justify-center mb-0 lg:mb-4 transition-all duration-300
                         ${isActive ? 'bg-[#ffffff]/10 text-[#ffffff]' : 'bg-[#ffffff]/5 text-[#ffffff]/60'}
                       `}
                       style={isActive ? { backgroundColor: group.accent } : {}}
@@ -162,24 +166,24 @@ export default function AgeSelection() {
                     </div>
                     
                     <div>
-                      <h3 className={`font-['Neutraface_2_Text:Bold',sans-serif] text-[#ffffff] leading-none transition-all duration-500 ${isActive ? 'text-3xl md:text-5xl mb-2' : 'text-xl lg:text-2xl lg:mb-2'}`}>
+                      <h3 className={`font-['Neutraface_2_Text:Bold',sans-serif] text-[#ffffff] leading-none transition-all duration-300 ${isActive ? 'text-3xl md:text-5xl mb-2' : 'text-xl lg:text-2xl lg:mb-2'}`}>
                         {group.title}
                       </h3>
-                      <p className={`font-['Neutraface_2_Text:Demi',sans-serif] tracking-widest text-[#ffffff]/60 text-xs md:text-sm uppercase transition-all duration-500 ${isActive ? 'opacity-100' : 'opacity-60'}`}>
+                      <p className={`font-['Neutraface_2_Text:Demi',sans-serif] tracking-widest text-[#ffffff]/60 text-xs md:text-sm uppercase transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-60'}`}>
                         {group.subtitle}
                       </p>
                     </div>
                   </div>
 
                   {/* Expanded Content */}
-                  <AnimatePresence mode="wait">
+                  <AnimatePresence initial={false}>
                     {isActive ? (
                       <motion.div
-                        key="expanded"
-                        initial={{ opacity: 0, y: 20 }}
+                        key={`${group.id}-expanded`}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.4, delay: 0.1 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                       >
                          {/* Decorative Line */}
                         <div className="w-16 h-1 rounded-full mb-6" style={{ backgroundColor: group.accent }} />
@@ -195,11 +199,11 @@ export default function AgeSelection() {
                       </motion.div>
                     ) : (
                       <motion.div
-                        key="collapsed"
+                        key={`${group.id}-collapsed`}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        transition={{ duration: 0.18 }}
                         className="hidden lg:block mt-4"
                       >
                          <p className="text-[#ffffff]/50 font-['Neutraface_2_Text:Book',sans-serif] italic text-sm border-l-2 pl-4 border-[#ffffff]/20">
