@@ -5,12 +5,10 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "vite build",
-    "dev": "vite",
-    "lighthouse:compare": "node scripts/compare-lighthouse.mjs"
+    "dev": "vite"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

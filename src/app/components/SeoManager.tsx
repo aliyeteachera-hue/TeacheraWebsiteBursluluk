@@ -289,14 +289,7 @@ export default function SeoManager() {
     const canonicalPath = knownPath ? pathname || '/' : '/';
     const canonicalUrl = `${SITE_URL}${canonicalPath}`;
     const isAuthPage = pathname === '/giris';
-    const isLegalDetailPage = /^\/hukuki\/[^/]+$/.test(pathname);
-    const robotsValue = isAuthPage
-      ? 'noindex,nofollow,noarchive'
-      : isLegalDetailPage
-        ? 'noindex,follow,noarchive'
-        : knownPath
-          ? DEFAULT_ROBOTS
-          : 'noindex,follow,noarchive';
+    const robotsValue = isAuthPage ? 'noindex,nofollow,noarchive' : knownPath ? DEFAULT_ROBOTS : 'noindex,follow,noarchive';
 
     document.title = meta.title;
 

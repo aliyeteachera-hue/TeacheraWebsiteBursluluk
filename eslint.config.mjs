@@ -32,11 +32,4 @@ export default tseslint.config(
       'no-shadow-restricted-names': 'off',
     },
   },
-  {
-    files: ['src/app/lib/**/*.{ts,tsx}'],
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    },
-  },
 )

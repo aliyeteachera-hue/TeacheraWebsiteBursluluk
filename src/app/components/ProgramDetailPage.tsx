@@ -2093,13 +2093,12 @@ function StarsSection() {
         {/* Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {starsData.map((star, idx) => (
-            <React.Fragment key={star.num}>
-              <Reveal delay={idx * 0.15}>
-                <motion.div
-                  className="relative rounded-2xl border border-white/[0.08] hover:border-white/[0.18] bg-gradient-to-br from-white/[0.05] to-white/[0.02] backdrop-blur-sm p-8 md:p-10 h-full flex flex-col group transition-colors duration-400 overflow-hidden"
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
-                >
+            <Reveal key={star.num} delay={idx * 0.15}>
+              <motion.div
+                className="relative rounded-2xl border border-white/[0.08] hover:border-white/[0.18] bg-gradient-to-br from-white/[0.05] to-white/[0.02] backdrop-blur-sm p-8 md:p-10 h-full flex flex-col group transition-colors duration-400 overflow-hidden"
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
+              >
                 {/* Top accent bar */}
                 <div
                   className="absolute top-0 left-0 right-0 h-[2px]"
@@ -2177,9 +2176,8 @@ function StarsSection() {
                     transition={{ duration: 1.2, delay: 0.3 + idx * 0.2, ease: [0.33, 1, 0.68, 1] }}
                   />
                 </div>
-                </motion.div>
-              </Reveal>
-            </React.Fragment>
+              </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -2271,12 +2269,11 @@ function RelatedPrograms({ current }: { current: ProgramItem }) {
           {related.map((p, i) => {
             const a = LANG_ACCENTS[p.language] || '#324D47';
             return (
-              <React.Fragment key={p.id}>
-                <Reveal delay={i * 0.1}>
-                  <div
-                    className="bg-white rounded-2xl border border-[#09090F]/[0.06] p-6 cursor-pointer hover:shadow-[0_8px_32px_rgba(50,77,71,0.07)] hover:border-[#324D47]/20 transition-all duration-300 group"
-                    onClick={() => navigate(`/egitimlerimiz/${p.slug}`)}
-                  >
+              <Reveal key={p.id} delay={i * 0.1}>
+                <div
+                  className="bg-white rounded-2xl border border-[#09090F]/[0.06] p-6 cursor-pointer hover:shadow-[0_8px_32px_rgba(50,77,71,0.07)] hover:border-[#324D47]/20 transition-all duration-300 group"
+                  onClick={() => navigate(`/egitimlerimiz/${p.slug}`)}
+                >
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: a }} />
                     <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[10px] tracking-[0.1em]" style={{ color: `${a}CC` }}>{p.languageLabel}</span>
@@ -2286,9 +2283,8 @@ function RelatedPrograms({ current }: { current: ProgramItem }) {
                   <span className="flex items-center gap-1 text-[#324D47] text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] group-hover:gap-2 transition-all">
                     Detayları İncele <ChevronRight size={12} />
                   </span>
-                  </div>
-                </Reveal>
-              </React.Fragment>
+                </div>
+              </Reveal>
             );
           })}
         </div>
@@ -2613,20 +2609,18 @@ export default function ProgramDetailPage() {
           </Reveal>
           <div className="space-y-0">
             {content.curriculum.modules.map((mod, i) => (
-              <React.Fragment key={`${mod.name}-${i}`}>
-                <Reveal delay={i * 0.08}>
-                  <div className="relative pl-12 md:pl-16 pb-10 last:pb-0">
-                    {i < content.curriculum.modules.length - 1 && <div className="absolute left-[18px] md:left-[22px] top-10 bottom-0 w-px bg-gradient-to-b from-[#09090F]/[0.08] to-transparent" />}
-                    <div className="absolute left-0 top-0 w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center text-white font-['Neutraface_2_Text:Bold',sans-serif] text-[12px] md:text-[13px]" style={{ backgroundColor: accent }}>
-                      {String(i + 1).padStart(2, '0')}
-                    </div>
-                    <div className="bg-white rounded-2xl border border-[#09090F]/[0.05] p-5 md:p-6 hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition-shadow">
-                      <h3 className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#09090F] text-[15px] mb-2">{mod.name}</h3>
-                      <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/50 text-mobile-meta md:text-[13px] leading-[1.7]">{mod.detail}</p>
-                    </div>
+              <Reveal key={i} delay={i * 0.08}>
+                <div className="relative pl-12 md:pl-16 pb-10 last:pb-0">
+                  {i < content.curriculum.modules.length - 1 && <div className="absolute left-[18px] md:left-[22px] top-10 bottom-0 w-px bg-gradient-to-b from-[#09090F]/[0.08] to-transparent" />}
+                  <div className="absolute left-0 top-0 w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center text-white font-['Neutraface_2_Text:Bold',sans-serif] text-[12px] md:text-[13px]" style={{ backgroundColor: accent }}>
+                    {String(i + 1).padStart(2, '0')}
                   </div>
-                </Reveal>
-              </React.Fragment>
+                  <div className="bg-white rounded-2xl border border-[#09090F]/[0.05] p-5 md:p-6 hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition-shadow">
+                    <h3 className="font-['Neutraface_2_Text:Bold',sans-serif] text-[#09090F] text-[15px] mb-2">{mod.name}</h3>
+                    <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[#09090F]/50 text-mobile-meta md:text-[13px] leading-[1.7]">{mod.detail}</p>
+                  </div>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -2646,9 +2640,7 @@ export default function ProgramDetailPage() {
           </Reveal>
           <div className="space-y-4">
             {content.faqs.map((faq, i) => (
-              <React.Fragment key={`${faq.q}-${i}`}>
-                <FAQItem question={faq.q} answer={faq.a} index={i} accent={accent} ctaType={faq.ctaType} />
-              </React.Fragment>
+              <FAQItem key={i} question={faq.q} answer={faq.a} index={i} accent={accent} ctaType={faq.ctaType} />
             ))}
           </div>
         </div>

@@ -136,7 +136,7 @@ export default function FreeTrialModal() {
         `Ad Soyad: ${formData.fullName}`,
         `Telefon: +90 ${formData.phone}`,
         `E-posta: ${formData.email || '-'}`,
-        `Yas Araligi: ${ageRanges.find((age) => age === formData.age) || formData.age}`,
+        `Yas Araligi: ${ageRanges.find((age) => age.id === formData.age)?.label || formData.age}`,
         `Dil: ${getLanguagesForAge(formData.age).find((language) => language.id === formData.language)?.name || formData.language}`,
         `Seans Tarihi: ${selectedDate ? formatDate(selectedDate) : '-'}`,
         `Saat Araligi: ${timeSlots.find((slot) => slot.id === selectedTime)?.label || selectedTime || '-'}`,

@@ -6,40 +6,12 @@ import TeacheraLogo from '../../../imports/TeacheraLogo';
 import EraSlogan from '../EraSlogan';
 import { LEGAL_DOCUMENT_MAP } from './legalDocumentData';
 
-const FALLBACK_SITE_URL = 'https://teachera.com.tr';
-const SITE_URL = (import.meta.env.VITE_SITE_URL || FALLBACK_SITE_URL).replace(/\/+$/, '');
-
 function isBulletParagraph(text: string) {
   return text.trim().startsWith('•');
 }
 
 function normalizeParagraph(text: string) {
   return text.replace(/^•\s*/, '').trim();
-}
-
-function upsertMetaTag(attr: 'name' | 'property', key: string, content: string) {
-  const selector = `meta[${attr}="${key}"]`;
-  let element = document.querySelector(selector) as HTMLMetaElement | null;
-
-  if (!element) {
-    element = document.createElement('meta');
-    element.setAttribute(attr, key);
-    document.head.appendChild(element);
-  }
-
-  element.setAttribute('content', content);
-}
-
-function upsertCanonicalLink(href: string) {
-  let element = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-
-  if (!element) {
-    element = document.createElement('link');
-    element.setAttribute('rel', 'canonical');
-    document.head.appendChild(element);
-  }
-
-  element.setAttribute('href', href);
 }
 
 export default function LegalDocumentPage() {
@@ -49,25 +21,8 @@ export default function LegalDocumentPage() {
   const paragraphCount = doc?.paragraphs.length ?? 0;
 
   useEffect(() => {
-    if (!doc) {
-      document.title = 'Hukuki Doküman Bulunamadı | Teachera';
-      upsertMetaTag('name', 'description', 'Aradığınız hukuki doküman bulunamadı. Teachera hukuki metinler sayfasından güncel belgelere ulaşabilirsiniz.');
-      upsertMetaTag('name', 'robots', 'noindex,follow,noarchive');
-      upsertMetaTag('property', 'og:title', 'Hukuki Doküman Bulunamadı | Teachera');
-      upsertMetaTag('property', 'og:description', 'Aradığınız hukuki doküman bulunamadı. Teachera hukuki metinler sayfasından güncel belgelere ulaşabilirsiniz.');
-      upsertMetaTag('property', 'og:url', `${SITE_URL}/hukuki`);
-      upsertCanonicalLink(`${SITE_URL}/hukuki`);
-      return;
-    }
-
-    const canonicalUrl = `${SITE_URL}/hukuki/${doc.slug}`;
+    if (!doc) return;
     document.title = `${doc.title} | Teachera Hukuki`;
-    upsertMetaTag('name', 'description', doc.shortDescription);
-    upsertMetaTag('name', 'robots', 'noindex,follow,noarchive');
-    upsertMetaTag('property', 'og:title', `${doc.title} | Teachera Hukuki`);
-    upsertMetaTag('property', 'og:description', doc.shortDescription);
-    upsertMetaTag('property', 'og:url', canonicalUrl);
-    upsertCanonicalLink(canonicalUrl);
   }, [doc]);
 
   if (!doc) {

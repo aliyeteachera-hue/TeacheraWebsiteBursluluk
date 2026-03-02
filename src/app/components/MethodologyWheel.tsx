@@ -1,7 +1,7 @@
 import { motion, useScroll, AnimatePresence } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Infinity as InfinityIcon } from 'lucide-react';
+import { Infinity } from 'lucide-react';
 import TeacheraLogo from "../../imports/TeacheraLogo";
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon } from './MethodologyIcons';
 
@@ -389,7 +389,7 @@ export default function MethodologyWheel() {
                           border: '1px solid rgba(50,77,71,0.08)',
                         }}
                       >
-                        <InfinityIcon size={16} className="text-[#324D47]" />
+                        <Infinity size={16} className="text-[#324D47]" />
                         <span className="text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#324D47]">
                           Bu döngü devam eder — cümleler refleks olur. Zamanla dil kalıcı bir şekilde akıcılaşır!
                         </span>

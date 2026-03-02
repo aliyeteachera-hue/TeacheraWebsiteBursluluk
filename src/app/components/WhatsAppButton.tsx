@@ -96,7 +96,7 @@ export function WhatsAppButton() {
       source: 'floating_widget',
       phone_number: phoneNumber,
     });
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank', 'noopener,noreferrer');
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
   };
 
   return (
@@ -211,6 +211,7 @@ export function WhatsAppButton() {
             className="w-full h-full object-cover will-change-transform"
             autoPlay
             muted
+            defaultMuted
             loop
             playsInline
             preload="auto"

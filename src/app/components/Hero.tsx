@@ -84,7 +84,7 @@ function OrbitingArcButton({
               ? {}
               : {
                   animate: { strokeDashoffset: [0, -perimeter] },
-                  transition: { duration: arcDuration, repeat: Infinity, ease: 'linear' as const },
+                  transition: { duration: arcDuration, repeat: Infinity, ease: 'linear' },
                 };
             return (
               <motion.rect
@@ -176,6 +176,7 @@ export default function Hero() {
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               muted
+              defaultMuted
               loop
               playsInline
               preload="metadata"
