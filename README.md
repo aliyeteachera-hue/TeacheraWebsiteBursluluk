@@ -77,6 +77,29 @@ pnpm dev
 pnpm build
 ```
 
+### Hero Video Pipeline (Mobile Variants)
+- Amaç: mobilde daha düşük veri tüketimi için `home-hero` ve `methodology-hero` videolarının optimize varyantlarını üretmek.
+- Çıktı dosyaları: `public/video/home-hero-mobile.(webm|mp4)` ve `public/video/methodology-hero-mobile.(webm|mp4)`.
+
+```bash
+# ffmpeg kurulu değilse (macOS)
+brew install ffmpeg
+
+# mobil varyantları üret
+pnpm video:hero:encode
+
+# mevcut varyant durumunu kontrol et
+pnpm video:hero:status
+```
+
+### Forms Security (Proxy + Captcha)
+- Frontend forms submit to `/api/forms` (server-side proxy).
+- Bot protection uses Cloudflare Turnstile when `TURNSTILE_SECRET_KEY` is configured.
+- Configure env vars from `.env.example` for:
+  - `VITE_TURNSTILE_SITE_KEY`
+  - `TURNSTILE_SECRET_KEY`
+  - `FORMS_UPSTREAM_TEMPLATE`
+
 ## 📂 Proje Yapısı
 
 ```

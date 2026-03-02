@@ -4,6 +4,8 @@ import { RotateCcw, ArrowRight, Play, MessageCircle, BookOpen } from 'lucide-rea
 import { useNavigate } from 'react-router';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
+import { useLiteMode } from '../lib/useLiteMode';
+import { detectMobileVideoVariants } from '../lib/videoVariants';
 import methodologyHeroVideo from '../../assets/video/methodology-hero.mp4';
 import methodologyHeroVideoWebm from '../../assets/video/methodology-hero.webm';
 import { ListenIcon, SpeakIcon, CorrectIcon, RepeatIcon as RepeatCustomIcon } from './MethodologyIcons';
@@ -80,17 +82,35 @@ function HeroSection() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const shouldReduceMotion = useReducedMotion();
+  const isLiteMode = useLiteMode();
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const [mobileVideoVariants, setMobileVideoVariants] = useState({ mobileWebm: false, mobileMp4: false });
 
   useEffect(() => {
-    if (shouldReduceMotion) {
+    if (shouldReduceMotion || isLiteMode) return;
+    if (!window.matchMedia('(max-width: 1023px)').matches) return;
+
+    let isCancelled = false;
+    void detectMobileVideoVariants('methodology-hero').then((availability) => {
+      if (!isCancelled) {
+        setMobileVideoVariants(availability);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isLiteMode, shouldReduceMotion]);
+
+  useEffect(() => {
+    if (shouldReduceMotion || isLiteMode) {
       setShouldLoadVideo(false);
       return;
     }
 
-    const timer = window.setTimeout(() => setShouldLoadVideo(true), 320);
+    const timer = window.setTimeout(() => setShouldLoadVideo(true), 480);
     return () => window.clearTimeout(timer);
-  }, [shouldReduceMotion]);
+  }, [isLiteMode, shouldReduceMotion]);
 
   return (
     <section ref={ref} className="relative h-auto min-h-[80vh] md:min-h-[88vh] overflow-hidden">
@@ -104,9 +124,15 @@ function HeroSection() {
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="none"
             aria-hidden="true"
           >
+            {mobileVideoVariants.mobileWebm && (
+              <source src="/video/methodology-hero-mobile.webm" type="video/webm" media="(max-width: 1023px)" />
+            )}
+            {mobileVideoVariants.mobileMp4 && (
+              <source src="/video/methodology-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
+            )}
             <source src={methodologyHeroVideoWebm} type="video/webm" />
             <source src={methodologyHeroVideo} type="video/mp4" />
           </video>

@@ -1,12 +1,24 @@
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { useRef, useEffect, useState, type ReactNode } from 'react';
 import { ChevronDown, Play } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import Group1000004255 from '../../imports/Group1000004255';
 import homeHeroVideo from '../../assets/video/home-hero.mp4';
 import homeHeroVideoWebm from '../../assets/video/home-hero.webm';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { useFreeTrial } from './FreeTrialContext';
 import { useLiteMode } from '../lib/useLiteMode';
+import { detectMobileVideoVariants } from '../lib/videoVariants';
+
+const HERO_LANGUAGE_LINKS = [
+  { label: 'İngilizce', slug: 'ingilizce/grup-programi' },
+  { label: 'İspanyolca', slug: 'ispanyolca/grup-programi' },
+  { label: 'Almanca', slug: 'almanca/grup-programi' },
+  { label: 'İtalyanca', slug: 'italyanca/grup-programi' },
+  { label: 'Fransızca', slug: 'fransizca/grup-programi' },
+  { label: 'Rusça', slug: 'rusca/grup-programi' },
+  { label: 'Arapça', slug: 'arapca/grup-programi' },
+] as const;
 
 /* ─── Orbiting Arc Button ───────────────────────────────────────────────── */
 function OrbitingArcButton({
@@ -115,6 +127,7 @@ function OrbitingArcButton({
 
 /* ─── Hero ──────────────────────────────────────────────────────────────── */
 export default function Hero() {
+  const navigate = useNavigate();
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
@@ -122,26 +135,44 @@ export default function Hero() {
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [enableDesktopEffects, setEnableDesktopEffects] = useState(false);
   const [enableHeroMotion, setEnableHeroMotion] = useState(false);
+  const [mobileVideoVariants, setMobileVideoVariants] = useState({ mobileWebm: false, mobileMp4: false });
   const isLiteMode = useLiteMode();
   const { open: openLevelAssessment } = useLevelAssessment();
   const { open: openFreeTrial } = useFreeTrial();
 
   useEffect(() => {
+    if (shouldReduceMotion || isLiteMode) return;
+    if (!window.matchMedia('(max-width: 1023px)').matches) return;
+
+    let isCancelled = false;
+    void detectMobileVideoVariants('home-hero').then((availability) => {
+      if (!isCancelled) {
+        setMobileVideoVariants(availability);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isLiteMode, shouldReduceMotion]);
+
+  useEffect(() => {
     let timer = 0;
-    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
 
     const updateVideoState = () => {
       window.clearTimeout(timer);
       const shouldEnableMotion = !shouldReduceMotion && !isLiteMode;
+      const shouldEnableVideo = shouldEnableMotion;
       const shouldEnableDesktopEffects = shouldEnableMotion && mediaQuery.matches;
       setEnableHeroMotion(shouldEnableMotion);
       setEnableDesktopEffects(shouldEnableDesktopEffects);
 
-      if (shouldReduceMotion) {
+      if (!shouldEnableVideo) {
         setShouldLoadVideo(false);
         return;
       }
-      timer = window.setTimeout(() => setShouldLoadVideo(true), mediaQuery.matches ? 420 : 260);
+      timer = window.setTimeout(() => setShouldLoadVideo(true), 520);
     };
 
     updateVideoState();
@@ -178,9 +209,15 @@ export default function Hero() {
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="none"
               aria-hidden="true"
             >
+              {mobileVideoVariants.mobileWebm && (
+                <source src="/video/home-hero-mobile.webm" type="video/webm" media="(max-width: 1023px)" />
+              )}
+              {mobileVideoVariants.mobileMp4 && (
+                <source src="/video/home-hero-mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
+              )}
               <source src={homeHeroVideoWebm} type="video/webm" />
               <source src={homeHeroVideo} type="video/mp4" />
             </video>
@@ -235,17 +272,19 @@ export default function Hero() {
 
             {/* Language badges */}
             <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5 md:gap-2 mb-2 sm:mb-3 md:mb-4">
-              {['İngilizce', 'İspanyolca', 'Almanca', 'İtalyanca', 'Fransızca', 'Rusça', 'Arapça'].map((lang, i) => (
-                <motion.span
-                  key={lang}
+              {HERO_LANGUAGE_LINKS.map((lang, i) => (
+                <motion.button
+                  key={lang.label}
+                  type="button"
                   initial={{ opacity: 0, scale: 0.7, y: 12 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 1.1 + i * 0.1, type: 'spring', bounce: 0.35 }}
-                  className="inline-flex items-center px-2.5 py-1 sm:px-2.5 sm:py-0.5 md:px-3 md:py-1 rounded-full border border-[#ffffff]/25 bg-[#ffffff]/8 backdrop-blur-sm text-[#ffffff]/82 text-mobile-meta sm:text-sm md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/12 hover:border-[#ffffff]/40 hover:text-[#ffffff] transition-all cursor-default"
+                  className="inline-flex items-center px-2.5 py-1 sm:px-2.5 sm:py-0.5 md:px-3 md:py-1 rounded-full border border-[#ffffff]/25 bg-[#ffffff]/8 backdrop-blur-sm text-[#ffffff]/82 text-mobile-meta sm:text-sm md:text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#ffffff]/12 hover:border-[#ffffff]/40 hover:text-[#ffffff] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E70000]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                  onClick={() => navigate(`/egitimlerimiz/${lang.slug}`)}
                   whileHover={{ scale: 1.07, y: -2 }}
                 >
-                  {lang}
-                </motion.span>
+                  {lang.label}
+                </motion.button>
               ))}
             </div>
 
