@@ -8,6 +8,8 @@ import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
+import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
+import { useFormSubmission } from '../lib/useFormSubmission';
 
 /* ─── DATA ──────────────────────────────────────────────────────────────── */
 const languages = [
@@ -114,6 +116,15 @@ function CallbackForm() {
   const [langOpen, setLangOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const {
+    isSubmitting,
+    fieldError,
+    submitError,
+    setFieldError,
+    clearErrors,
+    resetSubmissionState,
+    runSubmission,
+  } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
 
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -124,19 +135,32 @@ function CallbackForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.language || !selectedDate || !selectedTime || !isPhoneValid) return;
+    if (isSubmitting) return;
+    clearErrors();
+
+    if (!formData.fullName || !formData.language || !selectedDate || !selectedTime) {
+      setFieldError(FORM_UI_MESSAGES.required);
+      return;
+    }
+
+    if (!isPhoneValid) {
+      setFieldError(FORM_UI_MESSAGES.phone);
+      return;
+    }
 
     const selectedTimeLabel = timeSlots.find((slot) => slot.id === selectedTime)?.label || selectedTime;
-    const sent = await openMailDraft({
-      subject: 'Teachera Geri Arama Talebi',
-      lines: [
-        `Ad Soyad: ${formData.fullName}`,
-        `Telefon: +90 ${formData.phone}`,
-        `Dil: ${selectedLang?.name || formData.language}`,
-        `Tarih: ${formatDate(selectedDate)}`,
-        `Saat Aralığı: ${selectedTimeLabel}`,
-      ],
-    });
+    const sent = await runSubmission(() =>
+      openMailDraft({
+        subject: 'Teachera Geri Arama Talebi',
+        lines: [
+          `Ad Soyad: ${formData.fullName}`,
+          `Telefon: +90 ${formData.phone}`,
+          `Dil: ${selectedLang?.name || formData.language}`,
+          `Tarih: ${formatDate(selectedDate)}`,
+          `Saat Aralığı: ${selectedTimeLabel}`,
+        ],
+      }),
+    );
 
     if (!sent) {
       notifyError('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
@@ -152,6 +176,7 @@ function CallbackForm() {
     setSelectedDate(null);
     setSelectedTime('');
     setSubmitted(false);
+    resetSubmissionState();
   };
 
   const prevMonth = () => {
@@ -337,17 +362,28 @@ function CallbackForm() {
                   </div>
                 </FieldWrap>
 
+                {fieldError && (
+                  <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#F4EBD1]">
+                    {fieldError}
+                  </p>
+                )}
+                {submitError && (
+                  <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#FFD4D1]">
+                    {submitError}
+                  </p>
+                )}
+
                 {/* Submit */}
                 <motion.button
                   type="submit"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={!formData.fullName || !formData.language || !selectedDate || !selectedTime || !isPhoneValid}
+                  disabled={isSubmitting || !formData.fullName || !formData.language || !selectedDate || !selectedTime || !isPhoneValid}
                   className="w-full h-[48px] bg-[#00000B] hover:bg-[#68232E] rounded-[30px] flex items-center justify-center gap-2.5 transition-colors duration-300 mt-2 cursor-pointer disabled:bg-[#00000B]/40 disabled:cursor-not-allowed"
                 >
                   <Send size={15} className="text-white" />
                   <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[14px] text-white tracking-[0.05em] md:tracking-wide">
-                    Arama Talebi Oluştur
+                    {isSubmitting ? FORM_UI_MESSAGES.submitting : 'Arama Talebi Oluştur'}
                   </span>
                 </motion.button>
               </div>

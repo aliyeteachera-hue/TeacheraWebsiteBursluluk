@@ -21,4 +21,10 @@ describe('overlay lifecycle options', () => {
     expect(options.motionProfile).toBe('lite');
     expect(options.releaseAfterMs).toBe(420);
   });
+
+  it('keeps cookie consent out of global scroll lock flow', () => {
+    const options = getOverlayLifecycleOptions('cookie-consent', false, false);
+    expect(options.lockScroll).toBe(false);
+    expect(options.lockTouch).toBe(false);
+  });
 });

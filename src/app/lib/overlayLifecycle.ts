@@ -11,10 +11,12 @@ export type OverlayOwner =
   | 'level-assessment'
   | 'delivery-appointment'
   | 'speakup-form'
-  | 'speakup-video';
+  | 'speakup-video'
+  | 'cookie-consent';
 
 export interface OverlayLifecycleOptions {
   releaseAfterMs: number;
+  lockScroll: boolean;
   lockTouch: boolean;
   motionProfile: MotionProfile;
 }
@@ -44,11 +46,15 @@ export function getOverlayLifecycleOptions(
     releaseAfterMs = isCoarsePointer ? 420 : 260;
   }
   if (owner === 'speakup-video') releaseAfterMs = isCoarsePointer ? 120 : 100;
+  if (owner === 'cookie-consent') releaseAfterMs = isCoarsePointer ? 100 : 80;
   if (!isCoarsePointer && motionProfile === 'lite') releaseAfterMs = Math.min(releaseAfterMs, 90);
+
+  const lockScroll = owner !== 'cookie-consent';
 
   return {
     releaseAfterMs,
-    lockTouch: owner === 'mobile-menu' ? false : isCoarsePointer,
+    lockScroll,
+    lockTouch: owner === 'mobile-menu' || owner === 'cookie-consent' ? false : isCoarsePointer,
     motionProfile,
   };
 }
@@ -62,6 +68,6 @@ export function useOverlayLifecycle(active: boolean, owner: OverlayOwner) {
     [owner, isCoarsePointer, prefersLiteMotion],
   );
 
-  usePageScrollLock(active, owner, options.releaseAfterMs, options.lockTouch);
+  usePageScrollLock(active && options.lockScroll, owner, options.releaseAfterMs, options.lockTouch);
   return options;
 }

@@ -3137,6 +3137,10 @@ export type PlacementExamResolution =
   | { available: true; key: PlacementExamKey; note?: string }
   | { available: false; note: string };
 
+export type PlacementExamBankResult =
+  | ({ available: true; key: PlacementExamKey; note?: string } & { bank: PlacementExamBank })
+  | { available: false; note: string };
+
 export function resolvePlacementExamKey(age: string, languageId: string): PlacementExamResolution {
   const normalizedLanguage = languageId.toLowerCase();
 
@@ -3166,10 +3170,10 @@ export function resolvePlacementExamKey(age: string, languageId: string): Placem
   };
 }
 
-export function getPlacementBank(age: string, languageId: string) {
+export function getPlacementBank(age: string, languageId: string): PlacementExamBankResult {
   const resolved = resolvePlacementExamKey(age, languageId);
 
-  if (!resolved.available) {
+  if (resolved.available === false) {
     return resolved;
   }
 

@@ -1,5 +1,103 @@
 **Add your own guidelines here**
-<!--
+# Project Guidelines (for Codex / AI)
+
+## Non-negotiables
+- Keep changes **small, reviewable, and scoped**. No drive-by refactors.
+- **Do not edit generated output**: `node_modules/`, `dist/`, any build artifacts.
+- **No new production dependencies** without explicit approval.
+- Never introduce or log **secrets** (tokens/keys). Redact if encountered.
+- Respect existing conventions in the repo; **follow precedent** before inventing new patterns.
+
+## Tooling (source of truth)
+- Package manager: **pnpm** (lockfile: `pnpm-lock.yaml`)
+- Dev/build: **Vite**
+- Language: **TypeScript** (`tsconfig.json`)
+- Tests: **Vitest**
+- Lint: **ESLint**
+- Router: **react-router**
+
+## Canonical commands (use these exact scripts)
+- Install: `pnpm install`
+- Dev: `pnpm dev`
+- Build: `pnpm build`
+- Lint: `pnpm lint`
+- Typecheck: `pnpm typecheck`
+- Test (CI): `pnpm test`
+- Test (watch): `pnpm test:watch`
+
+### Verification rules (default)
+- Any behavior/UI logic change ⇒ `pnpm lint && pnpm typecheck && pnpm test`
+- Styling-only (no logic) ⇒ `pnpm lint && pnpm typecheck` (tests optional unless risky)
+- Dependency change ⇒ ask first + run full verification and ensure lockfile updated
+
+## Implementation workflow
+1) **Understand**: locate similar patterns/components in the codebase and mirror them.
+2) **Plan** (if > small edit): propose 3–7 steps + what commands will validate it.
+3) **Implement**: minimal diff, keep boundaries clean.
+4) **Verify**: run commands above; if you can’t run, state why and what to run.
+5) **Report**: summary + files changed + commands run + how to verify + risks/follow-ups.
+
+## TypeScript standards
+- Avoid `any`. Prefer `unknown` + narrowing (type guards) at boundaries.
+- Keep types explicit at module boundaries (exported functions/hooks/components).
+- Don’t change `tsconfig.json` without explicit approval (project-wide contract).
+- Prefer pure helpers for complex logic (testable functions in `utils/`).
+
+## React / UI standards
+- Functional components + hooks.
+- No side effects at module import time.
+- Accessibility:
+  - Use semantic HTML first.
+  - Ensure keyboard navigation and visible focus.
+  - Provide `aria-label` for icon-only buttons.
+- Prefer **one UI approach per feature**:
+  - If the project already uses a component pattern, follow it.
+  - Avoid mixing MUI and Radix *in the same component tree* unless the existing codebase already does.
+
+## Styling & layout
+- Prefer **responsive layouts** using flex/grid.
+- Avoid absolute positioning unless necessary.
+- Keep UI consistent: spacing, typography, and component rhythm should match existing screens.
+- If Tailwind is used in the project, prefer Tailwind utility classes for layout and spacing.
+- Don’t introduce a new styling system.
+
+## Forms & validation
+- Prefer `react-hook-form` for forms.
+- Validate user inputs at boundaries; show actionable errors.
+- Don’t silently fail; surface errors (inline + toast if appropriate).
+
+## Data / side effects
+- No real network calls in tests.
+- For API/data access, prefer a small client module (`src/api/*`) rather than scattered `fetch` calls.
+- Keep effects localized; cleanup timers/subscriptions.
+
+## Testing (Vitest)
+- Bugfix ⇒ add a regression test.
+- New feature ⇒ happy path + important edge cases.
+- Tests should be deterministic (no time/network flakiness).
+- If UI testing utilities are not present, don’t add them without approval.
+
+## Dependency policy
+- Ask before adding deps.
+- Prefer existing deps already in package.json.
+- When adding:
+  - explain why it’s necessary
+  - keep it minimal
+  - update lockfile
+  - ensure licensing/maintenance risk is reasonable
+
+## Definition of Done (DoD)
+A change is done when:
+- Lint passes (`pnpm lint`)
+- Typecheck passes (`pnpm typecheck`)
+- Tests pass when behavior changed (`pnpm test`)
+- No secrets introduced
+- Final output includes:
+  - Summary (what/why)
+  - Files changed
+  - Commands run
+  - How to verify
+  - Risks / rollout notes / follow-ups
 
 System Guidelines
 

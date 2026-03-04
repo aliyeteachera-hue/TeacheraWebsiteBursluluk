@@ -1543,14 +1543,14 @@ export default function ProgramFinder() {
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={openFreeTrial}
+                      onClick={() => openFreeTrial('program_finder_cta')}
                       className="flex items-center gap-2 px-7 py-3.5 bg-[#324D47] text-white rounded-full font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] hover:bg-[#3d5e56] transition-all cursor-pointer shadow-[0_4px_20px_rgba(50,77,71,0.35)]"
                     >
                       <Zap size={14} />
                       Ücretsiz Seans Al
                     </motion.button>
                     <button
-                      onClick={openLevelAssessment}
+                      onClick={() => openLevelAssessment('program_finder_cta')}
                       className="flex items-center gap-1.5 px-6 py-3.5 rounded-full border border-white/[0.12] text-white/45 text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] hover:border-white/25 hover:text-white/65 transition-all cursor-pointer"
                     >
                       Seviye Tespit

@@ -7,6 +7,8 @@ import {
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
+import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
+import { useFormSubmission } from '../lib/useFormSubmission';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -140,6 +142,15 @@ export default function CorporatePage() {
 function CorporateForm() {
   const [step, setStep] = useState(0); // 0 = kurum, 1 = yetkili, 2 = talep
   const [submitted, setSubmitted] = useState(false);
+  const {
+    isSubmitting,
+    fieldError,
+    submitError,
+    setFieldError,
+    clearErrors,
+    resetSubmissionState,
+    runSubmission,
+  } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
 
   // A — Kurum Bilgisi
   const [companyName, setCompanyName] = useState('');
@@ -198,34 +209,50 @@ function CorporateForm() {
     );
   };
 
-  const canStep0 = companyName && sector && city;
-  const canStep1 = fullName && isValidTrMobilePhone(phone) && callTime;
-  const canStep2 = selectedLanguages.length > 0 && selectedGoals.length > 0 && participants && level && model && kvkk;
+  const canStep0 = Boolean(companyName && sector && city);
+  const canStep1 = Boolean(fullName && isValidTrMobilePhone(phone) && callTime);
+  const canStep2 = Boolean(selectedLanguages.length > 0 && selectedGoals.length > 0 && participants && level && model && kvkk);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canStep2) return;
+    if (isSubmitting) return;
+    clearErrors();
 
-    const sent = await openMailDraft({
-      to: 'data@teachera.com.tr',
-      subject: 'Kurumsal Egitim Teklif Talebi',
-      lines: [
-        `Kurum: ${companyName}`,
-        `Sektor: ${sector}`,
-        `Sehir: ${city}`,
-        `Coklu Lokasyon: ${multiLocation ? 'Evet' : 'Hayir'}`,
-        `Yetkili Ad Soyad: ${fullName}`,
-        `Unvan: ${title || '-'}`,
-        `E-posta: ${email || '-'}`,
-        `Telefon: +90 ${phone}`,
-        `Aranma Saati: ${timeSlots.find((slot) => slot.id === callTime)?.label || callTime}`,
-        `Diller: ${selectedLanguages.map((id) => languages.find((lang) => lang.id === id)?.name || id).join(', ')}`,
-        `Hedefler: ${selectedGoals.join(', ')}`,
-        `Katilimci Sayisi: ${participants}`,
-        `Baslangic Seviyesi: ${level}`,
-        `Egitim Modeli: ${modelOptions.find((modelOption) => modelOption.id === model)?.label || model}`,
-      ],
-    });
+    if (!canStep2) {
+      if (!isValidTrMobilePhone(phone)) {
+        setFieldError(FORM_UI_MESSAGES.phone);
+        return;
+      }
+      if (!kvkk) {
+        setFieldError(FORM_UI_MESSAGES.kvkk);
+        return;
+      }
+      setFieldError(FORM_UI_MESSAGES.required);
+      return;
+    }
+
+    const sent = await runSubmission(() =>
+      openMailDraft({
+        to: 'data@teachera.com.tr',
+        subject: 'Kurumsal Egitim Teklif Talebi',
+        lines: [
+          `Kurum: ${companyName}`,
+          `Sektor: ${sector}`,
+          `Sehir: ${city}`,
+          `Coklu Lokasyon: ${multiLocation ? 'Evet' : 'Hayir'}`,
+          `Yetkili Ad Soyad: ${fullName}`,
+          `Unvan: ${title || '-'}`,
+          `E-posta: ${email || '-'}`,
+          `Telefon: +90 ${phone}`,
+          `Aranma Saati: ${timeSlots.find((slot) => slot.id === callTime)?.label || callTime}`,
+          `Diller: ${selectedLanguages.map((id) => languages.find((lang) => lang.id === id)?.name || id).join(', ')}`,
+          `Hedefler: ${selectedGoals.join(', ')}`,
+          `Katilimci Sayisi: ${participants}`,
+          `Baslangic Seviyesi: ${level}`,
+          `Egitim Modeli: ${modelOptions.find((modelOption) => modelOption.id === model)?.label || model}`,
+        ],
+      }),
+    );
 
     if (!sent) {
       notifyError('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
@@ -239,6 +266,7 @@ function CorporateForm() {
   const handleReset = () => {
     setStep(0);
     setSubmitted(false);
+    resetSubmissionState();
     setCompanyName(''); setSector(''); setCity(''); setMultiLocation(false);
     setFullName(''); setTitle(''); setEmail(''); setPhone(''); setCallTime('');
     setSelectedLanguages([]); setSelectedGoals([]); setParticipants('');
@@ -510,6 +538,16 @@ function CorporateForm() {
                       </FieldWrap>
 
                       {/* Nav */}
+                      {fieldError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#F4EBD1] mb-2">
+                          {fieldError}
+                        </p>
+                      )}
+                      {submitError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#FFD4D1] mb-2">
+                          {submitError}
+                        </p>
+                      )}
                       <div className="flex gap-3 mt-1">
                         <button
                           type="button"
@@ -691,6 +729,17 @@ function CorporateForm() {
                         </span>
                       </button>
 
+                      {fieldError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#F4EBD1]">
+                          {fieldError}
+                        </p>
+                      )}
+                      {submitError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#FFD4D1]">
+                          {submitError}
+                        </p>
+                      )}
+
                       {/* Nav */}
                       <div className="flex gap-3 mt-1">
                         <button
@@ -704,16 +753,16 @@ function CorporateForm() {
                           type="submit"
                           whileHover={{ scale: 1.01 }}
                           whileTap={{ scale: 0.98 }}
-                          disabled={!canStep2}
+                          disabled={isSubmitting || !canStep2}
                           className={`flex-[2] h-[48px] rounded-[30px] flex items-center justify-center gap-2.5 transition-all duration-300 ${
-                            canStep2
+                            !isSubmitting && canStep2
                               ? 'bg-[#00000B] hover:bg-[#68232E] cursor-pointer shadow-lg shadow-black/20'
                               : 'bg-white/10 cursor-not-allowed'
                           }`}
                         >
                           <Send size={14} className="text-white" />
-                          <span className={`font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] ${canStep2 ? 'text-white' : 'text-white/30'}`}>
-                            Teklif Talebi Gönder
+                          <span className={`font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] ${!isSubmitting && canStep2 ? 'text-white' : 'text-white/30'}`}>
+                            {isSubmitting ? FORM_UI_MESSAGES.submitting : 'Teklif Talebi Gönder'}
                           </span>
                         </motion.button>
                       </div>

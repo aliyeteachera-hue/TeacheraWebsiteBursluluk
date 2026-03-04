@@ -13,8 +13,10 @@ import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { useLiteMode } from '../lib/useLiteMode';
 import { notifyError, notifySuccess } from '../lib/notifications';
-import { useOverlayLifecycle } from '../lib/overlayLifecycle';
+import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
+import { useFormSubmission } from '../lib/useFormSubmission';
 import { useCoarsePointer } from '../lib/useCoarsePointer';
+import { OverlayModal } from './overlay/OverlayPrimitives';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -84,6 +86,15 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [kvkkConsent, setKvkkConsent] = useState(false);
+  const {
+    isSubmitting,
+    fieldError,
+    submitError,
+    setFieldError,
+    clearErrors,
+    resetSubmissionState,
+    runSubmission,
+  } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
 
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -94,7 +105,6 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   const selectedLang = LANGUAGES.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-  useOverlayLifecycle(isOpen, 'delivery-appointment');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -115,31 +125,51 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
         setSubmitted(false);
         setLangOpen(false);
         setCalendarOpen(false);
+        resetSubmissionState();
       }, 400);
       return () => clearTimeout(t);
     }
-  }, [isOpen]);
+  }, [isOpen, resetSubmissionState]);
 
   /* Phone mask: auto-format as 5XX XXX XX XX */
   const handlePhoneChange = (value: string) => {
+    setFieldError(null);
     setFormData({ ...formData, phone: normalizeTrMobileInput(value) });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!kvkkConsent || !formData.fullName || !formData.language || !isPhoneValid) return;
+    if (isSubmitting) return;
+    clearErrors();
 
-    const sent = await openMailDraft({
-      subject: 'Egitim Formati Danismanlik Talebi',
-      lines: [
-        `Ad Soyad: ${formData.fullName}`,
-        `Telefon: +90 ${formData.phone}`,
-        `E-posta: ${formData.email || '-'}`,
-        `Dil: ${LANGUAGES.find((lang) => lang.id === formData.language)?.name || formData.language}`,
-        `Tarih: ${selectedDate ? formatDate(selectedDate) : '-'}`,
-        `Saat Araligi: ${timeSlots.find((slot) => slot.id === selectedTime)?.label || selectedTime || '-'}`,
-      ],
-    });
+    if (!formData.fullName || !formData.language) {
+      setFieldError(FORM_UI_MESSAGES.required);
+      return;
+    }
+
+    if (!isPhoneValid) {
+      setFieldError(FORM_UI_MESSAGES.phone);
+      return;
+    }
+
+    if (!kvkkConsent) {
+      setFieldError(FORM_UI_MESSAGES.kvkk);
+      return;
+    }
+
+    const sent = await runSubmission(() =>
+      openMailDraft({
+        subject: 'Egitim Formati Danismanlik Talebi',
+        lines: [
+          `Ad Soyad: ${formData.fullName}`,
+          `Telefon: +90 ${formData.phone}`,
+          `E-posta: ${formData.email || '-'}`,
+          `Dil: ${LANGUAGES.find((lang) => lang.id === formData.language)?.name || formData.language}`,
+          `Tarih: ${selectedDate ? formatDate(selectedDate) : '-'}`,
+          `Saat Araligi: ${timeSlots.find((slot) => slot.id === selectedTime)?.label || selectedTime || '-'}`,
+        ],
+      }),
+    );
 
     if (!sent) {
       notifyError('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
@@ -162,98 +192,99 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={false}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 1 }}
-          transition={{ duration: 0 }}
-          className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#00000B]"
-          onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        <OverlayModal
+          open={isOpen}
+          onClose={onClose}
+          owner="delivery-appointment"
+          ariaLabel="Eğitim formatı danışmanlık randevu formu"
+          containerClassName="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#00000B]"
         >
-          {/* Background — aynı FreeTrialModal bg */}
-          <div className="fixed inset-0 pointer-events-none">
-            <img src={imgBg} alt="" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,11,0.5)] via-[rgba(50,77,71,0.35)] to-[rgba(0,0,11,0.65)]" />
-            <div className="absolute inset-0 bg-[#00000B]/18" />
-          </div>
+          {({ panelProps }) => (
+            <>
+              {/* Background — aynı FreeTrialModal bg */}
+              <div className="fixed inset-0 pointer-events-none">
+                <img src={imgBg} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,11,0.5)] via-[rgba(50,77,71,0.35)] to-[rgba(0,0,11,0.65)]" />
+                <div className="absolute inset-0 bg-[#00000B]/18" />
+              </div>
 
-          {/* Close */}
-          <motion.button
-            initial={isCoarsePointer ? false : { opacity: 0, scale: 0.8 }}
-            animate={isCoarsePointer ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 }}
-            onClick={onClose}
-            className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-12 h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300 cursor-pointer"
-            aria-label="Kapat"
-          >
-            <X size={22} />
-          </motion.button>
+              {/* Close */}
+              <motion.button
+                initial={isCoarsePointer ? false : { opacity: 0, scale: 0.8 }}
+                animate={isCoarsePointer ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                onClick={onClose}
+                className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-12 h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300 cursor-pointer"
+                aria-label="Kapat"
+              >
+                <X size={22} />
+              </motion.button>
 
-          {/* Card */}
-          <motion.div
-            initial={isCoarsePointer ? false : { opacity: 0, y: 40, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={isCoarsePointer ? { opacity: 0, y: 16 } : { opacity: 0, y: 30, scale: 0.96 }}
-            transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
-            className="relative z-[91] w-full max-w-[620px] mx-4 my-12 md:my-20"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <AnimatePresence mode="wait">
-              {submitted ? (
-                /* ═══ SUCCESS STATE ═══ */
-                <motion.div
-                  key="success"
-                  initial={isCoarsePointer ? false : { opacity: 0, scale: 0.95, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95, y: 20 }}
-                  transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
-                  className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
-                >
-                  <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
-                  <div className="relative z-10 p-10 py-16 flex flex-col items-center text-center">
-                    <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-6">
-                      <Coffee size={28} className="text-white" />
-                    </div>
-                    <h3 className="text-[26px] md:text-[32px] font-['Neutraface_2_Text:Demi',sans-serif] text-white mb-3">
-                      Randevunuz Alındı!
-                    </h3>
-                    <p className="text-white/70 font-['Neutraface_2_Text:Book',sans-serif] text-[14px] leading-relaxed max-w-[440px] mb-2">
-                      <span className="text-white">{formData.fullName}</span>, sizi{' '}
-                      {selectedDate && (
-                        <span className="text-[#F4EBD1]">{formatDate(selectedDate)}</span>
-                      )}{' '}
-                      tarihinde{' '}
-                      {selectedTime && (
-                        <span className="text-[#F4EBD1]">
-                          {timeSlots.find(s => s.id === selectedTime)?.label}
-                        </span>
-                      )}{' '}
-                      saatleri arasında kampüsümüzde ağırlamaktan mutluluk duyacağız.
-                    </p>
-                    <p className="text-white/40 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] mb-8">
-                      Detaylar, paylaştığınız iletişim bilgileriniz üzerinden iletilecektir.
-                    </p>
-                    <button
-                      onClick={onClose}
-                      className="h-[44px] px-8 rounded-[30px] bg-[#00000B] hover:bg-[#68232E] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[14px] tracking-[0.05em] transition-colors duration-300 cursor-pointer"
+              {/* Card */}
+              <motion.div
+                {...panelProps}
+                initial={isCoarsePointer ? false : { opacity: 0, y: 40, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={isCoarsePointer ? { opacity: 0, y: 16 } : { opacity: 0, y: 30, scale: 0.96 }}
+                transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
+                className="relative z-[91] w-full max-w-[620px] mx-4 my-12 md:my-20"
+              >
+                <AnimatePresence mode="wait">
+                  {submitted ? (
+                    /* ═══ SUCCESS STATE ═══ */
+                    <motion.div
+                      key="success"
+                      initial={isCoarsePointer ? false : { opacity: 0, scale: 0.95, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95, y: 20 }}
+                      transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
+                      className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
                     >
-                      Tamam
-                    </button>
-                  </div>
-                </motion.div>
-              ) : (
-                /* ═══ FORM STATE ═══ */
-                <motion.form
-                  key="form"
-                  onSubmit={handleSubmit}
-                  initial={isCoarsePointer ? false : { opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
-                  transition={{ duration: isCoarsePointer ? 0.24 : 0.35 }}
-                  className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
-                >
-                  {/* Glass shine */}
-                  <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+                      <div className="relative z-10 p-10 py-16 flex flex-col items-center text-center">
+                        <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-6">
+                          <Coffee size={28} className="text-white" />
+                        </div>
+                        <h3 className="text-[26px] md:text-[32px] font-['Neutraface_2_Text:Demi',sans-serif] text-white mb-3">
+                          Randevunuz Alındı!
+                        </h3>
+                        <p className="text-white/70 font-['Neutraface_2_Text:Book',sans-serif] text-[14px] leading-relaxed max-w-[440px] mb-2">
+                          <span className="text-white">{formData.fullName}</span>, sizi{' '}
+                          {selectedDate && (
+                            <span className="text-[#F4EBD1]">{formatDate(selectedDate)}</span>
+                          )}{' '}
+                          tarihinde{' '}
+                          {selectedTime && (
+                            <span className="text-[#F4EBD1]">
+                              {timeSlots.find(s => s.id === selectedTime)?.label}
+                            </span>
+                          )}{' '}
+                          saatleri arasında kampüsümüzde ağırlamaktan mutluluk duyacağız.
+                        </p>
+                        <p className="text-white/40 font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] mb-8">
+                          Detaylar, paylaştığınız iletişim bilgileriniz üzerinden iletilecektir.
+                        </p>
+                        <button
+                          onClick={onClose}
+                          className="h-[44px] px-8 rounded-[30px] bg-[#00000B] hover:bg-[#68232E] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[14px] tracking-[0.05em] transition-colors duration-300 cursor-pointer"
+                        >
+                          Tamam
+                        </button>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    /* ═══ FORM STATE ═══ */
+                    <motion.form
+                      key="form"
+                      onSubmit={handleSubmit}
+                      initial={isCoarsePointer ? false : { opacity: 0, scale: 0.97 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
+                      transition={{ duration: isCoarsePointer ? 0.24 : 0.35 }}
+                      className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
+                    >
+                      {/* Glass shine */}
+                      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
 
                   <div className="relative z-10 p-7 md:p-10">
                     {/* Header */}
@@ -424,21 +455,32 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                         </ConsentRow>
                       </div>
 
+                      {fieldError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#F4EBD1]">
+                          {fieldError}
+                        </p>
+                      )}
+                      {submitError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#FFD4D1]">
+                          {submitError}
+                        </p>
+                      )}
+
                       {/* Submit */}
                       <motion.button
                         type="submit"
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.98 }}
-                        disabled={!kvkkConsent || !isPhoneValid}
+                        disabled={isSubmitting || !kvkkConsent || !isPhoneValid}
                         className={`w-full h-[48px] rounded-[30px] flex items-center justify-center gap-2.5 transition-colors duration-300 mt-1 ${
-                          kvkkConsent && isPhoneValid
+                          !isSubmitting && kvkkConsent && isPhoneValid
                             ? 'bg-[#00000B] hover:bg-[#68232E] cursor-pointer'
                             : 'bg-[#00000B]/40 cursor-not-allowed'
                         }`}
                       >
                         <Send size={15} className="text-white" />
                         <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[14px] text-white tracking-[0.05em] md:tracking-wide">
-                          Randevu Oluştur
+                          {isSubmitting ? FORM_UI_MESSAGES.submitting : 'Randevu Oluştur'}
                         </span>
                       </motion.button>
 
@@ -448,11 +490,13 @@ function AppointmentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                       </p>
                     </div>
                   </div>
-                </motion.form>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </motion.div>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </>
+          )}
+        </OverlayModal>
       )}
     </AnimatePresence>
   );

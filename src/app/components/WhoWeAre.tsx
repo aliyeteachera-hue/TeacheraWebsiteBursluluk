@@ -1252,7 +1252,7 @@ export default function WhoWeAre() {
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              onClick={openFreeTrial}
+              onClick={() => openFreeTrial('who_we_are_program_preview')}
               className="group px-6 py-2.5 border border-[#324D47]/60 text-[#324D47] rounded-full text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47] hover:text-white transition-all duration-300 flex items-center gap-2 cursor-pointer"
             >
               Ücretsiz Deneme Seansı
@@ -1261,7 +1261,7 @@ export default function WhoWeAre() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={openLevelAssessment}
+              onClick={() => openLevelAssessment('who_we_are_program_preview')}
               className="px-6 py-2.5 border border-[#09090F]/15 text-[#484848] rounded-full text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#09090F]/5 hover:border-[#09090F]/30 transition-all duration-300 cursor-pointer"
             >
               Seviyeni Öğren
@@ -1380,7 +1380,7 @@ export default function WhoWeAre() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={openFreeTrial}
+              onClick={() => openFreeTrial('who_we_are_journey')}
               className="group inline-flex items-center gap-2 px-6 py-2.5 border border-[#09090F]/15 text-[#484848] rounded-full text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-[#09090F]/5 hover:border-[#09090F]/30 transition-all duration-300 cursor-pointer"
             >
               Ücretsiz Deneme Seansı
@@ -1583,7 +1583,7 @@ export default function WhoWeAre() {
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              onClick={openLevelAssessment}
+              onClick={() => openLevelAssessment('who_we_are_all_programs')}
               className="group inline-flex items-center gap-2.5 px-6 py-2.5 border border-[#324D47]/60 text-[#324D47] rounded-full text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47] hover:text-white transition-all duration-300 cursor-pointer"
             >
               Seviyeni Öğren, Programını Bul
@@ -1592,7 +1592,7 @@ export default function WhoWeAre() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={openFreeTrial}
+              onClick={() => openFreeTrial('who_we_are_all_programs')}
               className="group inline-flex items-center gap-2 px-6 py-2.5 border border-white/15 text-white/60 rounded-full text-sm font-['Neutraface_2_Text:Book',sans-serif] hover:bg-white/5 hover:border-white/25 transition-all duration-300 cursor-pointer"
             >
               Ücretsiz Deneme Seansı
@@ -1861,7 +1861,7 @@ export default function WhoWeAre() {
                 <motion.button
                   whileHover={{ scale: 1.02, y: -1 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={openFreeTrial}
+                  onClick={() => openFreeTrial('who_we_are_online')}
                   className="group/cta inline-flex min-h-[44px] items-center gap-2.5 px-5 py-2.5 border border-white/20 text-white/80 rounded-full text-mobile-kicker md:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em] md:tracking-wide hover:bg-white/10 hover:border-white/40 transition-all duration-300 cursor-pointer backdrop-blur-sm"
                 >
                   Online Tanışma Planla

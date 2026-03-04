@@ -5,8 +5,10 @@ import { ArrowUpRight, ChevronDown, Check, Volume2, VolumeX, ChevronLeft, Chevro
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
-import { useOverlayLifecycle } from '../lib/overlayLifecycle';
+import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
+import { useFormSubmission } from '../lib/useFormSubmission';
 import { useCoarsePointer } from '../lib/useCoarsePointer';
+import { OverlayModal } from './overlay/OverlayPrimitives';
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
@@ -404,11 +406,6 @@ export default function SpeakUpPage() {
   useEffect(() => {
     if (!isVideoFullscreen) return;
 
-    const keyHandler = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsVideoFullscreen(false);
-    };
-    document.addEventListener('keydown', keyHandler);
-
     postToPlayer(inlineIframeRef.current, 'pause');
     const timerId = window.setTimeout(() => {
       postToPlayer(fullscreenIframeRef.current, 'play');
@@ -418,7 +415,6 @@ export default function SpeakUpPage() {
     return () => {
       window.clearTimeout(timerId);
       setShowFullscreenSoundPrompt(false);
-      document.removeEventListener('keydown', keyHandler);
       if (isInlineVideoStarted) {
         postToPlayer(inlineIframeRef.current, isInlineVideoInView ? 'play' : 'pause');
       }
@@ -446,11 +442,18 @@ export default function SpeakUpPage() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calViewYear, setCalViewYear] = useState(CAL_MIN.getFullYear());
   const [calViewMonth, setCalViewMonth] = useState(CAL_MIN.getMonth());
+  const {
+    isSubmitting,
+    fieldError,
+    submitError,
+    setFieldError,
+    clearErrors,
+    resetSubmissionState,
+    runSubmission,
+  } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
   const calRef = useRef<HTMLDivElement>(null);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-  useOverlayLifecycle(isVideoFullscreen, 'speakup-video');
-  useOverlayLifecycle(isFormModalOpen, 'speakup-form');
 
   /* Close calendar on outside click */
   useEffect(() => {
@@ -482,11 +485,13 @@ export default function SpeakUpPage() {
     event?.preventDefault?.();
     setSubmitted(false);
     setCalendarOpen(false);
+    resetSubmissionState();
     setIsFormModalOpen(true);
   };
 
   const closeFormModal = () => {
     setCalendarOpen(false);
+    resetSubmissionState();
     setIsFormModalOpen(false);
   };
 
@@ -499,36 +504,41 @@ export default function SpeakUpPage() {
     }));
   };
 
-  useEffect(() => {
-    if (!isFormModalOpen) return;
-
-    const keyHandler = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeFormModal();
-    };
-    document.addEventListener('keydown', keyHandler);
-
-    return () => {
-      document.removeEventListener('keydown', keyHandler);
-    };
-  }, [isFormModalOpen]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.kvkk || formData.sessions.length === 0 || !isPhoneValid) return;
+    if (isSubmitting) return;
+    clearErrors();
 
-    const sent = await openMailDraft({
-      subject: 'SpeakUP Campus Basvuru Talebi',
-      lines: [
-        `Ad Soyad: ${formData.name}`,
-        `Telefon: +90 ${formData.phone}`,
-        `E-posta: ${formData.email || '-'}`,
-        `Bolum/Sinif: ${formData.department || '-'}`,
-        `Seans Tercihi: ${formData.sessions.join(', ')}`,
-        `Seviye: ${formData.level || '-'}`,
-        `Seviye Test Tarihi: ${formData.testDate ? formatDateTr(formData.testDate) : '-'}`,
-        `Seviye Test Saati: ${formData.testTime || '-'}`,
-      ],
-    });
+    if (!formData.name || formData.sessions.length === 0) {
+      setFieldError(FORM_UI_MESSAGES.required);
+      return;
+    }
+
+    if (!isPhoneValid) {
+      setFieldError(FORM_UI_MESSAGES.phone);
+      return;
+    }
+
+    if (!formData.kvkk) {
+      setFieldError(FORM_UI_MESSAGES.kvkk);
+      return;
+    }
+
+    const sent = await runSubmission(() =>
+      openMailDraft({
+        subject: 'SpeakUP Campus Basvuru Talebi',
+        lines: [
+          `Ad Soyad: ${formData.name}`,
+          `Telefon: +90 ${formData.phone}`,
+          `E-posta: ${formData.email || '-'}`,
+          `Bolum/Sinif: ${formData.department || '-'}`,
+          `Seans Tercihi: ${formData.sessions.join(', ')}`,
+          `Seviye: ${formData.level || '-'}`,
+          `Seviye Test Tarihi: ${formData.testDate ? formatDateTr(formData.testDate) : '-'}`,
+          `Seviye Test Saati: ${formData.testTime || '-'}`,
+        ],
+      }),
+    );
 
     if (!sent) {
       notifyError('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
@@ -746,61 +756,62 @@ export default function SpeakUpPage() {
 
       <AnimatePresence>
         {isVideoFullscreen && (
-          <motion.div
-            initial={false}
-            animate={{ opacity: 1 }}
-            exit={isCoarsePointer ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: isCoarsePointer ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[90] bg-[#00000B]/95 flex items-center justify-center p-3"
-            onClick={() => setIsVideoFullscreen(false)}
+          <OverlayModal
+            open={isVideoFullscreen}
+            onClose={() => setIsVideoFullscreen(false)}
+            owner="speakup-video"
+            ariaLabel="SpeakUP tanıtım videosu"
+            containerClassName="fixed inset-0 z-[90] bg-[#00000B]/95 flex items-center justify-center p-3"
           >
-            <motion.div
-              initial={isCoarsePointer ? false : { opacity: 0, y: 24, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={isCoarsePointer ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 24, scale: 0.95 }}
-              transition={{ duration: isCoarsePointer ? 0 : 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="relative h-[92svh] max-h-[92svh] max-w-[96vw] aspect-[9/16] rounded-[22px] overflow-hidden bg-black shadow-2xl shadow-black/60"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <iframe
-                ref={fullscreenIframeRef}
-                src={SPEAKUP_VIDEO_FULLSCREEN_SRC}
-                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                title="Teachera SpeakUP Fullscreen"
-                className="absolute inset-0 w-full h-full border-0"
-                loading="lazy"
-                onLoad={handleFullscreenIframeLoad}
-              />
-
-              <button
-                onClick={(event) => toggleMute(event)}
-                className="absolute top-3 left-3 h-9 px-3 bg-[#324D47]/85 rounded-full flex items-center justify-center gap-2 cursor-pointer text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em]"
+            {({ panelProps }) => (
+              <motion.div
+                {...panelProps}
+                initial={isCoarsePointer ? false : { opacity: 0, y: 24, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={isCoarsePointer ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 24, scale: 0.95 }}
+                transition={{ duration: isCoarsePointer ? 0 : 0.32, ease: [0.22, 1, 0.36, 1] }}
+                className="relative h-[92svh] max-h-[92svh] max-w-[96vw] aspect-[9/16] rounded-[22px] overflow-hidden bg-black shadow-2xl shadow-black/60"
               >
-                {isMuted ? <VolumeX size={15} className="text-white" /> : <Volume2 size={15} className="text-white" />}
-                {isMuted ? 'SESİ AÇ' : 'SESİ KAPAT'}
-              </button>
+                <iframe
+                  ref={fullscreenIframeRef}
+                  src={SPEAKUP_VIDEO_FULLSCREEN_SRC}
+                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  title="Teachera SpeakUP Fullscreen"
+                  className="absolute inset-0 w-full h-full border-0"
+                  loading="lazy"
+                  onLoad={handleFullscreenIframeLoad}
+                />
 
-              {showFullscreenSoundPrompt && (
                 <button
-                  onClick={enableFullscreenSound}
-                  className="absolute inset-0 flex items-center justify-center bg-[#00000B]/15 cursor-pointer"
+                  onClick={(event) => toggleMute(event)}
+                  className="absolute top-3 left-3 h-9 px-3 bg-[#324D47]/85 rounded-full flex items-center justify-center gap-2 cursor-pointer text-white text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.05em]"
                 >
-                  <span className="px-5 py-3 rounded-full bg-[#324D47]/92 border border-white/20 text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.08em] uppercase">
-                    Ekrana Dokun: Sesi Aç
-                  </span>
+                  {isMuted ? <VolumeX size={15} className="text-white" /> : <Volume2 size={15} className="text-white" />}
+                  {isMuted ? 'SESİ AÇ' : 'SESİ KAPAT'}
                 </button>
-              )}
 
-              <button
-                onClick={() => setIsVideoFullscreen(false)}
-                className="absolute top-3 right-3 w-9 h-9 bg-[#00000B]/75 rounded-full flex items-center justify-center cursor-pointer text-white"
-                aria-label="Tam ekran videoyu kapat"
-              >
-                <X size={18} />
-              </button>
-            </motion.div>
-          </motion.div>
+                {showFullscreenSoundPrompt && (
+                  <button
+                    onClick={enableFullscreenSound}
+                    className="absolute inset-0 flex items-center justify-center bg-[#00000B]/15 cursor-pointer"
+                  >
+                    <span className="px-5 py-3 rounded-full bg-[#324D47]/92 border border-white/20 text-white font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] tracking-[0.08em] uppercase">
+                      Ekrana Dokun: Sesi Aç
+                    </span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setIsVideoFullscreen(false)}
+                  className="absolute top-3 right-3 w-9 h-9 bg-[#00000B]/75 rounded-full flex items-center justify-center cursor-pointer text-white"
+                  aria-label="Tam ekran videoyu kapat"
+                >
+                  <X size={18} />
+                </button>
+              </motion.div>
+            )}
+          </OverlayModal>
         )}
       </AnimatePresence>
 
@@ -1083,37 +1094,36 @@ export default function SpeakUpPage() {
           ════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {isFormModalOpen && (
-          <motion.div
-            initial={false}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 1 }}
-            transition={{ duration: 0 }}
-            className="fixed inset-0 z-[92] flex items-start justify-center overflow-y-auto px-4 py-6 md:py-10 bg-[#00000B]"
-            onClick={(event) => {
-              if (event.target === event.currentTarget) closeFormModal();
-            }}
+          <OverlayModal
+            open={isFormModalOpen}
+            onClose={closeFormModal}
+            owner="speakup-form"
+            ariaLabel="SpeakUP başvuru formu"
+            containerClassName="fixed inset-0 z-[92] flex items-start justify-center overflow-y-auto px-4 py-6 md:py-10 bg-[#00000B]"
           >
-            <div className="absolute inset-0 bg-[#00000B]/82" />
+            {({ panelProps }) => (
+              <>
+                <div className="absolute inset-0 bg-[#00000B]/82" />
 
-            <motion.button
-              initial={isCoarsePointer ? false : { opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={isCoarsePointer ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-              onClick={closeFormModal}
-              className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300 cursor-pointer"
-              aria-label="Başvuru formunu kapat"
-            >
-              <X size={20} />
-            </motion.button>
+                <motion.button
+                  initial={isCoarsePointer ? false : { opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={isCoarsePointer ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+                  onClick={closeFormModal}
+                  className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300 cursor-pointer"
+                  aria-label="Başvuru formunu kapat"
+                >
+                  <X size={20} />
+                </motion.button>
 
-            <motion.div
-              initial={isCoarsePointer ? false : { opacity: 0, y: 26, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={isCoarsePointer ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.97 }}
-              transition={{ duration: isCoarsePointer ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="relative z-[93] w-full max-w-[700px] bg-white rounded-[22px] border border-[#324D47]/15 shadow-[0_30px_80px_rgba(0,0,0,0.45)] p-6 md:p-10"
-              onClick={(event) => event.stopPropagation()}
-            >
+                <motion.div
+                  {...panelProps}
+                  initial={isCoarsePointer ? false : { opacity: 0, y: 26, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={isCoarsePointer ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 20, scale: 0.97 }}
+                  transition={{ duration: isCoarsePointer ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative z-[93] w-full max-w-[700px] bg-white rounded-[22px] border border-[#324D47]/15 shadow-[0_30px_80px_rgba(0,0,0,0.45)] p-6 md:p-10"
+                >
               <div className="text-center mb-10 md:mb-12">
                 <div className="flex items-center gap-3 justify-center mb-6">
                   <div className="w-8 h-[1px] bg-[#E70000]/40" />
@@ -1391,20 +1401,33 @@ export default function SpeakUpPage() {
                       </label>
                     </div>
 
+                    {fieldError && (
+                      <p className="text-[12px] text-[#9C2735] font-['Neutraface_2_Text:Book',sans-serif]">
+                        {fieldError}
+                      </p>
+                    )}
+                    {submitError && (
+                      <p className="text-[12px] text-[#9C2735] font-['Neutraface_2_Text:Book',sans-serif]">
+                        {submitError}
+                      </p>
+                    )}
+
                     {/* Submit */}
                     <button
                       type="submit"
-                      disabled={!formData.name || !isPhoneValid || !formData.kvkk || formData.sessions.length === 0}
+                      disabled={isSubmitting || !formData.name || !isPhoneValid || !formData.kvkk || formData.sessions.length === 0}
                       className="w-full h-[48px] rounded-[30px] bg-[#E70000] hover:bg-[#c40000] disabled:bg-[#324D47]/15 disabled:cursor-not-allowed text-white disabled:text-[#324D47]/30 font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker md:text-[13px] tracking-[0.08em] md:tracking-[0.15em] transition-all duration-300 shadow-lg shadow-[#E70000]/20 disabled:shadow-none cursor-pointer flex items-center justify-center gap-2.5"
                     >
-                      BAŞVURUYU GÖNDER
+                      {isSubmitting ? FORM_UI_MESSAGES.submitting : 'BAŞVURUYU GÖNDER'}
                       <ArrowUpRight size={15} />
                     </button>
                   </motion.form>
                 )}
               </AnimatePresence>
-            </motion.div>
-          </motion.div>
+                </motion.div>
+              </>
+            )}
+          </OverlayModal>
         )}
       </AnimatePresence>
 

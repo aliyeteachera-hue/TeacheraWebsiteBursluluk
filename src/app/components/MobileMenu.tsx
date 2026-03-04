@@ -1,11 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { motion } from 'motion/react';
 import { Instagram, Linkedin, Facebook, Youtube, ArrowRight, User, X, Phone } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router';
 import imgRectangle279 from "figma:asset/884befb1e78a75b64de1fe6d23317da411da15ba.webp";
 import TeacheraLogo from '../../imports/TeacheraLogo';
 import { useLevelAssessment } from './LevelAssessmentContext';
-import { useOverlayLifecycle } from '../lib/overlayLifecycle';
+import { OverlayDrawer } from './overlay/OverlayPrimitives';
 
 /* ── X (Twitter) Icon ── */
 function XIcon({ size = 20, className = '' }: { size?: number; className?: string }) {
@@ -65,74 +65,8 @@ export default function MobileMenu({ onClose, currentSection: _currentSection }:
   const location = useLocation();
   const { open: openLevelAssessment } = useLevelAssessment();
   const disableMenuAnimations = true;
-  const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const currentPath = location.pathname;
-  useOverlayLifecycle(true, 'mobile-menu');
-
-  useEffect(() => {
-    closeButtonRef.current?.focus();
-
-    const resolveFocusableElements = () => {
-      if (!dialogRef.current) return [];
-
-      const selector = [
-        'a[href]',
-        'button:not([disabled])',
-        'input:not([disabled])',
-        'select:not([disabled])',
-        'textarea:not([disabled])',
-        '[tabindex]:not([tabindex="-1"])',
-      ].join(',');
-
-      const nodes: HTMLElement[] = Array.from(dialogRef.current.querySelectorAll(selector));
-      return nodes.filter((node) => {
-        if (node.getAttribute('aria-hidden') === 'true') return false;
-        if (node.tabIndex < 0) return false;
-        return node.getClientRects().length > 0;
-      });
-    };
-
-    const onKeyboardControl = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        onClose();
-        return;
-      }
-
-      if (event.key !== 'Tab') return;
-
-      const focusableElements = resolveFocusableElements();
-      if (focusableElements.length === 0) {
-        event.preventDefault();
-        closeButtonRef.current?.focus();
-        return;
-      }
-
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-      const activeElement = document.activeElement as HTMLElement | null;
-      const focusInsideDialog = activeElement ? dialogRef.current?.contains(activeElement) : false;
-
-      if (event.shiftKey) {
-        if (!focusInsideDialog || activeElement === firstElement) {
-          event.preventDefault();
-          lastElement.focus();
-        }
-        return;
-      }
-
-      if (!focusInsideDialog || activeElement === lastElement) {
-        event.preventDefault();
-        firstElement.focus();
-      }
-    };
-
-    window.addEventListener('keydown', onKeyboardControl);
-    return () => {
-      window.removeEventListener('keydown', onKeyboardControl);
-    };
-  }, [onClose]);
   
   const handleLinkClick = (item: MenuItem) => {
     if (item.isRoute) {
@@ -190,13 +124,20 @@ export default function MobileMenu({ onClose, currentSection: _currentSection }:
   };
 
   return (
-        <div
-          ref={dialogRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Mobil menü"
-          className="fixed inset-0 z-[55] h-[100dvh] bg-[#00000B] overflow-x-hidden overflow-y-hidden overscroll-none"
+        <OverlayDrawer
+          open
+          onClose={onClose}
+          owner="mobile-menu"
+          ariaLabel="Mobil menü"
+          closeOnOutsideClick={false}
+          initialFocusRef={closeButtonRef}
+          containerClassName="fixed inset-0 z-[55]"
         >
+          {({ panelProps }) => (
+          <div
+            {...panelProps}
+            className="h-[100dvh] bg-[#00000B] overflow-x-hidden overflow-y-hidden overscroll-none"
+          >
           {/* BACKGROUND IMAGE & OVERLAY */}
           <div className="absolute inset-0 z-0 pointer-events-none">
              <img
@@ -446,6 +387,8 @@ export default function MobileMenu({ onClose, currentSection: _currentSection }:
                </div>
             </div>
           </div>
-        </div>
+          </div>
+          )}
+        </OverlayDrawer>
   );
 }

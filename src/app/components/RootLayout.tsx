@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { Outlet, useLocation } from 'react-router';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import { Toaster } from 'sonner';
 import Navigation from './Navigation';
 import MobileMenu from './MobileMenu';
 import Footer from './Footer';
@@ -11,7 +10,9 @@ import { FreeTrialProvider } from './FreeTrialContext';
 import SeoManager from './SeoManager';
 import LevelAssessmentModal from './LevelAssessment';
 import FreeTrialModal from './FreeTrialModal';
+import AppToaster from './overlay/AppToaster';
 import { initTracking, trackPageView } from '../lib/analytics';
+import { initTagManager } from '../lib/tagManager';
 import { useLiteMode } from '../lib/useLiteMode';
 
 const WhatsAppButton = lazy(() =>
@@ -32,6 +33,7 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
+    initTagManager();
     return initTracking();
   }, []);
 
@@ -160,15 +162,7 @@ export default function RootLayout() {
 
           <LevelAssessmentModal />
           <FreeTrialModal />
-          <Toaster
-            richColors
-            position="top-center"
-            closeButton
-            toastOptions={{
-              className:
-                "font-['Neutraface_2_Text:Book',sans-serif]",
-            }}
-          />
+          <AppToaster />
 
           <Suspense fallback={null}>
             <WhatsAppButton />

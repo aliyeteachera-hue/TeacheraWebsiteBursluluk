@@ -12,6 +12,7 @@ import {
 import { openMailDraft, openMailDraftOnUnload } from './formMailto';
 import { readPlacementExamLead, type PlacementExamLead } from './exam/placementExamSession';
 import { useLevelAssessment } from './LevelAssessmentContext';
+import { trackEvent } from '../lib/analytics';
 
 interface RenderQuestion {
   id: string;
@@ -337,6 +338,23 @@ export default function PlacementExamPage() {
     setIsSendingResult(true);
     setSendError(null);
 
+    const durationSeconds = startedAtRef.current
+      ? Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000))
+      : undefined;
+    trackEvent('placement_exam_complete', {
+      completion_status: status,
+      answered_count: metrics.answeredCount,
+      correct_count: metrics.correctCount,
+      wrong_count: metrics.wrongCount,
+      unanswered_count: metrics.unansweredCount,
+      score: metrics.score,
+      percentage: metrics.percentage,
+      question_count: questions.length,
+      exam_language: selectedLanguageLabel || selectedLanguage,
+      age_range: selectedAge,
+      duration_seconds: durationSeconds,
+    });
+
     const sent = await openMailDraft({
       subject: 'Seviye Tespit Sınav Sonucu',
       lines: buildResultLines(snapshotRef.current, lead, status),
@@ -354,6 +372,22 @@ export default function PlacementExamPage() {
     if (!isStarted || isSubmitted || reportSentRef.current) return;
 
     reportSentRef.current = true;
+    const durationSeconds = startedAtRef.current
+      ? Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000))
+      : undefined;
+    trackEvent('placement_exam_complete', {
+      completion_status: 'left_exam',
+      answered_count: metrics.answeredCount,
+      correct_count: metrics.correctCount,
+      wrong_count: metrics.wrongCount,
+      unanswered_count: metrics.unansweredCount,
+      score: metrics.score,
+      percentage: metrics.percentage,
+      question_count: questions.length,
+      exam_language: selectedLanguageLabel || selectedLanguage,
+      age_range: selectedAge,
+      duration_seconds: durationSeconds,
+    });
     openMailDraftOnUnload({
       subject: 'Seviye Tespit Sınav Ayrilma Bildirimi',
       lines: buildResultLines(snapshotRef.current, lead, 'left_exam', leaveReason),
@@ -416,6 +450,13 @@ export default function PlacementExamPage() {
     reportSentRef.current = false;
     timerSubmissionTriggeredRef.current = false;
     startedAtRef.current = Date.now();
+
+    trackEvent('placement_exam_start', {
+      exam_language: selectedLanguageLabel || selectedLanguage,
+      age_range: selectedAge,
+      question_count: nextQuestions.length,
+      exam_bank: activeBankInfo.bank.key,
+    });
   };
 
   const restartExam = () => {

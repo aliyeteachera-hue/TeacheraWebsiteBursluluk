@@ -8,6 +8,8 @@ import {
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { openMailDraft } from './formMailto';
 import { ACADEMY_ARTICLES } from '../content/academyArticles';
+import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
+import { useFormSubmission } from '../lib/useFormSubmission';
 
 const categories = [
   { id: 'hepsi', label: 'TÜMÜ' },
@@ -22,8 +24,15 @@ export default function AcademyPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false);
-  const [newsletterFeedback, setNewsletterFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [newsletterSuccessMessage, setNewsletterSuccessMessage] = useState<string | null>(null);
+  const {
+    isSubmitting: isNewsletterSubmitting,
+    fieldError: newsletterFieldError,
+    submitError: newsletterSubmitError,
+    setFieldError: setNewsletterFieldError,
+    clearErrors: clearNewsletterErrors,
+    runSubmission: runNewsletterSubmission,
+  } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
 
   const filtered = ACADEMY_ARTICLES
     .filter((a) => activeCategory === 'hepsi' || a.category === activeCategory)
@@ -48,34 +57,34 @@ export default function AcademyPage() {
   const handleNewsletterSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (isNewsletterSubmitting) return;
+    clearNewsletterErrors();
+    setNewsletterSuccessMessage(null);
 
     const email = newsletterEmail.trim();
-    const isEmailValid = email === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-    if (!isEmailValid) {
-      setNewsletterFeedback({ type: 'error', text: 'Lütfen geçerli bir e-posta adresi giriniz veya alanı boş bırakınız.' });
+    if (!email) {
+      setNewsletterFieldError(FORM_UI_MESSAGES.required);
       return;
     }
 
-    setIsNewsletterSubmitting(true);
-    setNewsletterFeedback(null);
-
-    const sent = await openMailDraft({
-      subject: 'Teachera Academy Bulten Abonelik Talebi',
-      lines: [
-        `E-posta: ${email || '-'}`,
-        'Kaynak: Academy Bulten Formu',
-      ],
-    });
-
-    if (sent) {
-      setNewsletterFeedback({ type: 'success', text: 'Abonelik talebiniz alındı. Teşekkür ederiz.' });
-      setNewsletterEmail('');
-    } else {
-      setNewsletterFeedback({ type: 'error', text: 'Abonelik talebi gönderilemedi. Lütfen tekrar deneyin.' });
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!isEmailValid) {
+      setNewsletterFieldError(FORM_UI_MESSAGES.email);
+      return;
     }
 
-    setIsNewsletterSubmitting(false);
+    const sent = await runNewsletterSubmission(() =>
+      openMailDraft({
+        subject: 'Teachera Academy Bulten Abonelik Talebi',
+        lines: [
+          `E-posta: ${email}`,
+          'Kaynak: Academy Bulten Formu',
+        ],
+      }),
+    );
+    if (!sent) return;
+
+    setNewsletterSuccessMessage('Abonelik talebiniz alındı. Teşekkür ederiz.');
+    setNewsletterEmail('');
   };
 
   return (
@@ -494,16 +503,24 @@ export default function AcademyPage() {
                   disabled={isNewsletterSubmitting}
                   className="h-[48px] px-7 bg-[#E70000] hover:bg-[#c40000] text-white rounded-full font-['Neutraface_2_Text:Demi',sans-serif] text-[13px] tracking-wide transition-all duration-300 shadow-lg shadow-[#E70000]/20 cursor-pointer whitespace-nowrap hover:shadow-[#E70000]/30 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isNewsletterSubmitting ? 'Gönderiliyor...' : 'Abone Ol'}
+                  {isNewsletterSubmitting ? FORM_UI_MESSAGES.submitting : 'Abone Ol'}
                 </button>
               </div>
-              {newsletterFeedback && (
+              {newsletterFieldError && (
                 <p
-                  className={`mt-3 text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] ${
-                    newsletterFeedback.type === 'success' ? 'text-[#C4F7D9]' : 'text-[#FFD4D1]'
-                  }`}
+                  className="mt-3 text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#FFD4D1]"
                 >
-                  {newsletterFeedback.text}
+                  {newsletterFieldError}
+                </p>
+              )}
+              {newsletterSubmitError && (
+                <p className="mt-3 text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#FFD4D1]">
+                  {newsletterSubmitError}
+                </p>
+              )}
+              {newsletterSuccessMessage && (
+                <p className="mt-3 text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#C4F7D9]">
+                  {newsletterSuccessMessage}
                 </p>
               )}
             </form>

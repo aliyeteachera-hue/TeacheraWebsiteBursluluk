@@ -184,7 +184,7 @@ export default function CoursesHub() {
               <motion.button
                 whileHover={{ scale: 1.02, y: -1 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={openLevelAssessment}
+                onClick={() => openLevelAssessment('courses_hub_hero')}
                 className="inline-flex items-center gap-2.5 px-6 py-3 bg-[#324D47] text-white rounded-full text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#3d5e56] transition-colors cursor-pointer shadow-[0_4px_20px_rgba(50,77,71,0.4)]"
               >
                 Seviyeni Belirle
@@ -193,7 +193,7 @@ export default function CoursesHub() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={openFreeTrial}
+                onClick={() => openFreeTrial('courses_hub_hero')}
                 className="inline-flex items-center gap-2 px-6 py-3 border border-white/10 text-white/50 rounded-full text-[13px] font-['Neutraface_2_Text:Book',sans-serif] hover:border-[#6B1D2A]/40 hover:text-[#6B1D2A] hover:bg-[#6B1D2A]/[0.06] transition-all cursor-pointer backdrop-blur-sm"
               >
                 Ücretsiz Deneme Seansı

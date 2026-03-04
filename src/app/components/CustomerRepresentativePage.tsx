@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router';
 import { ArrowLeft, Headset, Mail } from 'lucide-react';
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
+import { useFormSubmission } from '../lib/useFormSubmission';
 
 interface CustomerRepresentativeForm {
   fullName: string;
@@ -55,8 +57,15 @@ const textareaBase =
 export default function CustomerRepresentativePage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<CustomerRepresentativeForm>(INITIAL_FORM);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const {
+    isSubmitting,
+    fieldError,
+    submitError,
+    setFieldError,
+    clearErrors,
+    runSubmission,
+  } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
 
   const handleField = <K extends keyof CustomerRepresentativeForm>(key: K, value: CustomerRepresentativeForm[K]) => {
@@ -70,46 +79,47 @@ export default function CustomerRepresentativePage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (isSubmitting) return;
-    if (!isPhoneValid) return;
+    clearErrors();
+    setSuccessMessage(null);
 
-    setIsSubmitting(true);
-    setFeedback(null);
-
-    const sent = await openMailDraft({
-      to: 'representative@teachera.com.tr',
-      subject: 'Musteri Temsilcisi Basvurusu',
-      lines: [
-        `Ad Soyad: ${formData.fullName}`,
-        `Telefon: +90 ${formData.phone}`,
-        `E-posta: ${formData.email || '-'}`,
-        `Dogum Tarihi: ${formData.birthDate}`,
-        `Profil Tipi: ${formData.profileType}`,
-        `Yasanan Ulke: ${formData.country}`,
-        `Sehir: ${formData.city}`,
-        `Milliyet: ${formData.nationality}`,
-        `Egitim Durumu: ${formData.educationLevel}`,
-        `Bolum / Alan: ${formData.educationDepartment}`,
-        `Hedef Calisma Bolgesi: ${formData.targetArea}`,
-        `Calisma Modeli: ${formData.workModel}`,
-        `Ders Disi Musaitlik ve Calisma Saatleri: ${formData.availability}`,
-        `Haftalik Tahmini Gorusme Kapasitesi: ${formData.weeklyLeadCapacity}`,
-        `Satis / Iletisim Tecrube Ozeti: ${formData.experienceSummary}`,
-        `Teachera Temsil Plani: ${formData.representationPlan}`,
-        `Sosyal Medya/Topluluk Linkleri: ${formData.socialLinks || '-'}`,
-        `Ek Not: ${formData.note || '-'}`,
-        'Calisma Modeli Bilgisi: Duzenli saat + satis uzerinden prim',
-        'Kaynak: Musteri Temsilcisi Basvuru Formu',
-      ],
-    });
-
-    if (sent) {
-      setFeedback({ type: 'success', text: 'Başvurunuz alındı. Uygunluk değerlendirmesi sonrası sizinle iletişime geçeceğiz.' });
-      setFormData(INITIAL_FORM);
-    } else {
-      setFeedback({ type: 'error', text: 'Başvuru gönderilemedi. Lütfen tekrar deneyin.' });
+    if (!isPhoneValid) {
+      setFieldError(FORM_UI_MESSAGES.phone);
+      return;
     }
 
-    setIsSubmitting(false);
+    const sent = await runSubmission(() =>
+      openMailDraft({
+        to: 'representative@teachera.com.tr',
+        subject: 'Musteri Temsilcisi Basvurusu',
+        lines: [
+          `Ad Soyad: ${formData.fullName}`,
+          `Telefon: +90 ${formData.phone}`,
+          `E-posta: ${formData.email || '-'}`,
+          `Dogum Tarihi: ${formData.birthDate}`,
+          `Profil Tipi: ${formData.profileType}`,
+          `Yasanan Ulke: ${formData.country}`,
+          `Sehir: ${formData.city}`,
+          `Milliyet: ${formData.nationality}`,
+          `Egitim Durumu: ${formData.educationLevel}`,
+          `Bolum / Alan: ${formData.educationDepartment}`,
+          `Hedef Calisma Bolgesi: ${formData.targetArea}`,
+          `Calisma Modeli: ${formData.workModel}`,
+          `Ders Disi Musaitlik ve Calisma Saatleri: ${formData.availability}`,
+          `Haftalik Tahmini Gorusme Kapasitesi: ${formData.weeklyLeadCapacity}`,
+          `Satis / Iletisim Tecrube Ozeti: ${formData.experienceSummary}`,
+          `Teachera Temsil Plani: ${formData.representationPlan}`,
+          `Sosyal Medya/Topluluk Linkleri: ${formData.socialLinks || '-'}`,
+          `Ek Not: ${formData.note || '-'}`,
+          'Calisma Modeli Bilgisi: Duzenli saat + satis uzerinden prim',
+          'Kaynak: Musteri Temsilcisi Basvuru Formu',
+        ],
+      }),
+    );
+
+    if (!sent) return;
+
+    setSuccessMessage('Başvurunuz alındı. Uygunluk değerlendirmesi sonrası sizinle iletişime geçeceğiz.');
+    setFormData(INITIAL_FORM);
   };
 
   return (
@@ -278,12 +288,6 @@ export default function CustomerRepresentativePage() {
               />
             </div>
 
-            {!isPhoneValid && formData.phone && (
-              <p className="text-[12px] text-[#9C2735] font-['Neutraface_2_Text:Book',sans-serif]">
-                Telefon numarası 5XX XXX XX XX formatında olmalıdır.
-              </p>
-            )}
-
             <textarea
               required
               placeholder="Ders dışı düzenli çalışabileceğiniz gün/saat aralığını yazınız"
@@ -315,15 +319,23 @@ export default function CustomerRepresentativePage() {
               className={textareaBase}
             />
 
-            {feedback && (
+            {fieldError && (
               <p
-                className={`rounded-xl px-4 py-3 text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] ${
-                  feedback.type === 'success'
-                    ? 'bg-[#324D47]/10 text-[#324D47] border border-[#324D47]/25'
-                    : 'bg-[#FFF3F1] text-[#68232E] border border-[#E70000]/25'
-                }`}
+                className="rounded-xl px-4 py-3 text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] bg-[#FFF3F1] text-[#68232E] border border-[#E70000]/25"
               >
-                {feedback.text}
+                {fieldError}
+              </p>
+            )}
+
+            {submitError && (
+              <p className="rounded-xl px-4 py-3 text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] bg-[#FFF3F1] text-[#68232E] border border-[#E70000]/25">
+                {submitError}
+              </p>
+            )}
+
+            {successMessage && (
+              <p className="rounded-xl px-4 py-3 text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] bg-[#324D47]/10 text-[#324D47] border border-[#324D47]/25">
+                {successMessage}
               </p>
             )}
 
@@ -332,7 +344,7 @@ export default function CustomerRepresentativePage() {
               disabled={isSubmitting || !isPhoneValid}
               className="h-[46px] px-7 rounded-full bg-[#324D47] text-white hover:bg-[#3d5e56] transition-colors font-['Neutraface_2_Text:Demi',sans-serif] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Gönderiliyor...' : 'Başvuruyu Gönder'}
+              {isSubmitting ? FORM_UI_MESSAGES.submitting : 'Başvuruyu Gönder'}
             </button>
           </form>
         </div>

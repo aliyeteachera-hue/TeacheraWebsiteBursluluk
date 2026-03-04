@@ -10,8 +10,10 @@ import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { notifyError, notifySuccess } from '../lib/notifications';
-import { useOverlayLifecycle } from '../lib/overlayLifecycle';
+import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
+import { useFormSubmission } from '../lib/useFormSubmission';
 import { useCoarsePointer } from '../lib/useCoarsePointer';
+import { OverlayModal } from './overlay/OverlayPrimitives';
 
 const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
 
@@ -73,6 +75,15 @@ export default function FreeTrialModal() {
   const [submitted, setSubmitted] = useState(false);
   const [kvkkConsent, setKvkkConsent] = useState(false);
   const [contactConsent, setContactConsent] = useState(false);
+  const {
+    isSubmitting,
+    fieldError,
+    submitError,
+    setFieldError,
+    clearErrors,
+    resetSubmissionState,
+    runSubmission,
+  } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
 
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -85,7 +96,6 @@ export default function FreeTrialModal() {
   const selectedLang = availableLanguages.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-  useOverlayLifecycle(isOpen, 'free-trial');
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -108,10 +118,11 @@ export default function FreeTrialModal() {
         setLangOpen(false);
         setAgeOpen(false);
         setCalendarOpen(false);
+        resetSubmissionState();
       }, 400);
       return () => clearTimeout(t);
     }
-  }, [isOpen]);
+  }, [isOpen, resetSubmissionState]);
 
   /* Yaş değişince dili sıfırla (yeni yaşta mevcut dil yoksa) */
   const handleAgeChange = (age: string) => {
@@ -127,21 +138,39 @@ export default function FreeTrialModal() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!kvkkConsent || !formData.fullName || !formData.age || !formData.language || !isPhoneValid) return;
+    if (isSubmitting) return;
+    clearErrors();
 
-    const sent = await openMailDraft({
-      subject: 'Ucretsiz Deneme Seansi Talebi',
-      lines: [
-        `Ad Soyad: ${formData.fullName}`,
-        `Telefon: +90 ${formData.phone}`,
-        `E-posta: ${formData.email || '-'}`,
-        `Yas Araligi: ${ageRanges.find((age) => age === formData.age) || formData.age}`,
-        `Dil: ${getLanguagesForAge(formData.age).find((language) => language.id === formData.language)?.name || formData.language}`,
-        `Seans Tarihi: ${selectedDate ? formatDate(selectedDate) : '-'}`,
-        `Saat Araligi: ${timeSlots.find((slot) => slot.id === selectedTime)?.label || selectedTime || '-'}`,
-        `Iletisim Izni: ${contactConsent ? 'Evet' : 'Hayir'}`,
-      ],
-    });
+    if (!formData.fullName || !formData.age || !formData.language) {
+      setFieldError(FORM_UI_MESSAGES.required);
+      return;
+    }
+
+    if (!isPhoneValid) {
+      setFieldError(FORM_UI_MESSAGES.phone);
+      return;
+    }
+
+    if (!kvkkConsent) {
+      setFieldError(FORM_UI_MESSAGES.kvkk);
+      return;
+    }
+
+    const sent = await runSubmission(() =>
+      openMailDraft({
+        subject: 'Ucretsiz Deneme Seansi Talebi',
+        lines: [
+          `Ad Soyad: ${formData.fullName}`,
+          `Telefon: +90 ${formData.phone}`,
+          `E-posta: ${formData.email || '-'}`,
+          `Yas Araligi: ${ageRanges.find((age) => age === formData.age) || formData.age}`,
+          `Dil: ${getLanguagesForAge(formData.age).find((language) => language.id === formData.language)?.name || formData.language}`,
+          `Seans Tarihi: ${selectedDate ? formatDate(selectedDate) : '-'}`,
+          `Saat Araligi: ${timeSlots.find((slot) => slot.id === selectedTime)?.label || selectedTime || '-'}`,
+          `Iletisim Izni: ${contactConsent ? 'Evet' : 'Hayir'}`,
+        ],
+      }),
+    );
 
     if (!sent) {
       notifyError('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
@@ -154,6 +183,7 @@ export default function FreeTrialModal() {
 
   /* Phone mask: auto-format as 5XX XXX XX XX */
   const handlePhoneChange = (value: string) => {
+    setFieldError(null);
     setFormData({ ...formData, phone: normalizeTrMobileInput(value) });
   };
 
@@ -169,64 +199,65 @@ export default function FreeTrialModal() {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={false}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 1 }}
-          transition={{ duration: 0 }}
-          className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#00000B]"
-          onClick={(e) => { if (e.target === e.currentTarget) close(); }}
+        <OverlayModal
+          open={isOpen}
+          onClose={close}
+          owner="free-trial"
+          ariaLabel="Ücretsiz deneme seansı formu"
+          containerClassName="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#00000B]"
         >
-          {/* Background */}
-          <div className="fixed inset-0 pointer-events-none">
-            <img src={imgBg} alt="" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,11,0.5)] via-[rgba(50,77,71,0.35)] to-[rgba(0,0,11,0.65)]" />
-            <div className="absolute inset-0 bg-[#00000B]/18" />
-          </div>
+          {({ panelProps }) => (
+            <>
+              {/* Background */}
+              <div className="fixed inset-0 pointer-events-none">
+                <img src={imgBg} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,11,0.5)] via-[rgba(50,77,71,0.35)] to-[rgba(0,0,11,0.65)]" />
+                <div className="absolute inset-0 bg-[#00000B]/18" />
+              </div>
 
-          {/* Close */}
-          <motion.button
-            initial={isCoarsePointer ? false : { opacity: 0, scale: 0.8 }}
-            animate={isCoarsePointer ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 }}
-            onClick={close}
-            className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-12 h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300"
-            aria-label="Kapat"
-          >
-            <X size={22} />
-          </motion.button>
+              {/* Close */}
+              <motion.button
+                initial={isCoarsePointer ? false : { opacity: 0, scale: 0.8 }}
+                animate={isCoarsePointer ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                onClick={close}
+                className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-12 h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300"
+                aria-label="Kapat"
+              >
+                <X size={22} />
+              </motion.button>
 
-          {/* Card */}
-          <motion.div
-            initial={isCoarsePointer ? false : { opacity: 0, y: 40, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={isCoarsePointer ? { opacity: 0, y: 16 } : { opacity: 0, y: 30, scale: 0.96 }}
-            transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
-            className="relative z-[91] w-full max-w-[620px] mx-4 my-12 md:my-20"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <AnimatePresence mode="wait">
-              {submitted ? (
-                <SuccessState
-                  key="success"
-                  selectedDate={selectedDate}
-                  selectedTime={selectedTime}
-                  isCoarsePointer={isCoarsePointer}
-                  onReset={() => setSubmitted(false)}
-                  onClose={close}
-                />
-              ) : (
-                <motion.form
-                  key="form"
-                  onSubmit={handleSubmit}
-                  initial={isCoarsePointer ? false : { opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
-                  transition={{ duration: isCoarsePointer ? 0.24 : 0.35 }}
-                  className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
-                >
-                  {/* Glass shine */}
-                  <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+              {/* Card */}
+              <motion.div
+                {...panelProps}
+                initial={isCoarsePointer ? false : { opacity: 0, y: 40, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={isCoarsePointer ? { opacity: 0, y: 16 } : { opacity: 0, y: 30, scale: 0.96 }}
+                transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
+                className="relative z-[91] w-full max-w-[620px] mx-4 my-12 md:my-20"
+              >
+                <AnimatePresence mode="wait">
+                  {submitted ? (
+                    <SuccessState
+                      key="success"
+                      selectedDate={selectedDate}
+                      selectedTime={selectedTime}
+                      isCoarsePointer={isCoarsePointer}
+                      onReset={() => setSubmitted(false)}
+                      onClose={close}
+                    />
+                  ) : (
+                    <motion.form
+                      key="form"
+                      onSubmit={handleSubmit}
+                      initial={isCoarsePointer ? false : { opacity: 0, scale: 0.97 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
+                      transition={{ duration: isCoarsePointer ? 0.24 : 0.35 }}
+                      className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
+                    >
+                      {/* Glass shine */}
+                      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
 
                   <div className="relative z-10 p-7 md:p-10">
                     {/* Header */}
@@ -430,21 +461,32 @@ export default function FreeTrialModal() {
                         </ConsentRow>
                       </div>
 
+                      {fieldError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#F4EBD1]">
+                          {fieldError}
+                        </p>
+                      )}
+                      {submitError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#FFD4D1]">
+                          {submitError}
+                        </p>
+                      )}
+
                       {/* Submit */}
                       <motion.button
                         type="submit"
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.98 }}
-                        disabled={!kvkkConsent || !isPhoneValid}
+                        disabled={isSubmitting || !kvkkConsent || !isPhoneValid}
                         className={`w-full h-[48px] rounded-[30px] flex items-center justify-center gap-2.5 transition-colors duration-300 mt-1 ${
-                          kvkkConsent && isPhoneValid
+                          !isSubmitting && kvkkConsent && isPhoneValid
                             ? 'bg-[#00000B] hover:bg-[#68232E] cursor-pointer'
                             : 'bg-[#00000B]/40 cursor-not-allowed'
                         }`}
                       >
                         <Send size={15} className="text-white" />
                         <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] text-white tracking-wide">
-                          Deneme Seansı Talep Et
+                          {isSubmitting ? FORM_UI_MESSAGES.submitting : 'Deneme Seansı Talep Et'}
                         </span>
                       </motion.button>
 
@@ -454,11 +496,13 @@ export default function FreeTrialModal() {
                       </p>
                     </div>
                   </div>
-                </motion.form>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </motion.div>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </>
+          )}
+        </OverlayModal>
       )}
     </AnimatePresence>
   );

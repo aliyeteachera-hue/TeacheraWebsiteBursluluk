@@ -23,11 +23,15 @@ Import dosyalari:
 3. Preview modunda su eventler dataLayer'a dusuyor mu?
 - `seo_landing_view`
 - `seo_landing_cta_click`
+- `cta_click`
+- `engaged_30s`
+- `scroll_depth_50`
 - `lead_form_submit_success`
 4. GA4 Admin > Conversions:
 - `lead_form_submit_success`
 - `whatsapp_click`
 - `phone_click`
+- `placement_exam_complete` (opsiyonel)
 
 ## Not
 

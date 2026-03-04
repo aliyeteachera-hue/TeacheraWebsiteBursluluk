@@ -2567,7 +2567,7 @@ export default function ProgramDetailPage() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={openFreeTrial}
+                onClick={() => openFreeTrial(`program_detail:${program.id}:hero`)}
                 className="px-5 md:px-6 py-2 md:py-2.5 border border-[#324D47]/60 backdrop-blur-sm text-white rounded-full text-mobile-kicker sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/20 hover:border-[#324D47] transition-all"
               >
                 Ücretsiz Deneme Seansı
@@ -2710,7 +2710,7 @@ export default function ProgramDetailPage() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={openFreeTrial}
+                onClick={() => openFreeTrial(`program_detail:${program.id}:bottom_cta`)}
                 className="px-5 md:px-6 py-2 md:py-2.5 border border-[#324D47]/60 text-[#324D47] rounded-full text-mobile-kicker sm:text-xs md:text-sm font-['Neutraface_2_Text:Demi',sans-serif] hover:bg-[#324D47]/10 hover:border-[#324D47] transition-all"
               >
                 Ücretsiz Deneme Seansı

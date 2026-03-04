@@ -1414,7 +1414,7 @@ function CTASection() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={openFreeTrial}
+              onClick={() => openFreeTrial('methodology_cta')}
               className="group flex min-h-[44px] items-center gap-2 bg-[#324D47] hover:bg-[#3d5e57] text-white font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker sm:text-[13px] tracking-[0.05em] px-6 sm:px-7 py-2.5 sm:py-3 rounded-full transition-all duration-300 cursor-pointer"
             >
               Ücretsiz Deneme Seansı
@@ -1423,7 +1423,7 @@ function CTASection() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={openLevelAssessment}
+              onClick={() => openLevelAssessment('methodology_cta')}
               className="flex min-h-[44px] items-center gap-2 border border-[#324D47]/20 hover:border-[#324D47]/40 text-[#09090F]/60 hover:text-[#324D47] font-['Neutraface_2_Text:Demi',sans-serif] text-mobile-kicker sm:text-[13px] tracking-[0.05em] px-5 sm:px-6 py-2.5 sm:py-3 rounded-full transition-all cursor-pointer"
             >
               Seviyeni Öğren
