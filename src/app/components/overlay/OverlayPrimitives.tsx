@@ -86,9 +86,14 @@ function OverlayBase({
   const overlayIdRef = useRef<string>(`overlay-${++overlayIdCounter}`);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const onCloseRef = useRef(onClose);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
   useOverlayLifecycle(open, owner);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) return;
@@ -119,13 +124,21 @@ function OverlayBase({
         return;
       }
 
-      const focusableElements = getFocusableElements(root);
+      const focusableElements = getFocusableElements(panel);
       if (focusableElements.length > 0) {
         focusableElements[0].focus();
         return;
       }
 
-      panel.focus();
+      const rootFocusableElements = getFocusableElements(root);
+      if (rootFocusableElements.length > 0) {
+        rootFocusableElements[0].focus();
+        return;
+      }
+
+      if (isElementVisible(panel)) {
+        panel.focus();
+      }
     }, 0);
 
     const onKeyboardControl = (event: KeyboardEvent) => {
@@ -133,7 +146,7 @@ function OverlayBase({
 
       if (event.key === 'Escape' && closeOnEscape) {
         event.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -183,7 +196,7 @@ function OverlayBase({
       }
       previousActiveElementRef.current = null;
     };
-  }, [open, onClose, closeOnEscape, restoreFocus, initialFocusRef]);
+  }, [open, closeOnEscape, restoreFocus, initialFocusRef]);
 
   if (!open) return null;
 

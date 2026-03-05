@@ -9,6 +9,7 @@ import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
 import { useFormSubmission } from '../lib/useFormSubmission';
 import { useCoarsePointer } from '../lib/useCoarsePointer';
 import { OverlayModal } from './overlay/OverlayPrimitives';
+import { DatePickerInput, formatDateTr } from './form/DatePickerInput';
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS
@@ -71,138 +72,6 @@ const FAQ_ITEMS = [
     a: 'Son başvuru tarihi 16 Mart 2026. Ancak ilk belirleyici olan kontenjanlar; dolduğunda başvurular erken kapanabilir.',
   },
 ];
-
-/* ═══════════════════════════════════════════════════════════════════════
-   HELPERS — calendar
-   ═══════════════════════════════════════════════════════════════════════ */
-const TR_MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-const TR_DAYS_SHORT = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-
-const CAL_MIN = new Date(2026, 1, 27); // 27 Şubat 2026
-const CAL_MAX = new Date(2026, 2, 16); // 16 Mart 2026
-
-function getMonthGrid(year: number, month: number) {
-  const firstDay = new Date(year, month, 1).getDay();
-  const startIdx = firstDay === 0 ? 6 : firstDay - 1; // Monday = 0
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  return { startIdx, daysInMonth };
-}
-
-function formatDateTr(d: Date) {
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  return `${day}.${month}.${year}`;
-}
-
-function isSameDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   DROPDOWN CALENDAR — FreeTrialModal style, SpeakUP renkleri
-   ═══════════════════════════════════════════════════════════════════════ */
-function CalendarDropdown({
-  viewYear, viewMonth, selectedDate,
-  onSelect, onPrev, onNext,
-}: {
-  viewYear: number; viewMonth: number;
-  selectedDate: Date | null;
-  onSelect: (d: Date) => void;
-  onPrev: () => void; onNext: () => void;
-}) {
-  const { startIdx, daysInMonth } = getMonthGrid(viewYear, viewMonth);
-  const cells: (number | null)[] = Array(startIdx).fill(null);
-  for (let i = 1; i <= daysInMonth; i++) cells.push(i);
-
-  const today = new Date();
-
-  const isEnabled = (day: number) => {
-    const d = new Date(viewYear, viewMonth, day);
-    return d >= CAL_MIN && d <= CAL_MAX;
-  };
-
-  const canPrev = viewYear > CAL_MIN.getFullYear() || (viewYear === CAL_MIN.getFullYear() && viewMonth > CAL_MIN.getMonth());
-  const canNext = viewYear < CAL_MAX.getFullYear() || (viewYear === CAL_MAX.getFullYear() && viewMonth < CAL_MAX.getMonth());
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -8, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -8, scale: 0.97 }}
-      transition={{ duration: 0.2 }}
-      className="absolute top-full left-0 mt-2 w-[260px] bg-white rounded-[14px] shadow-xl shadow-black/15 border border-[#324D47]/[0.08] overflow-hidden z-30 p-3"
-    >
-      {/* Month nav */}
-      <div className="flex items-center justify-between mb-2">
-        <button
-          type="button"
-          onClick={onPrev}
-          disabled={!canPrev}
-          className="w-6 h-6 rounded-full hover:bg-[#324D47]/[0.06] flex items-center justify-center transition-colors disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-        >
-          <ChevronLeft size={13} className="text-[#324D47]" />
-        </button>
-        <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[12px] text-[#324D47]">
-          {TR_MONTHS[viewMonth]} {viewYear}
-        </span>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!canNext}
-          className="w-6 h-6 rounded-full hover:bg-[#324D47]/[0.06] flex items-center justify-center transition-colors disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
-        >
-          <ChevronRight size={13} className="text-[#324D47]" />
-        </button>
-      </div>
-
-      {/* Day headers */}
-      <div className="grid grid-cols-7 gap-0 mb-0.5">
-        {TR_DAYS_SHORT.map(d => (
-          <div key={d} className="text-center text-[9px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#324D47]/25 py-0.5">
-            {d}
-          </div>
-        ))}
-      </div>
-
-      {/* Days */}
-      <div className="grid grid-cols-7 gap-0">
-        {cells.map((day, i) => {
-          if (day === null) return <div key={`e-${i}`} />;
-          const date = new Date(viewYear, viewMonth, day);
-          const enabled = isEnabled(day);
-          const isToday = isSameDay(date, today);
-          const isSelected = selectedDate && isSameDay(date, selectedDate);
-
-          return (
-            <button
-              key={day}
-              type="button"
-              disabled={!enabled}
-              onClick={() => onSelect(date)}
-              className={`w-full aspect-square rounded-full flex items-center justify-center text-[11px] font-['Neutraface_2_Text:Demi',sans-serif] transition-all duration-150 ${
-                !enabled
-                  ? 'text-[#324D47]/15 cursor-not-allowed'
-                  : isSelected
-                  ? 'bg-[#324D47] text-white shadow-md'
-                  : isToday
-                  ? 'bg-[#324D47]/10 text-[#324D47] hover:bg-[#324D47]/20 cursor-pointer'
-                  : 'text-[#324D47] hover:bg-[#324D47]/[0.06] cursor-pointer'
-              }`}
-            >
-              {day}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Note */}
-      <p className="text-center text-[9px] font-['Neutraface_2_Text:Book',sans-serif] text-[#324D47]/25 mt-1.5">
-        27 Şubat – 16 Mart arası seçim yapabilirsiniz.
-      </p>
-    </motion.div>
-  );
-}
 
 /* ═══════════════════════════════════════════════════════════════════════
    REVEAL ANIMATION
@@ -439,9 +308,7 @@ export default function SpeakUpPage() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [calendarOpen, setCalendarOpen] = useState(false);
-  const [calViewYear, setCalViewYear] = useState(CAL_MIN.getFullYear());
-  const [calViewMonth, setCalViewMonth] = useState(CAL_MIN.getMonth());
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
   const {
     isSubmitting,
     fieldError,
@@ -451,27 +318,8 @@ export default function SpeakUpPage() {
     resetSubmissionState,
     runSubmission,
   } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
-  const calRef = useRef<HTMLDivElement>(null);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
   const isCoarsePointer = useCoarsePointer();
-
-  /* Close calendar on outside click */
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (calRef.current && !calRef.current.contains(e.target as Node)) setCalendarOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const calPrev = () => {
-    if (calViewMonth === 0) { setCalViewMonth(11); setCalViewYear(y => y - 1); }
-    else setCalViewMonth(m => m - 1);
-  };
-  const calNext = () => {
-    if (calViewMonth === 11) { setCalViewMonth(0); setCalViewYear(y => y + 1); }
-    else setCalViewMonth(m => m + 1);
-  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -484,13 +332,11 @@ export default function SpeakUpPage() {
   const openFormModal = (event?: { preventDefault?: () => void }) => {
     event?.preventDefault?.();
     setSubmitted(false);
-    setCalendarOpen(false);
     resetSubmissionState();
     setIsFormModalOpen(true);
   };
 
   const closeFormModal = () => {
-    setCalendarOpen(false);
     resetSubmissionState();
     setIsFormModalOpen(false);
   };
@@ -1099,6 +945,7 @@ export default function SpeakUpPage() {
             onClose={closeFormModal}
             owner="speakup-form"
             ariaLabel="SpeakUP başvuru formu"
+            initialFocusRef={nameInputRef}
             containerClassName="fixed inset-0 z-[92] flex items-start justify-center overflow-y-auto px-4 py-6 md:py-10 bg-[#00000B]"
           >
             {({ panelProps }) => (
@@ -1194,6 +1041,7 @@ export default function SpeakUpPage() {
                         AD SOYAD <span className="text-[#E70000]">*</span>
                       </label>
                       <input
+                        ref={nameInputRef}
                         type="text"
                         required
                         value={formData.name}
@@ -1309,30 +1157,17 @@ export default function SpeakUpPage() {
                       <label className="block text-[#324D47] text-mobile-kicker font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.08em] md:tracking-[0.15em] mb-2">
                         SEVİYE TESPİTİ İÇİN GELEBİLECEĞİN TARİH
                       </label>
-                      <div className="relative" ref={calRef}>
-                        <button
-                          type="button"
-                          onClick={() => setCalendarOpen(!calendarOpen)}
-                          className="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-left flex items-center justify-between font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors cursor-pointer"
-                        >
-                          <span className={formData.testDate ? 'text-[#324D47]' : 'text-[#324D47]/25'}>
-                            {formData.testDate ? formatDateTr(formData.testDate) : 'Tarih Seçiniz'}
-                          </span>
-                          <ChevronDown size={15} className={`text-[#324D47]/30 transition-transform duration-200 ${calendarOpen ? 'rotate-180' : ''}`} />
-                        </button>
-                        <AnimatePresence>
-                          {calendarOpen && (
-                            <CalendarDropdown
-                              viewYear={calViewYear}
-                              viewMonth={calViewMonth}
-                              selectedDate={formData.testDate}
-                              onSelect={(d) => { setFormData(p => ({ ...p, testDate: d })); setCalendarOpen(false); }}
-                              onPrev={calPrev}
-                              onNext={calNext}
-                            />
-                          )}
-                        </AnimatePresence>
-                      </div>
+                      <DatePickerInput
+                        value={formData.testDate}
+                        onChange={(date) => setFormData((prev) => ({ ...prev, testDate: date }))}
+                        placeholder="Tarih Seçiniz"
+                        inputClassName="w-full h-[44px] rounded-[30px] px-5 bg-[#324D47]/[0.03] border border-[#324D47]/[0.08] text-left flex items-center justify-between font-['Neutraface_2_Text:Book',sans-serif] text-[14px] focus:border-[#E70000]/30 focus:outline-none transition-colors cursor-pointer"
+                        panelClassName="absolute top-full left-0 mt-2 w-[260px] bg-white rounded-[14px] shadow-xl shadow-black/15 border border-[#324D47]/[0.08] overflow-hidden z-30 p-3"
+                        valueClassName="text-[#324D47]"
+                        placeholderClassName="text-[#324D47]/25"
+                        indicator="chevron"
+                        indicatorClassName="text-[#324D47]/30"
+                      />
                     </div>
 
                     {/* Seviye Tespiti Saati */}

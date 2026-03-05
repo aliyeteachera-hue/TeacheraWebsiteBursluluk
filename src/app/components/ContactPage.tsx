@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   User, Phone, Globe, CalendarDays, Clock, ChevronDown, Check, Send,
-  PhoneCall, MessageCircle, MapPin, Mail, ArrowRight, Sparkles, ChevronLeft, ChevronRight,
+  PhoneCall, MessageCircle, MapPin, Mail, ArrowRight, Sparkles,
 } from 'lucide-react';
 import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
 import { openMailDraft } from './formMailto';
@@ -10,6 +10,7 @@ import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOB
 import { notifyError, notifySuccess } from '../lib/notifications';
 import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
 import { useFormSubmission } from '../lib/useFormSubmission';
+import { DatePickerInput, formatDateTr } from './form/DatePickerInput';
 
 /* ─── DATA ──────────────────────────────────────────────────────────────── */
 const languages = [
@@ -34,35 +35,6 @@ const WHATSAPP_HREF = 'https://wa.me/905528674226';
 
 const inputBase =
   "w-full h-[44px] bg-white rounded-[30px] px-5 text-[14px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#00000B] placeholder:text-[#686767] outline-none border border-black/5 focus:border-[#324D47]/50 focus:ring-2 focus:ring-[#324D47]/15 transition-all";
-
-/* ─── HELPERS ───────────────────────────────────────────────────────────── */
-const turkishMonths = [
-  'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-  'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
-];
-const turkishDays = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-
-function getMonthDays(year: number, month: number) {
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const startIdx = firstDay === 0 ? 6 : firstDay - 1; // Monday-based
-  return { daysInMonth, startIdx };
-}
-
-function formatDate(d: Date) {
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  return `${day}.${month}.${year}`;
-}
-
-function isSameDay(a: Date, b: Date) {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-}
-
-function isSunday(year: number, month: number, day: number) {
-  return new Date(year, month, day).getDay() === 0;
-}
 
 /* ─── PAGE ──────────────────────────────────────────────────────────────── */
 export default function ContactPage() {
@@ -114,7 +86,6 @@ function CallbackForm() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [langOpen, setLangOpen] = useState(false);
-  const [calendarOpen, setCalendarOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const {
     isSubmitting,
@@ -125,10 +96,6 @@ function CallbackForm() {
     resetSubmissionState,
     runSubmission,
   } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
-
-  const today = new Date();
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
 
   const selectedLang = languages.find((l) => l.id === formData.language);
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
@@ -156,7 +123,7 @@ function CallbackForm() {
           `Ad Soyad: ${formData.fullName}`,
           `Telefon: +90 ${formData.phone}`,
           `Dil: ${selectedLang?.name || formData.language}`,
-          `Tarih: ${formatDate(selectedDate)}`,
+          `Tarih: ${formatDateTr(selectedDate)}`,
           `Saat Aralığı: ${selectedTimeLabel}`,
         ],
       }),
@@ -177,15 +144,6 @@ function CallbackForm() {
     setSelectedTime('');
     setSubmitted(false);
     resetSubmissionState();
-  };
-
-  const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
-    else setViewMonth(viewMonth - 1);
-  };
-  const nextMonth = () => {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
-    else setViewMonth(viewMonth + 1);
   };
 
   return (
@@ -214,7 +172,7 @@ function CallbackForm() {
                 Talebiniz Alındı!
               </h3>
               <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[14px] text-white/70 max-w-[380px] leading-relaxed mb-2">
-                <span className="text-white">{selectedDate && formatDate(selectedDate)}</span> tarihinde,{' '}
+                <span className="text-white">{selectedDate && formatDateTr(selectedDate)}</span> tarihinde,{' '}
                 <span className="text-white">{timeSlots.find(t => t.id === selectedTime)?.label}</span> saatleri arasında sizi arayacağız.
               </p>
               <p className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] text-white/50 mb-8">
@@ -314,31 +272,16 @@ function CallbackForm() {
 
                 {/* Tarih seçimi */}
                 <FieldWrap icon={<CalendarDays size={14} />} label="Tercih Ettiğiniz Tarih">
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setCalendarOpen(!calendarOpen)}
-                      className={`${inputBase} text-left flex items-center justify-between cursor-pointer`}
-                    >
-                      <span className={selectedDate ? 'text-[#00000B]' : 'text-[#686767]'}>
-                        {selectedDate ? formatDate(selectedDate) : 'Tarih Seçiniz'}
-                      </span>
-                      <CalendarDays size={15} className="text-[#686767]" />
-                    </button>
-                    <AnimatePresence>
-                      {calendarOpen && (
-                        <MiniCalendar
-                          viewYear={viewYear}
-                          viewMonth={viewMonth}
-                          selectedDate={selectedDate}
-                          today={today}
-                          onSelect={(d) => { setSelectedDate(d); setCalendarOpen(false); }}
-                          onPrev={prevMonth}
-                          onNext={nextMonth}
-                        />
-                      )}
-                    </AnimatePresence>
-                  </div>
+                  <DatePickerInput
+                    value={selectedDate}
+                    onChange={setSelectedDate}
+                    placeholder="Tarih Seçiniz"
+                    disablePast
+                    inputClassName={`${inputBase} text-left flex items-center justify-between cursor-pointer`}
+                    panelClassName="absolute top-full left-0 right-0 mt-2 bg-white rounded-[20px] shadow-xl shadow-black/20 border border-black/5 overflow-hidden z-30 p-4"
+                    indicator="calendar"
+                    indicatorClassName="text-[#686767]"
+                  />
                 </FieldWrap>
 
                 {/* Saat Dilimi */}
@@ -532,97 +475,6 @@ function InfoCard() {
         ))}
       </div>
     </div>
-  );
-}
-
-/* ─── MINI CALENDAR ─────────────────────────────────────────────────────── */
-function MiniCalendar({
-  viewYear, viewMonth, selectedDate, today,
-  onSelect, onPrev, onNext,
-}: {
-  viewYear: number; viewMonth: number;
-  selectedDate: Date | null; today: Date;
-  onSelect: (d: Date) => void;
-  onPrev: () => void; onNext: () => void;
-}) {
-  const { daysInMonth, startIdx } = getMonthDays(viewYear, viewMonth);
-  const cells: (number | null)[] = Array(startIdx).fill(null);
-  for (let i = 1; i <= daysInMonth; i++) cells.push(i);
-
-  const isPast = (day: number) => {
-    const d = new Date(viewYear, viewMonth, day);
-    const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    return d < t;
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -8, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -8, scale: 0.97 }}
-      transition={{ duration: 0.2 }}
-      className="absolute top-full left-0 right-0 mt-2 bg-white rounded-[20px] shadow-xl shadow-black/20 border border-black/5 overflow-hidden z-30 p-4"
-    >
-      {/* Month nav */}
-      <div className="flex items-center justify-between mb-3">
-        <button type="button" onClick={onPrev} className="w-7 h-7 rounded-full hover:bg-[#F4EBD1] flex items-center justify-center transition-colors">
-          <ChevronLeft size={16} className="text-[#00000B]" />
-        </button>
-        <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] text-[#00000B]">
-          {turkishMonths[viewMonth]} {viewYear}
-        </span>
-        <button type="button" onClick={onNext} className="w-7 h-7 rounded-full hover:bg-[#F4EBD1] flex items-center justify-center transition-colors">
-          <ChevronRight size={16} className="text-[#00000B]" />
-        </button>
-      </div>
-
-      {/* Day headers */}
-      <div className="grid grid-cols-7 gap-0.5 mb-1">
-        {turkishDays.map((d) => (
-          <div key={d} className="text-center text-mobile-kicker md:text-[10px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#686767] py-1">
-            {d}
-          </div>
-        ))}
-      </div>
-
-      {/* Days */}
-      <div className="grid grid-cols-7 gap-0.5">
-        {cells.map((day, i) => {
-          if (day === null) return <div key={`e-${i}`} />;
-          const date = new Date(viewYear, viewMonth, day);
-          const isToday = isSameDay(date, today);
-          const isSelected = selectedDate && isSameDay(date, selectedDate);
-          const past = isPast(day);
-          const sunday = isSunday(viewYear, viewMonth, day);
-          const disabled = past || sunday;
-
-          return (
-            <button
-              key={day}
-              type="button"
-              disabled={disabled}
-              onClick={() => onSelect(date)}
-              className={`w-full aspect-square rounded-full flex items-center justify-center text-mobile-meta md:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] transition-all duration-150 ${
-                disabled
-                  ? 'text-[#d0d0d0] cursor-not-allowed'
-                  : isSelected
-                  ? 'bg-[#324D47] text-white shadow-md'
-                  : isToday
-                  ? 'bg-[#324D47]/10 text-[#324D47] hover:bg-[#324D47]/20'
-                  : 'text-[#00000B] hover:bg-[#F4EBD1]/60 cursor-pointer'
-              }`}
-            >
-              {day}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Sunday note */}
-      <p className="text-center text-mobile-kicker md:text-[10px] font-['Neutraface_2_Text:Book',sans-serif] text-[#686767]/60 mt-2">
-        Pazar günleri ders yapılmamaktadır.
-      </p>
-    </motion.div>
   );
 }
 

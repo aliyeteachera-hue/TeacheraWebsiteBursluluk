@@ -5,6 +5,7 @@ import { openMailDraft } from './formMailto';
 import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
 import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
 import { useFormSubmission } from '../lib/useFormSubmission';
+import { DatePickerInput, parseISODate, toISODateString } from './form/DatePickerInput';
 
 interface JobApplicationForm {
   fullName: string;
@@ -59,6 +60,7 @@ export default function JobOpportunitiesPage() {
     runSubmission,
   } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
   const isPhoneValid = isValidTrMobilePhone(formData.phone);
+  const birthDate = parseISODate(formData.birthDate);
 
   const handleField = <K extends keyof JobApplicationForm>(key: K, value: JobApplicationForm[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -73,6 +75,11 @@ export default function JobOpportunitiesPage() {
     if (isSubmitting) return;
     clearErrors();
     setSuccessMessage(null);
+
+    if (!formData.birthDate) {
+      setFieldError(FORM_UI_MESSAGES.required);
+      return;
+    }
 
     if (!isPhoneValid) {
       setFieldError(FORM_UI_MESSAGES.phone);
@@ -173,13 +180,15 @@ export default function JobOpportunitiesPage() {
                 onChange={(e) => handleField('email', e.target.value)}
                 className={inputBase}
               />
-              <input
-                type="date"
-                lang="tr-TR"
-                required
-                value={formData.birthDate}
-                onChange={(e) => handleField('birthDate', e.target.value)}
-                className={inputBase}
+              <DatePickerInput
+                value={birthDate}
+                onChange={(date) => handleField('birthDate', toISODateString(date))}
+                placeholder="Doğum Tarihi"
+                maxDate={new Date()}
+                inputClassName={`${inputBase} text-left flex items-center justify-between cursor-pointer`}
+                panelClassName="absolute top-full left-0 right-0 mt-2 bg-white rounded-[20px] shadow-xl shadow-black/20 border border-black/5 overflow-hidden z-30 p-4"
+                indicator="calendar"
+                indicatorClassName="text-[#686767]"
               />
               <input
                 type="text"
