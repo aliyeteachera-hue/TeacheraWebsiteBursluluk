@@ -230,7 +230,7 @@ export default function CookieConsent() {
                             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                             className="overflow-hidden"
                           >
-                            <div className="pt-5 mt-5 border-t border-white/5">
+                            <div className="pt-5 mt-5">
                               {/* Info notice */}
                               <div className="flex items-center gap-2 mb-5 px-1">
                                 <Shield size={13} className="text-[#324D47] shrink-0" />
@@ -249,10 +249,10 @@ export default function CookieConsent() {
                                     key={cookie.key}
                                     onClick={() => togglePreference(cookie.key)}
                                     disabled={cookie.locked}
-                                    className={`group text-left p-3.5 rounded-xl border transition-all duration-200 ${
+                                    className={`group text-left p-3.5 rounded-xl transition-all duration-200 ${
                                       preferences[cookie.key]
-                                        ? 'bg-[#324D47]/10 border-[#324D47]/30'
-                                        : 'bg-white/[0.02] border-white/5 hover:border-white/10'
+                                        ? 'bg-[#324D47]/10'
+                                        : 'bg-white/[0.02] hover:bg-white/[0.04]'
                                     } ${cookie.locked ? 'cursor-default' : 'cursor-pointer'}`}
                                   >
                                     <div className="flex items-center justify-between mb-1.5">
@@ -281,7 +281,7 @@ export default function CookieConsent() {
                               </div>
 
                               {/* Detail actions */}
-                              <div className="flex items-center justify-between mt-5 pt-4 border-t border-white/5">
+                              <div className="flex items-center justify-between mt-5 pt-4">
                                 <button
                                   onClick={handleRejectOptional}
                                   className="md:hidden text-[11px] text-white/30 hover:text-white/60 font-['Neutraface_2_Text:Demi',sans-serif] tracking-wide transition-colors"
