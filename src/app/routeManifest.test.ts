@@ -25,6 +25,7 @@ describe('route manifest', () => {
     expect(isKnownAppRoutePath('/hukuki/cerez-politikasi')).toBe(true);
     expect(isKnownAppRoutePath('/egitimlerimiz/ingilizce/grup-programi')).toBe(true);
     expect(isKnownAppRoutePath('/bursluluk/sinav')).toBe(true);
+    expect(isKnownAppRoutePath('/panel/dashboard')).toBe(true);
     expect(isKnownAppRoutePath('/yok/boyle/bir/route')).toBe(false);
   });
 });

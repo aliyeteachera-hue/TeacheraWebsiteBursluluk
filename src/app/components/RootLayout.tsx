@@ -28,6 +28,7 @@ export default function RootLayout() {
   const location = useLocation();
   const liteMode = useLiteMode();
   const isImmersiveBurslulukRoute = location.pathname.startsWith('/bursluluk/');
+  const isImmersivePanelRoute = location.pathname === '/panel' || location.pathname.startsWith('/panel/');
 
   useEffect(() => {
     document.documentElement.lang = 'tr';
@@ -133,7 +134,7 @@ export default function RootLayout() {
   }, [currentSection]);
 
   const isAuthPage = location.pathname === '/giris';
-  const showChrome = !isImmersiveBurslulukRoute;
+  const showChrome = !(isImmersiveBurslulukRoute || isImmersivePanelRoute);
 
   return (
     <FreeTrialProvider>

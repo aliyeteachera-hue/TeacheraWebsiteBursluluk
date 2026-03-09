@@ -51,8 +51,8 @@ export function applyCors(req, res, envKey = 'BURSLULUK_ALLOWED_ORIGINS') {
     res.setHeader('Vary', 'Origin');
   }
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Admin-Key');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Admin-Key,X-Admin-Role');
 
   if (req.method === 'OPTIONS') {
     res.status(204).end();

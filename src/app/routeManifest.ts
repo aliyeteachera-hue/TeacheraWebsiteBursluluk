@@ -25,6 +25,13 @@ export const STATIC_ROUTE_PATHS = [
   '/bursluluk/bekleme',
   '/bursluluk/sinav',
   '/bursluluk/sonuc',
+  '/panel',
+  '/panel/dashboard',
+  '/panel/candidates',
+  '/panel/notifications',
+  '/panel/unviewed-results',
+  '/panel/dlq',
+  '/panel/settings',
   '/speakup',
   '/is-firsatlari',
   '/musteri-temsilcisi-ol',
@@ -38,6 +45,7 @@ const DYNAMIC_ROUTE_PATTERNS = [
   /^\/academy\/[^/]+$/,
   /^\/hukuki\/[^/]+$/,
   /^\/egitimlerimiz\/[^/]+\/[^/]+$/,
+  /^\/panel\/[^/]+$/,
 ];
 
 export function isKnownAppRoutePath(pathname: string) {

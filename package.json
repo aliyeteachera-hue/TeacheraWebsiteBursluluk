@@ -9,7 +9,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "seed:panel-mock": "node scripts/seed_panel_mock_data.mjs",
+    "smoke:panel-dashboard": "node scripts/smoke_panel_dashboard.mjs"
   },
   "dependencies": {
     "@vercel/speed-insights": "^1.3.1",
