@@ -24,6 +24,7 @@ describe('route manifest', () => {
     expect(isKnownAppRoutePath('/academy/hedef-dilde-dusunmek')).toBe(true);
     expect(isKnownAppRoutePath('/hukuki/cerez-politikasi')).toBe(true);
     expect(isKnownAppRoutePath('/egitimlerimiz/ingilizce/grup-programi')).toBe(true);
+    expect(isKnownAppRoutePath('/bursluluk/sinav')).toBe(true);
     expect(isKnownAppRoutePath('/yok/boyle/bir/route')).toBe(false);
   });
 });

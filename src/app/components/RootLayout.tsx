@@ -27,6 +27,7 @@ export default function RootLayout() {
   const currentSectionRef = useRef('home');
   const location = useLocation();
   const liteMode = useLiteMode();
+  const isImmersiveBurslulukRoute = location.pathname.startsWith('/bursluluk/');
 
   useEffect(() => {
     document.documentElement.lang = 'tr';
@@ -132,40 +133,45 @@ export default function RootLayout() {
   }, [currentSection]);
 
   const isAuthPage = location.pathname === '/giris';
+  const showChrome = !isImmersiveBurslulukRoute;
 
   return (
     <FreeTrialProvider>
       <LevelAssessmentProvider>
         <div className="relative min-h-screen bg-[#00000B]">
           <SeoManager />
-          <Navigation
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            currentSection={currentSection}
-          />
+          {showChrome ? (
+            <Navigation
+              isMenuOpen={isMenuOpen}
+              setIsMenuOpen={setIsMenuOpen}
+              currentSection={currentSection}
+            />
+          ) : null}
 
-          <AnimatePresence mode="wait" initial={false}>
-            {isMenuOpen ? (
-              <MobileMenu
-                key="mobile-menu"
-                onClose={() => setIsMenuOpen(false)}
-                currentSection={currentSection}
-              />
-            ) : null}
-          </AnimatePresence>
+          {showChrome ? (
+            <AnimatePresence mode="wait" initial={false}>
+              {isMenuOpen ? (
+                <MobileMenu
+                  key="mobile-menu"
+                  onClose={() => setIsMenuOpen(false)}
+                  currentSection={currentSection}
+                />
+              ) : null}
+            </AnimatePresence>
+          ) : null}
 
           <main className="relative">
             <Outlet />
           </main>
 
-          {!isAuthPage && <Footer />}
+          {!isAuthPage && showChrome && <Footer />}
 
           <LevelAssessmentModal />
           <FreeTrialModal />
           <AppToaster />
 
           <Suspense fallback={null}>
-            <WhatsAppButton />
+            {showChrome ? <WhatsAppButton /> : null}
             {showDeferredUi && <CookieConsent />}
           </Suspense>
 

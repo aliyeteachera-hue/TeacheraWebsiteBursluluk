@@ -19,6 +19,7 @@ const PREFERRED_SITELINKS = [
   { name: 'Konya İngilizce Grup Programı', path: '/egitimlerimiz/ingilizce/grup-programi' },
   { name: 'Teachera Academy', path: '/academy' },
   { name: 'Seviye Tespit Sınavı', path: '/seviye-tespit-sinavi' },
+  { name: 'Teachera Bursluluk Sınavı', path: '/bursluluk-2026' },
   { name: 'İletişim', path: '/iletisim' },
 ] as const;
 
@@ -129,6 +130,37 @@ const STATIC_ROUTE_META: Record<string, SeoMeta> = {
     description:
       'Teachera Konya için ücretsiz seviye tespit sınavına katılın. Türkiye geneline uygun online/yüz yüze dil programı önerinizi alın.',
     keywords: [...CORE_KEYWORDS, 'ücretsiz seviye tespit sınavı', 'konya ingilizce seviye testi'],
+  },
+  '/bursluluk-2026': {
+    title: 'Teachera Online Bursluluk Sınavı | Konya Geneli',
+    description:
+      'Teachera Dil Okulu online bursluluk sınavı ile Konya genelindeki 1-12. sınıf öğrencileri için ücretsiz katılım ve yüksek burs fırsatı sunar.',
+    keywords: [...CORE_KEYWORDS, 'konya bursluluk sınavı', 'online bursluluk sınavı', 'teachera bursluluk'],
+  },
+  '/bursluluk/onay': {
+    title: 'Başvuru Onayı | Teachera Bursluluk Sınavı',
+    description: 'Teachera bursluluk sınavı başvuru onayı ve giriş bilgilerinin özeti.',
+    keywords: [...CORE_KEYWORDS, 'teachera bursluluk başvuru onayı'],
+  },
+  '/bursluluk/giris': {
+    title: 'Aday Girişi | Teachera Bursluluk Sınavı',
+    description: 'Teachera bursluluk sınavı aday giriş ekranı.',
+    keywords: [...CORE_KEYWORDS, 'teachera bursluluk giriş'],
+  },
+  '/bursluluk/bekleme': {
+    title: 'Bekleme Odası | Teachera Bursluluk Sınavı',
+    description: 'Teachera bursluluk sınavı oturum bekleme ekranı.',
+    keywords: [...CORE_KEYWORDS, 'teachera bursluluk bekleme ekranı'],
+  },
+  '/bursluluk/sinav': {
+    title: 'Sınav Alanı | Teachera Bursluluk Sınavı',
+    description: 'Teachera bursluluk sınavı aday sınav ekranı.',
+    keywords: [...CORE_KEYWORDS, 'teachera bursluluk sınav ekranı'],
+  },
+  '/bursluluk/sonuc': {
+    title: 'Burs Sonucu | Teachera Bursluluk Sınavı',
+    description: 'Teachera bursluluk sınavı sonuç ve burs oranı görüntüleme ekranı.',
+    keywords: [...CORE_KEYWORDS, 'teachera bursluluk sonucu'],
   },
   '/is-firsatlari': {
     title: 'İş Fırsatları | Teachera Konya',
@@ -290,10 +322,13 @@ export default function SeoManager() {
     const canonicalUrl = `${SITE_URL}${canonicalPath}`;
     const isAuthPage = pathname === '/giris';
     const isLegalDetailPage = /^\/hukuki\/[^/]+$/.test(pathname);
+    const isPrivateBurslulukPage = pathname.startsWith('/bursluluk/');
     const robotsValue = isAuthPage
       ? 'noindex,nofollow,noarchive'
       : isLegalDetailPage
         ? 'noindex,follow,noarchive'
+        : isPrivateBurslulukPage
+          ? 'noindex,nofollow,noarchive'
         : knownPath
           ? DEFAULT_ROBOTS
           : 'noindex,follow,noarchive';

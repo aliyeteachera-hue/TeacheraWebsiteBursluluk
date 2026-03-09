@@ -130,6 +130,8 @@ describe('analytics', () => {
     expect(derivePageType('/egitimlerimiz/ingilizce/grup-programi')).toBe('program');
     expect(derivePageType('/konya-online-dil-kursu')).toBe('seo_landing');
     expect(derivePageType('/seviye-tespit-sinavi')).toBe('placement_exam');
+    expect(derivePageType('/bursluluk-2026')).toBe('scholarship_exam');
+    expect(derivePageType('/bursluluk/sonuc')).toBe('scholarship_exam');
     expect(getLeadSegment(10)).toBe('cold');
     expect(getLeadSegment(35)).toBe('warm');
     expect(getLeadSegment(80)).toBe('hot');

@@ -1,0 +1,2342 @@
+[
+  {
+    "id": "karatay-abdulhamid-han-ortaokulu",
+    "name": "Abdülhamid Han Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-akabe-ilkokulu",
+    "name": "Akabe İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-akabe-imam-hatip-ortaokulu",
+    "name": "Akabe İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-akif-pasa-ilkokulu",
+    "name": "Akif Paşa İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-akcesme-ilkokulu",
+    "name": "Akçesme İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-alaeddin-keykubad-imam-hatip-ortaokulu",
+    "name": "Alaeddin Keykubad İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-aliye-huseyin-tekbas-ilkokulu",
+    "name": "Aliye-Hüseyin Tekbaş İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-aynur-kasabal-ilkokulu",
+    "name": "Aynur Kasabalı İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-ayse-huseyin-ozkan-ilkokulu",
+    "name": "Ayşe Hüseyin Özkan İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-ayse-huseyin-ozkan-imam-hatip-ortaokulu",
+    "name": "Ayşe Hüseyin Özkan İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-ayse-huseyin-ozkan-ortaokulu",
+    "name": "Ayşe-Hüseyin Özkan Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-birol-polat-ilkokulu",
+    "name": "Birol Polat İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-bozkrllar-vakf-kz-anadolu-imam-hatip-lisesi",
+    "name": "Bozkırlılar Vakfı Kız Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-bozkrllar-vakf-imam-hatip-ortaokulu",
+    "name": "Bozkırlılar Vakfı İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-buyuk-sinan-mehmet-fatma-dalan-ilkokulu",
+    "name": "Büyük Sinan Mehmet Fatma Dalan İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-celaleddin-karatay-tarm-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Celaleddin Karatay Tarım Mesleki ve Teknik Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-cemil-kelesoglu-anadolu-lisesi",
+    "name": "Cemil Keleşoğlu Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-cengiz-topel-ilkokulu",
+    "name": "Cengiz Topel İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-doktor-sedat-yuksel-ilkokulu",
+    "name": "Doktor Sedat Yüksel İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-dr-ali-rza-bahadr-kz-anadolu-imam-hatip-lisesi",
+    "name": "Dr.Ali Rıza Bahadır Kız Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-fetihkent-imam-hatip-ortaokulu",
+    "name": "Fetihkent İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-gevher-nesibe-hatun-imam-hatip-ortaokulu",
+    "name": "Gevher Nesibe Hatun İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-gocu-ilkokulu",
+    "name": "GÖÇÜ İLKOKULU",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-gocu-ortaokulu",
+    "name": "Göçü Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-hac-sadk-ilkokulu",
+    "name": "Hacı Sadık İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-hac-yusuf-mescit-ahmet-hashas-ilkokulu",
+    "name": "Hacı Yusuf Mescit Ahmet Haşhaş İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-hacveyiszade-anadolu-imam-hatip-lisesi",
+    "name": "Hacıveyiszade Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-hacveyiszade-mahallesi-ahmet-hashas-ilkokulu",
+    "name": "Hacıveyiszade Mahallesi Ahmet Haşhaş İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-halil-bahceci-ilkokulu",
+    "name": "Halil Bahçeci İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-hamzaoglu-imam-hatip-ortaokulu",
+    "name": "Hamzaoğlu İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-hasan-ali-yucel-ilkokulu",
+    "name": "Hasan Ali Yücel İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-hayroglu-ilkokulu",
+    "name": "Hayıroğlu İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-hayroglu-imam-hatip-ortaokulu",
+    "name": "Hayıroğlu İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-hediye-mehmet-ali-uzman-ilkokulu",
+    "name": "Hediye-Mehmet Ali Uzman İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-huseyin-sevim-koroglu-ilkokulu",
+    "name": "Hüseyin Sevim Köroğlu İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-karaaslan-ataturk-ortaokulu",
+    "name": "Karaaslan Atatürk Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-karaaslan-ataturk-imam-hatip-ortaokulu",
+    "name": "Karaaslan Atatürk İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-karaaslan-cumhuriyet-ilkokulu",
+    "name": "Karaaslan Cumhuriyet İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-karatay-15-temmuz-sehitleri-anadolu-lisesi",
+    "name": "Karatay 15 Temmuz Şehitleri Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-ali-ulvi-kurucu-anadolu-imam-hatip-lisesi",
+    "name": "Karatay Ali Ulvi Kurucu Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-aykent-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Karatay Aykent Mesleki ve Teknik Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-belediyesi-23-nisan-imam-hatip-ortaokulu",
+    "name": "Karatay Belediyesi 23 Nisan İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-karatay-belediyesi-osman-benliler-ilkokulu",
+    "name": "Karatay Belediyesi Osman Benliler İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-karatay-belediyesi-imam-hatip-ortaokulu",
+    "name": "Karatay Belediyesi İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-karatay-borsa-istanbul-gazi-mustafa-kemal-turizm-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Karatay Borsa İstanbul Gazi Mustafa Kemal Turizm Mesleki ve Teknik Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-borsa-istanbul-zubeyde-hanm-kz-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Karatay Borsa İstanbul Zübeyde Hanım Kız Mesleki ve Teknik Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-fen-lisesi",
+    "name": "Karatay Fen Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-hamza-yerlikaya-spor-lisesi",
+    "name": "Karatay Hamza Yerlikaya Spor Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-hurriyet-ortaokulu",
+    "name": "Karatay Hürriyet Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-karatay-kocatepe-ilkokulu",
+    "name": "Karatay Kocatepe İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-karatay-nermin-agah-erdinc-topak-ortaokulu",
+    "name": "Karatay Nermin-Agah-Erdinç Topak Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-karatay-ortaokulu",
+    "name": "Karatay Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-karatay-sadreddin-konevi-anadolu-imam-hatip-lisesi",
+    "name": "Karatay Sadreddin Konevi Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-toki-anadolu-lisesi",
+    "name": "Karatay TOKİ Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-ticaret-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Karatay Ticaret Mesleki ve Teknik Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-karatay-ilhan-nuran-keskin-ortaokulu",
+    "name": "Karatay İlhan-Nuran Keskin Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-karkent-ilkokulu",
+    "name": "Karkent İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-konya-anadolu-imam-hatip-lisesi",
+    "name": "Konya Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-konya-turk-telekom-sosyal-bilimler-lisesi",
+    "name": "Konya Türk Telekom Sosyal Bilimler Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-koyunoglu-ilkokulu",
+    "name": "Koyunoğlu İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-kurtulus-ortaokulu",
+    "name": "Kurtuluş Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-kuvayi-milliye-ilkokulu",
+    "name": "Kuvayi Milliye İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-klcarslan-borsa-istanbul-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Kılıçarslan Borsa İstanbul Mesleki ve Teknik Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-mahide-kosukcu-ilkokulu",
+    "name": "Mahide Koşukçu İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-mehmet-hanife-yapc-anadolu-lisesi",
+    "name": "Mehmet-Hanife Yapıcı Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-mehmetcik-ilkokulu",
+    "name": "Mehmetçik İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-mehmetcik-imam-hatip-ortaokulu",
+    "name": "Mehmetçik İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-mevlana-kz-anadolu-imam-hatip-lisesi",
+    "name": "Mevlana Kız Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-mustafa-aydn-ilkokulu",
+    "name": "Mustafa Aydın İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-muslume-ali-yaman-imam-hatip-ortaokulu",
+    "name": "Müslüme Ali Yaman İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-namk-kemal-ortaokulu",
+    "name": "Namık Kemal Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-nermin-agah-erdinc-topak-ilkokulu",
+    "name": "Nermin Agah Erdinç Topak İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-nizamulmulk-anadolu-lisesi",
+    "name": "Nizamülmülk Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-orhan-gazi-ilkokulu",
+    "name": "Orhan Gazi İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-ovakavag-ilkokulu",
+    "name": "Ovakavağı İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-ovakavag-imam-hatip-ortaokulu",
+    "name": "Ovakavağı İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-prof-dr-fuat-sezgin-ortaokulu",
+    "name": "Prof. Dr. Fuat Sezgin Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-prof-dr-omer-dincer-kz-anadolu-imam-hatip-lisesi",
+    "name": "Prof.Dr.Ömer Dinçer Kız Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-saracoglu-ahmet-hashas-ilkokulu",
+    "name": "Saraçoğlu Ahmet Haşhaş İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-saracoglu-toki-mustafa-cetin-ilkokulu",
+    "name": "Saraçoğlu Toki Mustafa Çetin İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-saracoglu-imam-hatip-ortaokulu",
+    "name": "Saraçoğlu İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-sezai-karakoc-imam-hatip-ortaokulu",
+    "name": "Sezai Karakoç İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-sultan-alparslan-imam-hatip-ortaokulu",
+    "name": "Sultan Alparslan İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-suleyman-sah-anadolu-lisesi",
+    "name": "Süleyman Şah Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-tatlcak-ortaokulu",
+    "name": "Tatlıcak Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-turk-anadolu-vakf-hafz-kz-anadolu-imam-hatip-lisesi",
+    "name": "Türk Anadolu Vakfı Hafız Kız Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-ulubatl-hasan-imam-hatip-ortaokulu",
+    "name": "Ulubatlı Hasan İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-ulurmak-hurriyet-imam-hatip-ortaokulu",
+    "name": "Uluırmak Hürriyet İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-vali-kemal-katitas-ilkokulu",
+    "name": "VALİ KEMAL KATITAŞ İLKOKULU",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-yenikent-ortaokulu",
+    "name": "YENİKENT ORTAOKULU",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-yarma-ortaokulu",
+    "name": "Yarma Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-yarma-ilkokulu",
+    "name": "Yarma İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-yavuz-selim-ilkokulu",
+    "name": "Yavuz Selim İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-yaglbayat-ortaokulu",
+    "name": "Yağlıbayat Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-yasar-dogu-ortaokulu",
+    "name": "Yaşar Doğu Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-yenikent-ilkokulu",
+    "name": "Yenikent İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-yusuf-gul-ilkokulu",
+    "name": "Yusuf Gül İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-zeliha-seymen-ilkokulu",
+    "name": "Zeliha Seymen İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-catalhuyuk-anadolu-lisesi",
+    "name": "Çatalhüyük Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-catalhuyuk-meliksah-ilkokulu",
+    "name": "Çatalhüyük Melikşah İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-catalhuyuk-munise-lutfi-onat-ilkokulu",
+    "name": "Çatalhüyük Münise Lütfi Onat İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-cumraloglu-vakf-anadolu-imam-hatip-lisesi",
+    "name": "Çumralıoğlu Vakfı Anadolu İmam Hatip Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-isa-can-bezirci-imam-hatip-ortaokulu",
+    "name": "İSA CAN BEZİRCİ İMAM HATİP ORTAOKULU",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-ibrahim-sulhiye-kamanl-ilkokulu",
+    "name": "İbrahim Sulhiye Kamanlı İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-ilhan-nuran-keskin-ilkokulu",
+    "name": "İlhan-Nuran Keskin İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-isa-can-bezirci-ortaokulu",
+    "name": "İsa Can Bezirci Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-ismet-pasa-ilkokulu",
+    "name": "İsmet Paşa İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-istiklal-ortaokulu",
+    "name": "İstiklal Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-istiklal-ilkokulu",
+    "name": "İstiklal İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-izzet-bezirci-ilkokulu",
+    "name": "İzzet Bezirci İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-sehit-ustegmen-mehmet-duzenli-imam-hatip-ortaokulu",
+    "name": "ŞEHİT ÜSTEĞMEN MEHMET DÜZENLİ İMAM HATİP ORTAOKULU",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-sehit-albay-ibrahim-karaoglanoglu-imam-hatip-ortaokulu",
+    "name": "Şehit Albay İbrahim Karaoğlanoğlu İmam Hatip Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-sehit-azam-gudendede-anadolu-lisesi",
+    "name": "Şehit Azam Güdendede Anadolu Lisesi",
+    "district": "KARATAY",
+    "type": "LİSE"
+  },
+  {
+    "id": "karatay-sehit-erol-olcok-ilkokulu",
+    "name": "Şehit Erol Olçok İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "karatay-sehit-sadk-ortaokulu",
+    "name": "Şehit Sadık Ortaokulu",
+    "district": "KARATAY",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "karatay-sekibe-aksoy-ilkokulu",
+    "name": "Şekibe Aksoy İlkokulu",
+    "district": "KARATAY",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-15-temmuz-milli-birlik-ilkokulu",
+    "name": "15 Temmuz Milli Birlik İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-15-temmuz-sehitleri-ilkokulu",
+    "name": "15 Temmuz Şehitleri İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-24-kasm-ilkokulu",
+    "name": "24 Kasım İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-abdussamet-fazilet-kuzucu-ilkokulu",
+    "name": "Abdussamet Fazilet Kuzucu İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ahmet-azmi-makbule-elberk-ilkokulu",
+    "name": "Ahmet Azmi-Makbule Elberk İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ahmet-naci-gucuyener-ilkokulu",
+    "name": "Ahmet Naci Gücüyener İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ahmet-tevfik-ileri-imam-hatip-ortaokulu",
+    "name": "Ahmet Tevfik İleri İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-alakova-ortaokulu",
+    "name": "Alakova Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-alakova-ilkokulu",
+    "name": "Alakova İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ali-tasoluk-ilkokulu",
+    "name": "Ali Taşoluk İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ali-ihsan-dayoglugil-ilkokulu",
+    "name": "Ali İhsan Dayıoğlugil İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ataturk-ilkokulu",
+    "name": "Atatürk İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-aybahce-mah-ahmet-hashas-ilkokulu",
+    "name": "Aybahçe Mah. Ahmet Haşhaş İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-aybahce-toki-sehit-suleyman-ballan-ilkokulu",
+    "name": "Aybahçe Toki Şehit Süleyman Ballan İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ayse-sonmez-ilkokulu",
+    "name": "Ayşe Sönmez İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-boruktolu-ortaokulu",
+    "name": "Boruktolu Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-boruktolu-ilkokulu",
+    "name": "Boruktolu İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-celalettin-hakan-katrc-imam-hatip-ortaokulu",
+    "name": "Celalettin Hakan Katırcı İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-cemal-bardakc-ilkokulu",
+    "name": "Cemal Bardakçı İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-cumhuriyet-ilkokulu",
+    "name": "Cumhuriyet İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-dere-imam-hatip-ortaokulu",
+    "name": "Dere İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-dr-teoman-bilge-ilkokulu",
+    "name": "Dr. Teoman Bilge İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-emlak-konut-temasehir-ortaokulu",
+    "name": "Emlak Konut Temaşehir Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-faik-altoklar-ortaokulu",
+    "name": "Faik Altıoklar Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-faik-altoklar-ilkokulu",
+    "name": "Faik Altıoklar İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-fatih-sultan-mehmet-ilkokulu",
+    "name": "Fatih Sultan Mehmet İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-fevzi-cakmak-ortaokulu",
+    "name": "Fevzi Çakmak Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-godene-orhan-gazi-imam-hatip-ortaokulu",
+    "name": "Gödene Orhan Gazi İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-godene-toki-imam-hatip-ortaokulu",
+    "name": "Gödene Toki İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-godene-toki-sehit-abdullah-paltac-ortaokulu",
+    "name": "Gödene Toki Şehit Abdullah Paltacı Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-gokyurt-ortaokulu",
+    "name": "Gökyurt Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-gokyurt-ilkokulu",
+    "name": "Gökyurt İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-guneydere-ortaokulu",
+    "name": "Güneydere Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-guneydere-ilkokulu",
+    "name": "Güneydere İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-hadimi-anadolu-lisesi",
+    "name": "Hadimi Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-hanefi-aytekin-ilkokulu",
+    "name": "Hanefi Aytekin İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-hatunsaray-ilkokulu",
+    "name": "Hatunsaray İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-hatunsaray-imam-hatip-ortaokulu",
+    "name": "Hatunsaray İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-hatp-ogretmen-mahide-bahadrturk-ortaokulu",
+    "name": "Hatıp Öğretmen Mahide Bahadırtürk Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-hatp-ilkokulu",
+    "name": "Hatıp İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-karadigin-deresi-ilkokulu",
+    "name": "KARADİĞİN DERESİ İLKOKULU",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-karadigin-yeniaylar-ortaokulu",
+    "name": "Karadiğin Yeniaylar Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-karadigin-yeniaylar-ilkokulu",
+    "name": "Karadiğin Yeniaylar İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-karahuyuk-mah-ahmet-hashas-ilkokulu",
+    "name": "Karahüyük Mah. Ahmet Haşhaş İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-kasnhan-cumhuriyet-ortaokulu",
+    "name": "Kaşınhanı Cumhuriyet Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-kasnhan-cumhuriyet-ilkokulu",
+    "name": "Kaşınhanı Cumhuriyet İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-kasnhan-imam-hatip-ortaokulu",
+    "name": "Kaşınhanı İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-kemal-hatipoglu-ilkokulu",
+    "name": "Kemal Hatipoğlu İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-konya-lisesi",
+    "name": "Konya Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-konya-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Konya Mesleki ve Teknik Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-kozagac-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Kozağaç Mesleki ve Teknik Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-meram-mehmet-kadir-ozguzar-ilkokulu",
+    "name": "MERAM MEHMET-KADİR ÖZGÜZAR İLKOKULU",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-mehmet-akif-ersoy-anadolu-imam-hatip-lisesi",
+    "name": "Mehmet Akif Ersoy Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-mehmet-begen-ortaokulu",
+    "name": "Mehmet Beğen Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-mehmet-hasan-sert-ilkokulu",
+    "name": "Mehmet Hasan Sert İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-mehmet-karaciganlar-mevlana-imam-hatip-ortaokulu",
+    "name": "Mehmet Karaciğanlar Mevlana İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-mehmet-sukriye-sert-ilkokulu",
+    "name": "Mehmet Şükriye Sert İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-75-yl-kz-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Meram 75. Yıl Kız Mesleki ve Teknik Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-meram-ali-yaman-ortaokulu",
+    "name": "Meram Ali Yaman Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-meram-ali-yaman-ilkokulu",
+    "name": "Meram Ali Yaman İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-alparslan-anadolu-lisesi",
+    "name": "Meram Alparslan Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-meram-anadolu-lisesi",
+    "name": "Meram Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-meram-ataturk-kz-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Meram Atatürk Kız Mesleki ve Teknik Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-meram-aybahce-toki-sehit-suleyman-ballan-imam-hatip-ortaokulu",
+    "name": "Meram Aybahçe Toki Şehit Süleyman Ballan İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-meram-beybes-sehit-ogretmen-huseyin-yavuz-ilkokulu",
+    "name": "Meram Beybes Şehit Öğretmen Hüseyin Yavuz İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-dere-cumhuriyet-ilkokulu",
+    "name": "Meram Dere Cumhuriyet İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-dere-zafer-ilkokulu",
+    "name": "Meram Dere Zafer İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-fen-lisesi",
+    "name": "Meram Fen Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-meram-godene-toki-sehit-yunus-berber-ilkokulu",
+    "name": "Meram Gödene Toki Şehit Yunus Berber İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-godene-ilkokulu",
+    "name": "Meram Gödene İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-harmanck-toki-ziya-nur-aksun-ortaokulu",
+    "name": "Meram Harmancık Toki Ziya Nur Aksun Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-meram-hasankoy-ilkokulu",
+    "name": "Meram Hasanköy İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-kasnhan-ataturk-ilkokulu",
+    "name": "Meram Kaşınhanı Atatürk İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-lalebahce-mehmet-fevzi-ve-atiye-atceken-ilkokulu",
+    "name": "Meram Lalebahçe Mehmet Fevzi ve Atiye Atçeken İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-mehmet-akif-inan-anadolu-lisesi",
+    "name": "Meram Mehmet Akif İnan Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-meram-mehmet-ve-ibrahim-celik-ilkokulu",
+    "name": "Meram Mehmet ve İbrahim Çelik İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-mehmet-kadir-ozguzar-ortaokulu",
+    "name": "Meram Mehmet-Kadir Özgüzar Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-meram-mehmet-munevver-kurban-anadolu-lisesi",
+    "name": "Meram Mehmet-Münevver Kurban Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-meram-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Meram Mesleki ve Teknik Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-meram-mustafa-bagrack-ortaokulu",
+    "name": "Meram Mustafa Bağrıaçık Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-meram-mustafa-bagrack-ilkokulu",
+    "name": "Meram Mustafa Bağrıaçık İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-niyaz-usta-ilkokulu",
+    "name": "Meram Niyaz Usta İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-turan-bilge-ortaokulu",
+    "name": "Meram Turan Bilge Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-meram-turan-bilge-ilkokulu",
+    "name": "Meram Turan Bilge İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-cayrbag-tahsin-ozlem-bengisu-emiroglu-ortaokulu",
+    "name": "Meram Çayırbağı Tahsin-Özlem Bengisu Emiroğlu Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-meram-cayrbag-tahsin-ozlem-bengisu-emiroglu-ilkokulu",
+    "name": "Meram Çayırbağı Tahsin-Özlem-Bengisu Emiroğlu İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-ozcan-saliha-calkusu-ilkokulu",
+    "name": "Meram Özcan-Saliha Çalıkuşu İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-imam-hatip-ortaokulu",
+    "name": "Meram İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-meram-sehit-pilot-ayfer-gok-ortaokulu",
+    "name": "Meram Şehit Pilot Ayfer Gök Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-meram-seyh-samil-ilkokulu",
+    "name": "Meram Şeyh Şamil İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-meram-sifa-hatun-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Meram Şifa Hatun Mesleki ve Teknik Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-muhittin-guzelklnc-imam-hatip-ortaokulu",
+    "name": "Muhittin Güzelkılınç İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-mustafa-ilboga-anadolu-imam-hatip-lisesi",
+    "name": "Mustafa İlboğa Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-mumtaz-koru-anadolu-imam-hatip-lisesi",
+    "name": "Mümtaz Koru Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-naciye-mumcuoglu-anadolu-lisesi",
+    "name": "Naciye Mumcuoğlu Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-necip-fazl-ksakurek-imam-hatip-ortaokulu",
+    "name": "Necip Fazıl Kısakürek İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-nuri-pakdil-anadolu-lisesi",
+    "name": "Nuri Pakdil Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-osman-gazi-ortaokulu",
+    "name": "Osman Gazi Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-rukiye-mehmet-aks-fen-ve-teknoloji-anadolu-imam-hatip-lisesi",
+    "name": "Rukiye Mehmet Akış Fen ve Teknoloji Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-sare-ozkaskc-yatl-bolge-ortaokulu",
+    "name": "Sare Özkaşıkcı Yatılı Bölge Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-selcuk-ilkokulu",
+    "name": "Selçuk İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-tahir-buyukkorukcu-anadolu-imam-hatip-lisesi",
+    "name": "Tahir Büyükkörükçü Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-telafer-ilkokulu",
+    "name": "Telafer İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ticaret-borsas-ortaokulu",
+    "name": "Ticaret Borsası Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-uhut-mahallesi-ahmet-hashas-imam-hatip-ortaokulu",
+    "name": "Uhut Mahallesi Ahmet Haşhaş İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-vakfbank-imam-hatip-ortaokulu",
+    "name": "Vakıfbank İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-vali-necati-cetinkaya-ortaokulu",
+    "name": "Vali Necati Çetinkaya Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-yaka-cumraloglu-imam-hatip-ortaokulu",
+    "name": "Yaka Çumralıoğlu İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-yavuz-sultan-selim-ortaokulu",
+    "name": "Yavuz Sultan Selim Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-yavuz-sultan-selim-imam-hatip-ortaokulu",
+    "name": "Yavuz Sultan Selim İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-yaylapnar-ortaokulu",
+    "name": "Yaylapınar Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-yenibahce-ortaokulu",
+    "name": "Yenibahçe Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-yenibahce-ilkokulu",
+    "name": "Yenibahçe İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-yesildere-firuzan-isk-izmirligil-ortaokulu",
+    "name": "Yeşildere Firuzan Işık İzmirligil Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-yesildere-firuzan-isk-izmirligil-ilkokulu",
+    "name": "Yeşildere Firuzan Işık İzmirligil İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-yunus-emre-ilkokulu",
+    "name": "Yunus Emre İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-yldz-kz-anadolu-imam-hatip-lisesi",
+    "name": "Yıldız Kız Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-zafer-ortaokulu",
+    "name": "Zafer Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-zeki-ozdemir-anadolu-lisesi",
+    "name": "Zeki Özdemir Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-carklar-ortaokulu",
+    "name": "Çarıklar Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-carklar-ilkokulu",
+    "name": "Çarıklar İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-cayrbag-imam-hatip-ortaokulu",
+    "name": "Çayırbağı İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-celebi-husameddin-anadolu-imam-hatip-lisesi",
+    "name": "Çelebi Hüsameddin Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-comakl-talip-kahraman-ortaokulu",
+    "name": "Çomaklı Talip Kahraman Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-comakl-ilkokulu",
+    "name": "Çomaklı İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-uresinler-ilkokulu",
+    "name": "Üresinler İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ibrahim-ethem-kz-anadolu-imam-hatip-lisesi",
+    "name": "İbrahim Ethem Kız Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-ibrahim-hakk-konyal-ilkokulu",
+    "name": "İbrahim Hakkı Konyalı İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ihsan-ozkaskc-ilkokulu",
+    "name": "İhsan Özkaşıkcı İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-inlice-ortaokulu",
+    "name": "İnlice Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-inlice-ilkokulu",
+    "name": "İnlice İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-ismail-adile-avcan-imam-hatip-ortaokulu",
+    "name": "İsmail-Adile Avcan İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-sehit-abdullah-umit-sercan-ilkokulu",
+    "name": "Şehit Abdullah Ümit Sercan İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-sehit-ahmet-senih-durum-ilkokulu",
+    "name": "Şehit Ahmet Senih Durum İlkokulu",
+    "district": "MERAM",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "meram-sehit-fethi-sekin-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Şehit Fethi Sekin Mesleki ve Teknik Anadolu Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-sehit-mehmet-lutfi-gulsen-anadolu-imam-hatip-lisesi",
+    "name": "Şehit Mehmet- Lütfi Gülşen Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "meram-sehit-omer-halisdemir-imam-hatip-ortaokulu",
+    "name": "Şehit Ömer Halisdemir İmam Hatip Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-serife-mevlut-harmankaya-ortaokulu",
+    "name": "Şerife Mevlüt Harmankaya Ortaokulu",
+    "district": "MERAM",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "meram-sukru-doruk-kz-anadolu-imam-hatip-lisesi",
+    "name": "Şükrü Doruk Kız Anadolu İmam Hatip Lisesi",
+    "district": "MERAM",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-100-yl-mahallesi-ahmet-hashas-ortaokulu",
+    "name": "100. Yıl Mahallesi Ahmet Haşhaş Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-100-yl-ahmet-hashas-imam-hatip-ortaokulu",
+    "name": "100.Yıl Ahmet Haşhaş İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-15-temmuz-sehitleri-ilkokulu",
+    "name": "15 Temmuz Şehitleri İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-akincilar-mahallesi-ahmet-hashas-ilkokul",
+    "name": "AKINCILAR MAHALLESİ AHMET HAŞHAŞ İLKOKUL",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-aselsan-konya-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "ASELSAN KONYA Meslekî ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-abdulezel-pasa-imam-hatip-ortaokulu",
+    "name": "Abdülezel Paşa İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-abidin-saniye-ercal-ilkokulu",
+    "name": "Abidin Saniye Erçal İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-adil-karaagac-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Adil Karaağaç Mesleki ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-adnan-akgul-ozel-egitim-meslek-lisesi",
+    "name": "Adnan Akgül Özel Eğitim Meslek Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-adnan-hadiye-surmegoz-ortaokulu",
+    "name": "Adnan Hadiye Sürmegöz Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-ahmet-acar-ilkokul",
+    "name": "Ahmet Acar İlkokul",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-ahmet-hazm-ulusahin-imam-hatip-ortaokulu",
+    "name": "Ahmet Hazım Uluşahin İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-ahmet-karacigan-ortaokulu",
+    "name": "Ahmet Karacigan Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-ahmet-perihan-demirok-ilkokulu",
+    "name": "Ahmet Perihan Demirok İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-aksemseddin-ilkokulu",
+    "name": "Akşemseddin İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-alaeddin-ilkokulu",
+    "name": "Alaeddin İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-aliya-izzetbegovic-anadolu-lisesi",
+    "name": "Aliya İzzetbegoviç Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-ataturk-anadolu-lisesi",
+    "name": "Atatürk Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-ataturk-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Atatürk Mesleki ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-ayse-tumer-ilkokulu",
+    "name": "Ayşe Tümer İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-ayse-kemal-inanc-imam-hatip-ortaokulu",
+    "name": "Ayşe-Kemal İnanç İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-barbaros-ilkokulu",
+    "name": "Barbaros İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-beyhekim-imam-hatip-ortaokulu",
+    "name": "Beyhekim İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-borsa-istanbul-ortaokulu",
+    "name": "Borsa İstanbul Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-bosna-hersek-anadolu-imam-hatip-lisesi",
+    "name": "Bosna Hersek Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-buhari-kz-anadolu-imam-hatip-lisesi",
+    "name": "Buhari Kız Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-buyukbayram-ortaokulu",
+    "name": "Büyükbayram Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-cahit-zarifoglu-ilkokulu",
+    "name": "Cahit Zarifoğlu İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-cemil-meric-anadolu-lisesi",
+    "name": "Cemil Meriç Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-cemile-erkunt-ilkokulu",
+    "name": "Cemile Erkunt İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-cumhuriyet-anadolu-lisesi",
+    "name": "Cumhuriyet Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-cumhuriyet-mahallesi-ahmet-hashas-ortaokulu",
+    "name": "Cumhuriyet Mahallesi Ahmet Haşhaş Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-dikilitas-sahip-ata-ilkokulu",
+    "name": "Dikilitaş Sahip Ata İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-dolapoglu-anadolu-lisesi",
+    "name": "Dolapoğlu Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-dr-mustafa-oten-ilkokulu",
+    "name": "Dr. Mustafa Öten İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-dumlupnar-mahallesi-ahmet-hashas-ilkokulu",
+    "name": "Dumlupınar Mahallesi Ahmet Haşhaş İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-dursun-fakih-anadolu-lisesi",
+    "name": "Dursun Fakih Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-erbil-koru-anadolu-lisesi",
+    "name": "Erbil Koru Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-erdem-bayazt-ortaokulu",
+    "name": "Erdem Bayazıt Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-erenkoy-zeki-altndag-ortaokulu",
+    "name": "Erenköy Zeki Altındağ Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-erenkoy-zeki-altndag-imam-hatip-ortaokulu",
+    "name": "Erenköy Zeki Altındağ İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-ertugrul-gazi-ortaokulu",
+    "name": "Ertuğrul Gazi Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-esrefoglu-ilkokulu",
+    "name": "Eşrefoğlu İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-fatih-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Fatih Mesleki ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-fatih-ortaokulu",
+    "name": "Fatih Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-gazi-kz-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Gazi Kız Mesleki ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-hakim-omer-onsun-ilkokulu",
+    "name": "Hakim Ömer Onsun İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-hamidiye-imam-hatip-ortaokulu",
+    "name": "Hamidiye İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-hoca-ahmet-yesevi-ortaokulu",
+    "name": "Hoca Ahmet Yesevi Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-hocacihan-anadolu-imam-hatip-lisesi",
+    "name": "Hocacihan Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-hocacihan-huseyin-yldz-ilkokulu",
+    "name": "Hocacihan Hüseyin Yıldız İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-hocacihan-ortaokulu",
+    "name": "Hocacihan Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-kosova-ortaokulu",
+    "name": "KOSOVA ORTAOKULU",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-kanuni-sultan-suleyman-ilkokulu",
+    "name": "Kanuni Sultan Süleyman İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-kazm-ozenc-secen-ortaokulu",
+    "name": "Kazım Özenç Seçen Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-kasgarl-mahmut-ortaokulu",
+    "name": "Kaşgarlı Mahmut Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-kemal-akpnar-imam-hatip-ortaokulu",
+    "name": "Kemal Akpınar İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-kemal-rzvanoglu-ilkokulu",
+    "name": "Kemal Rızvanoğlu İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-kemal-inanc-kz-anadolu-imam-hatip-lisesi",
+    "name": "Kemal İnanç Kız Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-konevi-anadolu-lisesi",
+    "name": "Konevi Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-konya-cimento-guzel-sanatlar-lisesi",
+    "name": "Konya Çimento Güzel Sanatlar Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-m-halil-ibrahim-hekimoglu-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "M. Halil İbrahim Hekimoğlu Mesleki ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-mahmud-celaleddin-okten-anadolu-imam-hatip-lisesi",
+    "name": "Mahmud Celaleddin Ökten Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-mahmut-sami-ramazanoglu-anadolu-imam-hatip-lisesi",
+    "name": "Mahmut Sami Ramazanoğlu Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-mahmut-sami-ramazanoglu-kz-anadolu-imam-hatip-lisesi",
+    "name": "Mahmut Sami Ramazanoğlu Kız Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-maresal-mustafa-kemal-ortaokulu",
+    "name": "Mareşal Mustafa Kemal Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-mehmet-akdogan-ortaokulu",
+    "name": "Mehmet Akdoğan Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-mehmet-akif-ersoy-anadolu-lisesi",
+    "name": "Mehmet Akif Ersoy Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-mehmet-ali-atiker-imam-hatip-ortaokulu",
+    "name": "Mehmet Ali Atiker İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-mehmet-halil-ibrahim-hekimoglu-anadolu-lisesi",
+    "name": "Mehmet Halil İbrahim Hekimoğlu Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-mehmet-nuri-kucukkoylu-imam-hatip-ortaokulu",
+    "name": "Mehmet Nuri Küçükköylü İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-mehmet-tuza-pakpen-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Mehmet Tuza Pakpen Mesleki ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-mehmet-zahid-kotku-kz-anadolu-imam-hatip-lisesi",
+    "name": "Mehmet Zahid Kotku Kız Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-mimar-sinan-ilkokulu",
+    "name": "Mimar Sinan İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-muhammed-hamdi-yazr-imam-hatip-ortaokulu",
+    "name": "Muhammed Hamdi Yazır İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-mustafa-bulbul-ortaokulu",
+    "name": "Mustafa Bülbül Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-mustafa-buyukkaplan-anadolu-imam-hatip-lisesi",
+    "name": "Mustafa Büyükkaplan Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-mustafa-fevzi-serin-ilkokulu",
+    "name": "Mustafa Fevzi Serin İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-mustafa-hotamsl-anadolu-imam-hatip-lisesi",
+    "name": "Mustafa Hotamışlı Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-mustafa-karacigan-ilkokulu",
+    "name": "Mustafa Karaciğan İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-mustafa-necati-ilkokulu",
+    "name": "Mustafa Necati İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-mumine-hatun-kz-anadolu-imam-hatip-lisesi",
+    "name": "Mümine Hatun Kız Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-necip-fazl-ksakurek-ortaokulu",
+    "name": "Necip Fazıl Kısakürek Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-nene-hatun-imam-hatip-ortaokulu",
+    "name": "Nene Hatun İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-nesrin-ve-aysegul-kardesler-ilkokulu",
+    "name": "Nesrin ve Ayşegül Kardeşler İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-nurcan-akpnar-ilkokulu",
+    "name": "Nurcan Akpınar İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-osman-nuri-hekimoglu-anadolu-lisesi",
+    "name": "Osman Nuri Hekimoğlu Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-osmangazi-ilkokulu",
+    "name": "Osmangazi İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-ova-un-ilkokulu",
+    "name": "Ova Un İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-oguz-kagan-ilkokulu",
+    "name": "Oğuz Kağan İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-piri-reis-ilkokulu",
+    "name": "Piri Reis İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-prof-dr-mahmut-esad-cosan-imam-hatip-ortaokulu",
+    "name": "Prof. Dr. Mahmut Esad Coşan İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-rebii-karatekn-ortaokulu",
+    "name": "Rebii Karatekın Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-saraybosna-anadolu-lisesi",
+    "name": "Saraybosna Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-selahaddin-eyyubi-anadolu-lisesi",
+    "name": "Selahaddin Eyyubi Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-selcuklu-anadolu-lisesi",
+    "name": "Selçuklu Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-selcuklu-belediyesi-ortaokulu",
+    "name": "Selçuklu Belediyesi Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-selcuklu-belediyesi-sille-ilkokulu",
+    "name": "Selçuklu Belediyesi Sille İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-selcuklu-belediyesi-ilkokulu",
+    "name": "Selçuklu Belediyesi İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-selcuklu-belediyesi-imam-hatip-ortaokulu",
+    "name": "Selçuklu Belediyesi İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-selcuklu-belediyesi-sehit-erkan-kursun-ilkokulu",
+    "name": "Selçuklu Belediyesi Şehit Erkan Kurşun İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-selcuklu-fen-lisesi",
+    "name": "Selçuklu Fen Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-selcuklu-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Selçuklu Mesleki ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-seyit-ulugulyagc-imam-hatip-ortaokulu",
+    "name": "Seyit Ulugülyağcı İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-sultan-mesut-ilkokulu",
+    "name": "Sultan Mesut İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-suleyman-celebi-ortaokulu",
+    "name": "Süleyman Çelebi Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-srac-aydntasbas-ilkokulu",
+    "name": "Sıraç Aydıntaşbaş İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-toki-ilkokulu",
+    "name": "TOKİ İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-talha-bayrakc-kz-anadolu-imam-hatip-lisesi",
+    "name": "Talha Bayrakçı Kız Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-turk-anadolu-vakf-imam-hatip-ortaokulu",
+    "name": "Türk Anadolu Vakfı İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-turk-telekom-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Türk Telekom Mesleki ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-uluslararas-mevlana-anadolu-imam-hatip-lisesi",
+    "name": "Uluslararası Mevlana Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-vali-ihsan-dede-anadolu-lisesi",
+    "name": "Vali İhsan Dede Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-yazr-sehit-osman-kucukdillan-ilkokulu",
+    "name": "Yazır Şehit Osman Küçükdillan İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-zeki-altndag-ilkokulu",
+    "name": "Zeki Altındağ İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-zeliha-ve-lutfi-kulluk-ilkokulu",
+    "name": "Zeliha ve Lütfi Kulluk İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-ip-olcok-imam-hatip-ortaokulu",
+    "name": "ip Olçok İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-taokulu",
+    "name": "taokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-omer-cemile-guler-imam-hatip-ortaokulu",
+    "name": "Ömer Cemile Güler İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-ozel-idare-100-yl-ilkokulu",
+    "name": "Özel İdare 100. Yıl İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-oztekinler-kz-mesleki-ve-teknik-anadolu-lisesi",
+    "name": "Öztekinler Kız Mesleki ve Teknik Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-ogretmen-fethiye-onsun-ilkokulu",
+    "name": "Öğretmen Fethiye Onsun İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-ibrahim-yapc-ilkokulu",
+    "name": "İbrahim Yapıcı İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-ihsaniye-ilkokulu",
+    "name": "İhsaniye İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-ismail-hakk-tonguc-imam-hatip-ortaokulu",
+    "name": "İsmail Hakkı Tonguç İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-ismail-kaya-anadolu-imam-hatip-lisesi",
+    "name": "İsmail Kaya Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-sehit-mustafa-cuhadar-ortaokulu",
+    "name": "Şehit Mustafa Çuhadar Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-sehit-osman-demir-ilkokulu",
+    "name": "Şehit Osman Demir İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-sehit-tegmen-bayram-olgun-imam-hatip-ortaokulu",
+    "name": "Şehit Teğmen Bayram Olgun İmam Hatip Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-sehit-ufuk-baysan-anadolu-lisesi",
+    "name": "Şehit Ufuk Baysan Anadolu Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-sehit-ibrahim-betin-ilkokulu",
+    "name": "Şehit İbrahim Betin İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-sems-i-tebrizi-kz-anadolu-imam-hatip-lisesi",
+    "name": "Şems-i Tebrizi Kız Anadolu İmam Hatip Lisesi",
+    "district": "SELÇUKLU",
+    "type": "LİSE"
+  },
+  {
+    "id": "selcuklu-serife-akkanat-ortaokulu",
+    "name": "Şerife Akkanat Ortaokulu",
+    "district": "SELÇUKLU",
+    "type": "ORTAOKUL"
+  },
+  {
+    "id": "selcuklu-serife-akkanat-ilkokulu",
+    "name": "Şerife Akkanat İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  },
+  {
+    "id": "selcuklu-sukriye-onsun-ilkokulu",
+    "name": "Şükriye Onsun İlkokulu",
+    "district": "SELÇUKLU",
+    "type": "İLKOKUL"
+  }
+]
