@@ -1,4 +1,4 @@
-import { useState, useRef, type CSSProperties } from 'react';
+import { useState, useRef } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'motion/react';
 import { useNavigate, useLocation } from 'react-router';
 import TeacheraLogo from '../../imports/TeacheraLogo';
@@ -22,7 +22,6 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
   const [scrolled, setScrolled] = useState(false);
   const isAcademyPage = location.pathname === '/academy' || location.pathname.startsWith('/academy/');
   const isSpeakUpPage = location.pathname === '/speakup';
-  const isBurslulukLanding = location.pathname === '/bursluluk-2026';
   const navHeightClass = isSpeakUpPage
     ? scrolled
       ? 'h-[66px] md:h-[74px]'
@@ -68,11 +67,8 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
   };
 
   const goHome = () => {
-    if (location.pathname !== '/') {
-      window.location.assign('/');
-      return;
-    }
-    scrollToSection('home');
+    if (location.pathname !== '/') navigate('/');
+    else scrollToSection('home');
   };
 
   return (
@@ -95,7 +91,6 @@ export default function Navigation({ isMenuOpen, setIsMenuOpen, currentSection }
           >
             <div
               className={`transition-all duration-700 ease-out ${logoSizeClass} aspect-[146/29] max-w-[44vw] sm:max-w-none`}
-              style={(isBurslulukLanding ? { '--fill-0': '#EEEBF5' } : {}) as CSSProperties}
             >
               <TeacheraLogo />
             </div>

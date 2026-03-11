@@ -9,7 +9,6 @@ export type OverlayOwner =
   | 'mobile-menu'
   | 'free-trial'
   | 'level-assessment'
-  | 'bursluluk-application'
   | 'delivery-appointment'
   | 'speakup-form'
   | 'speakup-video'
@@ -41,7 +40,6 @@ export function getOverlayLifecycleOptions(
   if (
     owner === 'free-trial' ||
     owner === 'level-assessment' ||
-    owner === 'bursluluk-application' ||
     owner === 'delivery-appointment' ||
     owner === 'speakup-form'
   ) {

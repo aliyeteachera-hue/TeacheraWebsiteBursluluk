@@ -1,33 +1,88 @@
-import { applyCors, parseBody, requireAdmin, requireMethod, sendJson, safeTrim } from '../../_lib/http.js';
-import { applyUnviewedResultsAction, resolveAdminRole } from '../../_lib/panelData.js';
+import { requireRole } from '../../_lib/auth.js';
+import { ROLES } from '../../_lib/constants.js';
+import { query } from '../../_lib/db.js';
+import { HttpError } from '../../_lib/errors.js';
+import { handleRequest, methodGuard, ok, parseBody, safeTrim } from '../../_lib/http.js';
+import { enqueueNotification } from '../../_lib/notifications.js';
 
-function statusFromError(error) {
-  const code = safeTrim(error?.message);
-  if (code.startsWith('missing_') || code === 'unsupported_action') return 400;
-  if (code === 'forbidden_read_only') return 403;
-  return 500;
+function normalizeCandidateIds(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item) => safeTrim(item)).filter(Boolean).slice(0, 1000);
 }
 
 export default async function handler(req, res) {
-  if (!applyCors(req, res)) return;
-  if (!requireAdmin(req, res)) return;
-  if (!requireMethod(req, res, 'POST')) return;
+  await handleRequest(req, res, async () => {
+    methodGuard(req, ['POST']);
+    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS]);
 
-  const body = await parseBody(req);
-  if (!body || typeof body !== 'object') {
-    sendJson(res, 400, { ok: false, error: 'invalid_json' });
-    return;
-  }
+    const body = await parseBody(req);
+    if (!body || typeof body !== 'object') {
+      throw new HttpError(400, 'Request body must be valid JSON.', 'invalid_json');
+    }
 
-  try {
-    const payload = await applyUnviewedResultsAction({
-      action: body.action,
-      candidateIds: body.candidate_ids || body.candidateIds,
-      role: resolveAdminRole(req),
+    const action = safeTrim(body.action).toLowerCase();
+    if (!['send_whatsapp'].includes(action)) {
+      throw new HttpError(400, 'Unsupported action.', 'invalid_action');
+    }
+
+    const candidateIds = normalizeCandidateIds(body.candidate_ids || body.candidateIds);
+    if (candidateIds.length === 0) {
+      throw new HttpError(400, 'candidateIds is required.', 'missing_candidate_ids');
+    }
+
+    const templateCode = safeTrim(body.template_code || body.templateCode || 'WA_RESULT');
+    const { rows } = await query(
+      `
+        SELECT
+          c.id AS candidate_id,
+          c.campaign_code,
+          g.phone_e164 AS parent_phone_e164,
+          ea.id AS attempt_id,
+          r.id AS result_id
+        FROM candidates c
+        LEFT JOIN guardians g ON g.id = c.guardian_id
+        LEFT JOIN LATERAL (
+          SELECT id
+          FROM exam_attempts
+          WHERE candidate_id = c.id
+          ORDER BY created_at DESC
+          LIMIT 1
+        ) ea ON TRUE
+        LEFT JOIN results r ON r.attempt_id = ea.id
+        WHERE c.id = ANY($1::uuid[])
+          AND r.published_at IS NOT NULL
+          AND r.viewed_at IS NULL
+      `,
+      [candidateIds],
+    );
+
+    const jobs = rows
+      .filter((row) => row.parent_phone_e164)
+      .map((row) =>
+        enqueueNotification({
+          campaignCode: row.campaign_code,
+          candidateId: row.candidate_id,
+          attemptId: row.attempt_id,
+          resultId: row.result_id,
+          channel: 'WHATSAPP',
+          templateCode,
+          recipient: row.parent_phone_e164,
+          payload: {
+            trigger: 'panel_unviewed_results',
+            templateCode,
+          },
+        }),
+      );
+
+    const created = await Promise.all(jobs);
+
+    ok(res, {
+      action,
+      requested: candidateIds.length,
+      enqueued: created.length,
+      skipped: candidateIds.length - created.length,
+      job_ids: created.map((item) => item.jobId),
     });
-
-    sendJson(res, 200, { ok: true, ...payload });
-  } catch (error) {
-    sendJson(res, statusFromError(error), { ok: false, error: safeTrim(error?.message) || 'panel_unviewed_results_action_failed' });
-  }
+  });
 }
+

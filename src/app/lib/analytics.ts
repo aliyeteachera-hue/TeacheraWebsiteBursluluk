@@ -42,8 +42,6 @@ const EVENT_LEAD_POINTS: Partial<Record<EventName, number>> = {
   pricing_view: 10,
   seo_landing_cta_click: 8,
   hero_language_cta_click: 5,
-  result_view: 12,
-  booking_cta_click: 20,
 };
 
 type ConsentRequirement = 'none' | 'analytics' | 'marketing';
@@ -57,7 +55,6 @@ export type PageType =
   | 'pricing'
   | 'contact'
   | 'placement_exam'
-  | 'scholarship_exam'
   | 'seo_landing'
   | 'speakup'
   | 'other';
@@ -85,14 +82,6 @@ export type EventName =
   | 'engaged_30s'
   | 'placement_exam_start'
   | 'placement_exam_complete'
-  | 'exam_login'
-  | 'exam_start'
-  | 'exam_autosave'
-  | 'exam_submit'
-  | 'result_sms_sent'
-  | 'result_login'
-  | 'result_view'
-  | 'booking_cta_click'
   | 'pricing_view'
   | 'contact_view';
 
@@ -138,20 +127,6 @@ interface PlacementExamCompletePayload {
   exam_language?: string;
   age_range?: string;
   duration_seconds?: number;
-}
-
-interface BurslulukEventPayload {
-  application_code?: string;
-  session_id?: string;
-  attempt_id?: string;
-  exam_status?: string;
-  result_status?: string;
-  answered_count?: number;
-  question_count?: number;
-  scholarship_rate?: number;
-  score?: number;
-  source?: string;
-  channel?: string;
 }
 
 interface FormStartPayload {
@@ -229,14 +204,6 @@ interface EventPayloadMap {
   engaged_30s: { engagement_seconds: number };
   placement_exam_start: PlacementExamStartPayload;
   placement_exam_complete: PlacementExamCompletePayload;
-  exam_login: BurslulukEventPayload;
-  exam_start: BurslulukEventPayload;
-  exam_autosave: BurslulukEventPayload;
-  exam_submit: BurslulukEventPayload;
-  result_sms_sent: BurslulukEventPayload;
-  result_login: BurslulukEventPayload;
-  result_view: BurslulukEventPayload;
-  booking_cta_click: BurslulukEventPayload;
   pricing_view: { source?: string };
   contact_view: { source?: string };
 }
@@ -538,7 +505,6 @@ export function derivePageType(pathname: string): PageType {
   if (pathname === '/fiyatlar') return 'pricing';
   if (pathname === '/iletisim') return 'contact';
   if (pathname === '/seviye-tespit-sinavi') return 'placement_exam';
-  if (pathname === '/bursluluk-2026' || pathname.startsWith('/bursluluk/')) return 'scholarship_exam';
   if (pathname === '/speakup') return 'speakup';
   if (pathname.startsWith('/egitimlerimiz')) return 'program';
   if (SEO_LANDING_PATHS.has(pathname)) return 'seo_landing';

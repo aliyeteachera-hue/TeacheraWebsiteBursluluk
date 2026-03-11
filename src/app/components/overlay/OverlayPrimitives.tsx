@@ -1,5 +1,4 @@
 import { useEffect, useRef, type PointerEventHandler, type ReactNode, type RefObject } from 'react';
-import { createPortal } from 'react-dom';
 import { useOverlayLifecycle, type OverlayOwner } from '../../lib/overlayLifecycle';
 
 const FOCUSABLE_SELECTOR = [
@@ -218,17 +217,11 @@ function OverlayBase({
     onPointerDown: (event) => event.stopPropagation(),
   };
 
-  const overlayNode = (
+  return (
     <div ref={rootRef} className={containerClassName} onPointerDown={onOutsidePointerDown}>
       {typeof children === 'function' ? children({ panelRef, panelProps }) : <div {...panelProps}>{children}</div>}
     </div>
   );
-
-  if (typeof document === 'undefined') {
-    return overlayNode;
-  }
-
-  return createPortal(overlayNode, document.body);
 }
 
 export interface OverlayModalProps extends OverlayBaseProps {}

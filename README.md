@@ -77,6 +77,95 @@ pnpm dev
 pnpm build
 ```
 
+## 🧩 Online Sınav Backend (V1)
+
+Bu repo artık seviye tespit/bursluluk operasyonu için backend endpoint’lerini içerir.
+
+### Migration
+`db/migrations/*.sql` dosyaları aşağıdaki tabloları ve panel view’larını oluşturur/günceller:
+- `campaigns`, `schools`, `guardians`, `candidates`, `applications`
+- `exam_attempts`, `exam_answers`, `exam_session_tokens`, `results`
+- `notification_jobs`, `notification_events`, `dlq_jobs`, `activity_events`, `app_settings`
+- `notification_webhook_inbox` (webhook reconciliation için)
+- panel performansı için `v_candidate_operations`, `v_notifications`, `v_unviewed_results` view’ları
+
+Uygulama:
+```bash
+npm run db:migrate
+```
+`db:migrate` script’i `db/migrations/*.sql` dosyalarını sırayla uygular.
+
+Panel admin bootstrap:
+```bash
+npm run panel:generate-totp-secret
+npm run panel:create-admin -- --email admin@teachera.com --name "Panel Admin" --password "StrongPassword!" --role SUPER_ADMIN --totp-secret "<BASE32_SECRET>"
+```
+
+### API Uçları
+- `POST /api/exam/session/start`
+- `POST /api/exam/session/answer`
+- `POST /api/exam/session/submit`
+- `GET /api/exam/results/:attemptId`
+- `GET /api/panel/dashboard`
+- `GET /api/panel/candidates`
+- `GET /api/panel/candidates/export`
+- `POST /api/panel/candidates/actions`
+- `GET /api/panel/notifications`
+- `POST /api/panel/notifications/actions`
+- `GET /api/panel/unviewed-results`
+- `POST /api/panel/unviewed-results/actions`
+- `GET /api/panel/dlq`
+- `POST /api/panel/dlq/actions`
+- `GET|PUT /api/panel/settings`
+- `POST /api/panel/auth/login`
+- `GET /api/panel/auth/me`
+- `POST /api/panel/auth/logout`
+- `POST /api/notifications/worker`
+- `POST /api/notifications/provider-webhook`
+- `GET|POST /api/notifications/dlq-replay`
+- `GET /api/health`
+
+### Frontend Entegrasyonu
+`src/app/components/PlacementExamPage.tsx` dosyası artık sınav oturumunu backend’den başlatır ve submit işlemini
+`/api/exam/session/submit` ile tamamlar.
+
+### Ölçekleme Notu (10.000 aday)
+- DB sorguları sözleşme kolonlarına göre indekslenmiştir.
+- Bildirimler `notification_jobs` + worker akışı ile asenkron işlenir.
+- Retry/backoff politikası: `1m -> 5m -> 15m -> 60m -> 6h`, ardından DLQ.
+- Eşleşmeyen provider callback’leri `notification_webhook_inbox` tablosuna alınır; worker her koşuda reconcile eder.
+- Retry / DLQ yönetimi panel aksiyonlarıyla desteklenir.
+- API’ler sayfalama (`page`, `per_page`) ve filtreli listeleme sözleşmesine uyumludur.
+- Sonuç görüntüleme durumu yalnızca aday sonucu açtığında `VIEWED` olur (panel görüntülemesi işaretlemez).
+
+### Worker / Cron
+- `api/notifications/worker` artık `GET` ve `POST` kabul eder.
+- Vercel cron her dakika worker’ı çağıracak şekilde `vercel.json` içinde tanımlıdır.
+- Güvenlik için `NOTIFICATION_WORKER_SECRET` veya `CRON_SECRET` set edilmelidir.
+- Provider webhook endpoint’i HMAC-SHA256 signature doğrular (`NOTIFICATION_PROVIDER_WEBHOOK_SIGNING_SECRET`).
+- Manuel tetikleme örneği:
+```bash
+curl -X POST "https://teachera.com.tr/api/notifications/worker?limit=100&reconcile_limit=100&worker_secret=YOUR_SECRET"
+```
+
+### Panel Auth (P0-6 Hardened)
+- Panel uçları artık client-provided role/header ile yetkilendirme yapmaz.
+- Kimlik doğrulama sadece server-signed session token ile yapılır (Bearer veya HttpOnly cookie).
+- Session claim’leri: `sub`, `sid`, `role`, `mfa`, `iat`, `exp`.
+- Token doğrulama sonrası DB’de `admin_sessions` + `admin_users` kontrolü yapılır.
+- MFA zorunludur: `/api/panel/auth/login` çağrısında geçerli TOTP kodu gerekir.
+- `PANEL_API_KEYS` modeli kaldırılmıştır.
+
+### Anti-Abuse (P0-7)
+- Kritik uçlarda Redis-backed rate limit fail-open değildir; Redis yoksa istek `503` ile reddedilir.
+- Brute-force koruması:
+  - Panel login: IP + email bazlı fail counter/lock
+  - Exam session auth: IP + token fingerprint bazlı fail counter/lock
+  - Forms: IP + contact bazlı fail counter/lock
+- Turnstile server doğrulaması zorunludur:
+  - `TURNSTILE_SECRET_KEY` yoksa `/api/forms` istekleri `503 turnstile_not_configured` döner.
+  - Geçersiz/eksik token `403 captcha_failed` döner.
+
 ## 📂 Proje Yapısı
 
 ```

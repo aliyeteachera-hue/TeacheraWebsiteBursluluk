@@ -1,0 +1,315 @@
+import { randomUUID } from 'node:crypto';
+import {
+  assertNotBruteForceLocked,
+  clearBruteForceState,
+  registerBruteForceFailure,
+} from '../../_lib/abuseProtection.js';
+import { ROLES } from '../../_lib/constants.js';
+import { withTransaction } from '../../_lib/db.js';
+import { HttpError } from '../../_lib/errors.js';
+import { handleRequest, methodGuard, ok, parseBody, safeTrim } from '../../_lib/http.js';
+import { verifyTotpCode } from '../../_lib/panelMfa.js';
+import {
+  buildPanelSessionCookie,
+  createPanelSessionToken,
+  hashPanelSessionToken,
+  readPanelSessionTtlMinutes,
+} from '../../_lib/panelSession.js';
+import { enforceRateLimit, getRequestIp } from '../../_lib/redisRateLimit.js';
+
+const ROLE_PRIORITY = [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY];
+
+function normalizeEmail(value) {
+  return safeTrim(value).toLowerCase();
+}
+
+function readBoundedIntEnv(name, fallback, min, max) {
+  const parsed = Number.parseInt(safeTrim(process.env[name] || ''), 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(min, Math.min(max, parsed));
+}
+
+function normalizeRoleCodes(value) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => safeTrim(item).toUpperCase())
+    .filter((item) => ROLE_PRIORITY.includes(item));
+}
+
+function pickPrimaryRole(roles) {
+  for (const role of ROLE_PRIORITY) {
+    if (roles.includes(role)) return role;
+  }
+  return null;
+}
+
+function readRequestIp(req) {
+  const forwarded = safeTrim(req.headers?.['x-forwarded-for']);
+  if (forwarded) {
+    return safeTrim(forwarded.split(',')[0]);
+  }
+  return safeTrim(req.socket?.remoteAddress || '');
+}
+
+function readUserAgent(req) {
+  return safeTrim(req.headers?.['user-agent']).slice(0, 512) || null;
+}
+
+async function verifyPassword(client, password, hash) {
+  const result = await client.query('SELECT crypt($1, $2) = $2 AS ok', [password, hash]);
+  return Boolean(result.rows[0]?.ok);
+}
+
+async function assertLoginNotLocked(ipAddress, email) {
+  await assertNotBruteForceLocked({
+    scope: 'panel_login_ip',
+    identity: ipAddress,
+    errorCode: 'panel_login_ip_locked',
+    errorMessage: 'Too many failed login attempts from this IP. Please retry later.',
+  });
+
+  await assertNotBruteForceLocked({
+    scope: 'panel_login_email',
+    identity: email,
+    errorCode: 'panel_login_email_locked',
+    errorMessage: 'Too many failed login attempts for this account. Please retry later.',
+  });
+}
+
+async function registerLoginFailure(ipAddress, email) {
+  await registerBruteForceFailure({
+    scope: 'panel_login_ip',
+    identity: ipAddress,
+    threshold: readBoundedIntEnv('BRUTE_PANEL_LOGIN_IP_THRESHOLD', 12, 3, 1000),
+    failWindowSeconds: readBoundedIntEnv('BRUTE_PANEL_LOGIN_IP_WINDOW_SECONDS', 10 * 60, 30, 24 * 60 * 60),
+    lockSeconds: readBoundedIntEnv('BRUTE_PANEL_LOGIN_IP_LOCK_SECONDS', 15 * 60, 30, 24 * 60 * 60),
+  });
+
+  await registerBruteForceFailure({
+    scope: 'panel_login_email',
+    identity: email,
+    threshold: readBoundedIntEnv('BRUTE_PANEL_LOGIN_EMAIL_THRESHOLD', 8, 3, 1000),
+    failWindowSeconds: readBoundedIntEnv('BRUTE_PANEL_LOGIN_EMAIL_WINDOW_SECONDS', 15 * 60, 30, 24 * 60 * 60),
+    lockSeconds: readBoundedIntEnv('BRUTE_PANEL_LOGIN_EMAIL_LOCK_SECONDS', 30 * 60, 30, 24 * 60 * 60),
+  });
+}
+
+async function clearLoginFailureState(ipAddress, email) {
+  await clearBruteForceState({
+    scope: 'panel_login_ip',
+    identity: ipAddress,
+  });
+  await clearBruteForceState({
+    scope: 'panel_login_email',
+    identity: email,
+  });
+}
+
+export default async function handler(req, res) {
+  await handleRequest(req, res, async () => {
+    methodGuard(req, ['POST']);
+    const body = await parseBody(req);
+    if (!body || typeof body !== 'object') {
+      throw new HttpError(400, 'Request body must be valid JSON.', 'invalid_json');
+    }
+
+    const email = normalizeEmail(body.email);
+    const password = safeTrim(body.password);
+    const mfaCode = safeTrim(body.mfaCode || body.totpCode);
+    if (!email || !password || !mfaCode) {
+      throw new HttpError(400, 'email, password and mfaCode are required.', 'missing_login_fields');
+    }
+
+    const ttlMinutes = readPanelSessionTtlMinutes();
+    const ipAddress = getRequestIp(req) || readRequestIp(req) || 'unknown';
+    const userAgent = readUserAgent(req);
+    await assertLoginNotLocked(ipAddress, email);
+
+    await enforceRateLimit(req, res, {
+      scope: 'panel_login_ip',
+      identity: ipAddress,
+      limitEnv: 'RL_PANEL_LOGIN_IP_LIMIT',
+      windowSecondsEnv: 'RL_PANEL_LOGIN_IP_WINDOW_SECONDS',
+      defaultLimit: 20,
+      defaultWindowSeconds: 60,
+      requireRedis: true,
+      errorCode: 'panel_login_ip_rate_limited',
+      errorMessage: 'Too many login requests from this IP. Please slow down.',
+    });
+
+    await enforceRateLimit(req, res, {
+      scope: 'panel_login_email',
+      identity: email,
+      limitEnv: 'RL_PANEL_LOGIN_EMAIL_LIMIT',
+      windowSecondsEnv: 'RL_PANEL_LOGIN_EMAIL_WINDOW_SECONDS',
+      defaultLimit: 12,
+      defaultWindowSeconds: 5 * 60,
+      requireRedis: true,
+      errorCode: 'panel_login_email_rate_limited',
+      errorMessage: 'Too many login requests for this account. Please retry later.',
+    });
+
+    let session;
+    try {
+      session = await withTransaction(async (client) => {
+        const userResult = await client.query(
+          `
+          SELECT
+            u.id,
+            u.email,
+            u.full_name,
+            u.password_hash,
+            u.status,
+            u.mfa_enabled,
+            u.mfa_totp_secret,
+            COALESCE(
+              array_agg(r.code) FILTER (WHERE r.code IS NOT NULL),
+              ARRAY[]::text[]
+            ) AS role_codes
+          FROM admin_users u
+          LEFT JOIN admin_user_roles ur ON ur.admin_user_id = u.id
+          LEFT JOIN roles r ON r.id = ur.role_id
+          WHERE lower(u.email) = lower($1)
+          GROUP BY u.id
+          LIMIT 1
+        `,
+          [email],
+        );
+
+        if (userResult.rowCount === 0) {
+          throw new HttpError(401, 'Invalid email or password.', 'invalid_credentials');
+        }
+
+        const user = userResult.rows[0];
+        if (safeTrim(user.status).toUpperCase() !== 'ACTIVE') {
+          throw new HttpError(403, 'Panel user is disabled.', 'panel_user_disabled');
+        }
+
+        const passwordOk = await verifyPassword(client, password, user.password_hash);
+        if (!passwordOk) {
+          throw new HttpError(401, 'Invalid email or password.', 'invalid_credentials');
+        }
+
+        if (!user.mfa_enabled) {
+          throw new HttpError(403, 'MFA must be enabled for panel users.', 'panel_mfa_not_enabled');
+        }
+
+        const mfaSecret = safeTrim(user.mfa_totp_secret);
+        if (!mfaSecret || !verifyTotpCode(mfaSecret, mfaCode)) {
+          throw new HttpError(401, 'Invalid MFA code.', 'invalid_mfa_code');
+        }
+
+        const roleCodes = normalizeRoleCodes(user.role_codes);
+        const role = pickPrimaryRole(roleCodes);
+        if (!role) {
+          throw new HttpError(403, 'Panel user does not have an assigned role.', 'panel_role_missing');
+        }
+
+        const sessionId = randomUUID();
+        const tokenPayload = createPanelSessionToken({
+          userId: user.id,
+          sessionId,
+          role,
+          email: user.email,
+          mfaVerified: true,
+          ttlMinutes,
+        });
+        const tokenHash = hashPanelSessionToken(tokenPayload.token);
+
+        await client.query(
+          `
+          INSERT INTO admin_sessions (
+            id,
+            admin_user_id,
+            role_code,
+            token_hash,
+            mfa_verified_at,
+            issued_at,
+            expires_at,
+            ip_address,
+            user_agent,
+            last_seen_at,
+            updated_at
+          )
+          VALUES (
+            $1::uuid,
+            $2::uuid,
+            $3,
+            $4,
+            NOW(),
+            NOW(),
+            $5::timestamptz,
+            $6,
+            $7,
+            NOW(),
+            NOW()
+          )
+        `,
+          [
+            sessionId,
+            user.id,
+            role,
+            tokenHash,
+            tokenPayload.expiresAt,
+            ipAddress,
+            userAgent,
+          ],
+        );
+
+        await client.query(
+          `
+          UPDATE admin_users
+          SET last_login_at = NOW(), updated_at = NOW()
+          WHERE id = $1::uuid
+        `,
+          [user.id],
+        );
+
+        return {
+          token: tokenPayload.token,
+          role,
+          expiresAt: tokenPayload.expiresAt,
+          sessionId,
+          user: {
+            id: user.id,
+            email: normalizeEmail(user.email),
+            fullName: safeTrim(user.full_name),
+          },
+        };
+      });
+    } catch (error) {
+      if (error instanceof HttpError) {
+        const isBruteForceCandidate = [
+          'invalid_credentials',
+          'invalid_mfa_code',
+          'panel_user_disabled',
+          'panel_role_missing',
+          'panel_mfa_not_enabled',
+        ].includes(error.code);
+        if (isBruteForceCandidate) {
+          await registerLoginFailure(ipAddress, email);
+        }
+      }
+      throw error;
+    }
+
+    await clearLoginFailureState(ipAddress, email);
+
+    const ttlSeconds = ttlMinutes * 60;
+    res.setHeader('Set-Cookie', buildPanelSessionCookie(session.token, req, ttlSeconds));
+    ok(res, {
+      session: {
+        token: session.token,
+        expires_at: session.expiresAt,
+        session_id: session.sessionId,
+      },
+      user: {
+        id: session.user.id,
+        email: session.user.email,
+        full_name: session.user.fullName,
+        role: session.role,
+        mfa_verified: true,
+      },
+    });
+  });
+}

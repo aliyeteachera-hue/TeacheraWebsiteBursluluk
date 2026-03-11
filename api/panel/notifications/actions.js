@@ -1,33 +1,97 @@
-import { applyCors, parseBody, requireAdmin, requireMethod, sendJson, safeTrim } from '../../_lib/http.js';
-import { applyNotificationsAction, resolveAdminRole } from '../../_lib/panelData.js';
+import { requireRole } from '../../_lib/auth.js';
+import { ROLES } from '../../_lib/constants.js';
+import { withTransaction } from '../../_lib/db.js';
+import { HttpError } from '../../_lib/errors.js';
+import { handleRequest, methodGuard, ok, parseBody, safeTrim } from '../../_lib/http.js';
 
-function statusFromError(error) {
-  const code = safeTrim(error?.message);
-  if (code.startsWith('missing_') || code === 'unsupported_action') return 400;
-  if (code === 'forbidden_read_only') return 403;
-  return 500;
+function normalizeIds(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item) => safeTrim(item)).filter(Boolean).slice(0, 1000);
 }
 
 export default async function handler(req, res) {
-  if (!applyCors(req, res)) return;
-  if (!requireAdmin(req, res)) return;
-  if (!requireMethod(req, res, 'POST')) return;
+  await handleRequest(req, res, async () => {
+    methodGuard(req, ['POST']);
+    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS]);
 
-  const body = await parseBody(req);
-  if (!body || typeof body !== 'object') {
-    sendJson(res, 400, { ok: false, error: 'invalid_json' });
-    return;
-  }
+    const body = await parseBody(req);
+    if (!body || typeof body !== 'object') {
+      throw new HttpError(400, 'Request body must be valid JSON.', 'invalid_json');
+    }
 
-  try {
-    const payload = await applyNotificationsAction({
-      action: body.action,
-      jobIds: body.job_ids || body.jobIds,
-      role: resolveAdminRole(req),
+    const action = safeTrim(body.action).toLowerCase();
+    const jobIds = normalizeIds(body.job_ids || body.jobIds);
+    if (jobIds.length === 0) {
+      throw new HttpError(400, 'jobIds is required.', 'missing_job_ids');
+    }
+    if (!['retry', 'cancel', 'requeue_dlq'].includes(action)) {
+      throw new HttpError(400, 'Unsupported action.', 'invalid_action');
+    }
+
+    const updated = await withTransaction(async (client) => {
+      if (action === 'cancel') {
+        const { rowCount } = await client.query(
+          `
+            UPDATE notification_jobs
+            SET
+              status = 'CANCELLED',
+              next_retry_at = NULL,
+              updated_at = NOW()
+            WHERE id = ANY($1::uuid[])
+          `,
+          [jobIds],
+        );
+        return rowCount;
+      }
+
+      if (action === 'retry') {
+        const { rowCount } = await client.query(
+          `
+            UPDATE notification_jobs
+            SET
+              status = 'QUEUED',
+              next_retry_at = NOW(),
+              updated_at = NOW()
+            WHERE id = ANY($1::uuid[])
+          `,
+          [jobIds],
+        );
+        return rowCount;
+      }
+
+      const { rowCount } = await client.query(
+        `
+          UPDATE notification_jobs
+          SET
+            status = 'QUEUED',
+            next_retry_at = NOW(),
+            updated_at = NOW()
+          WHERE id = ANY($1::uuid[])
+            AND status = 'DLQ'
+        `,
+        [jobIds],
+      );
+
+      await client.query(
+        `
+          UPDATE dlq_jobs
+          SET
+            status = 'REQUEUED',
+            updated_at = NOW()
+          WHERE source_job_id = ANY($1::uuid[])
+            AND status <> 'CLOSED'
+        `,
+        [jobIds],
+      );
+
+      return rowCount;
     });
 
-    sendJson(res, 200, { ok: true, ...payload });
-  } catch (error) {
-    sendJson(res, statusFromError(error), { ok: false, error: safeTrim(error?.message) || 'panel_notifications_action_failed' });
-  }
+    ok(res, {
+      action,
+      requested: jobIds.length,
+      updated,
+    });
+  });
 }
+

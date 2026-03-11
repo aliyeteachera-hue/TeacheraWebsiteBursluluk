@@ -13,7 +13,6 @@ describe('SeoManager helpers', () => {
     expect(isKnownPath('/academy/hedef-dilde-dusunmek')).toBe(true);
     expect(isKnownPath('/egitimlerimiz/ingilizce/grup-programi')).toBe(true);
     expect(isKnownPath('/hukuki/gizlilik-politikasi')).toBe(true);
-    expect(isKnownPath('/bursluluk-2026')).toBe(true);
     expect(isKnownPath('/olmayan-sayfa')).toBe(false);
   });
 

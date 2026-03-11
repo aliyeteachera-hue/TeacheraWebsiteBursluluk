@@ -36,7 +36,7 @@ export function useFormSubmission(options: UseFormSubmissionOptions = {}) {
         if (!sent) {
           const message = runOptions.submitErrorMessage ?? defaultSubmitErrorMessage;
           if (message) {
-            setSubmitError((current) => current || message);
+            setSubmitError(message);
           }
         }
         return sent;
@@ -58,3 +58,4 @@ export function useFormSubmission(options: UseFormSubmissionOptions = {}) {
     runSubmission,
   };
 }
+

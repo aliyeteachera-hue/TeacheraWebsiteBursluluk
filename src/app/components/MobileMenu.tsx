@@ -73,13 +73,20 @@ export default function MobileMenu({ onClose, currentSection: _currentSection }:
       const targetPath = item.href;
       const currentPath = window.location.pathname;
 
+      navigate(targetPath);
+      onClose();
+
       if (currentPath === targetPath) {
-        onClose();
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
-      window.location.assign(targetPath);
+      // Fallback for rare mobile navigation race conditions.
+      window.setTimeout(() => {
+        if (window.location.pathname !== targetPath) {
+          window.location.assign(targetPath);
+        }
+      }, 350);
       return;
     }
     if (window.location.pathname !== '/') {

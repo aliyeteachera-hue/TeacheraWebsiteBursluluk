@@ -9,7 +9,7 @@ import {
   getPlacementBank,
   type PlacementExamBank,
 } from './exam/placementExamData';
-import { openMailDraft, openMailDraftOnUnload } from './formMailto';
+import { startExamSession, submitExam, submitExamOnUnload } from '../api/examApi';
 import { readPlacementExamLead, type PlacementExamLead } from './exam/placementExamSession';
 import { useLevelAssessment } from './LevelAssessmentContext';
 import { trackEvent } from '../lib/analytics';
@@ -31,18 +31,6 @@ interface ScoreMetrics {
   wrongCount: number;
   unansweredCount: number;
   percentage: number;
-}
-
-interface ExamSnapshot {
-  questions: RenderQuestion[];
-  answers: Record<string, string>;
-  selectedAge: string;
-  selectedLanguage: string;
-  selectedLanguageLabel: string;
-  activeBank: PlacementExamBank | null;
-  remainingSeconds: number;
-  startedAt: number | null;
-  metrics: ScoreMetrics;
 }
 
 function shuffleArray<T>(values: T[]) {
@@ -138,6 +126,26 @@ function calculateMetrics(questions: RenderQuestion[], answers: Record<string, s
   };
 }
 
+function buildSubmissionAnswers(questions: RenderQuestion[], answers: Record<string, string>) {
+  return questions.map((question) => {
+    const selectedOption = answers[question.id] ?? null;
+    const isCorrect = selectedOption ? selectedOption === question.answer : null;
+    const scoreDelta = selectedOption
+      ? selectedOption === question.answer
+        ? 1
+        : question.wrongPenalty
+      : 0;
+
+    return {
+      questionId: question.id,
+      selectedOption,
+      isCorrect,
+      scoreDelta,
+      questionWeight: 1,
+    };
+  });
+}
+
 function getEstimatedLevel(percentage: number) {
   if (percentage >= 85) return 'B2+';
   if (percentage >= 70) return 'B1 - B2';
@@ -176,49 +184,6 @@ function getExamDisplayTitle(age: string, languageLabel: string, fallbackTitle: 
   return `${getAudienceLabel(age)} ${languageLabel} Seviye Tespiti`;
 }
 
-function buildResultLines(snapshot: ExamSnapshot, lead: PlacementExamLead | null, status: SubmissionStatus, leaveReason?: string) {
-  const now = new Date().toISOString();
-  const startedAtIso = snapshot.startedAt ? new Date(snapshot.startedAt).toISOString() : '-';
-  const elapsedSeconds = snapshot.startedAt ? Math.max(0, Math.floor((Date.now() - snapshot.startedAt) / 1000)) : 0;
-  const placementLabel = getPlacementLabel(snapshot.activeBank, snapshot.metrics.score, snapshot.metrics.percentage);
-  const examDisplayTitle = getExamDisplayTitle(
-    snapshot.selectedAge,
-    snapshot.selectedLanguageLabel,
-    snapshot.activeBank?.title || '-',
-  );
-
-  const lines = [
-    `Ad Soyad: ${lead?.fullName || '-'}`,
-    `Telefon: ${lead?.phone || '-'}`,
-    `E-posta: ${lead?.email || '-'}`,
-    `Yas Araligi: ${snapshot.selectedAge || lead?.age || '-'}`,
-    `Dil: ${snapshot.selectedLanguageLabel || snapshot.selectedLanguage || lead?.language || '-'}`,
-    `Sinav: ${examDisplayTitle}`,
-    `Durum: ${getStatusLabel(status)}`,
-    `Toplam Soru: ${snapshot.questions.length}`,
-    `Cevaplanan: ${snapshot.metrics.answeredCount}`,
-    `Dogru: ${snapshot.metrics.correctCount}`,
-    `Yanlis: ${snapshot.metrics.wrongCount}`,
-    `Bos: ${snapshot.metrics.unansweredCount}`,
-    `Net Puan: ${snapshot.metrics.score}`,
-    `Maksimum Puan: ${snapshot.questions.length}`,
-    `Yuzde: %${snapshot.metrics.percentage}`,
-    `Yerlestirme: ${placementLabel}`,
-    `Baslangic: ${startedAtIso}`,
-    `Bitis: ${now}`,
-    `Gecen Sure (sn): ${elapsedSeconds}`,
-    `Kalan Sure (sn): ${snapshot.remainingSeconds}`,
-    `Lead Kaynagi: ${lead?.source || '-'}`,
-    'Kaynak: PlacementExamPage',
-  ];
-
-  if (leaveReason) {
-    lines.push(`Ayrilma Nedeni: ${leaveReason}`);
-  }
-
-  return lines;
-}
-
 export default function PlacementExamPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -235,6 +200,9 @@ export default function PlacementExamPage() {
   const [activeBank, setActiveBank] = useState<PlacementExamBank | null>(null);
   const [lead, setLead] = useState<PlacementExamLead | null>(() => readPlacementExamLead());
   const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus | null>(null);
+  const [attemptId, setAttemptId] = useState<string | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [isStartingExam, setIsStartingExam] = useState(false);
   const [isSendingResult, setIsSendingResult] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
 
@@ -261,28 +229,31 @@ export default function PlacementExamPage() {
   const timerSubmissionTriggeredRef = useRef(false);
   const startedAtRef = useRef<number | null>(null);
   const leadPromptedRef = useRef(false);
-  const snapshotRef = useRef<ExamSnapshot>({
-    questions: [],
-    answers: {},
-    selectedAge: '',
-    selectedLanguage: '',
-    selectedLanguageLabel: '',
-    activeBank: null,
-    remainingSeconds: 0,
-    startedAt: null,
+  const attemptIdRef = useRef<string | null>(null);
+  const sessionTokenRef = useRef<string | null>(null);
+  const examSnapshotRef = useRef({
     metrics: calculateMetrics([], {}),
+    questions: [] as RenderQuestion[],
+    answers: {} as Record<string, string>,
+    selectedLanguageLabel: '',
+    selectedLanguage: '',
+    selectedAge: '',
+    activeBank: null as PlacementExamBank | null,
   });
 
-  snapshotRef.current = {
+  useEffect(() => {
+    attemptIdRef.current = attemptId;
+    sessionTokenRef.current = sessionToken;
+  }, [attemptId, sessionToken]);
+
+  examSnapshotRef.current = {
+    metrics,
     questions,
     answers,
-    selectedAge,
-    selectedLanguage,
     selectedLanguageLabel,
+    selectedLanguage,
+    selectedAge,
     activeBank,
-    remainingSeconds,
-    startedAt: startedAtRef.current,
-    metrics,
   };
 
   useEffect(() => {
@@ -333,6 +304,11 @@ export default function PlacementExamPage() {
       return;
     }
 
+    if (!attemptIdRef.current || !sessionTokenRef.current) {
+      setSendError('Sınav oturumu bulunamadı. Lütfen sınavı yeniden başlatın.');
+      return;
+    }
+
     reportSentRef.current = true;
     setSubmissionStatus(status);
     setIsSendingResult(true);
@@ -355,42 +331,79 @@ export default function PlacementExamPage() {
       duration_seconds: durationSeconds,
     });
 
-    const sent = await openMailDraft({
-      subject: 'Seviye Tespit Sınav Sonucu',
-      lines: buildResultLines(snapshotRef.current, lead, status),
-    });
-
-    if (!sent) {
+    const placementBand = activeBank ? getPlacementBandForScore(activeBank, metrics.score) : null;
+    const submissionAnswers = buildSubmissionAnswers(questions, answers);
+    try {
+      await submitExam(sessionTokenRef.current, {
+        attemptId: attemptIdRef.current,
+        completionStatus: status,
+        durationSeconds: durationSeconds || 0,
+        placementLabel: placementBand?.label || getPlacementLabel(activeBank, metrics.score, metrics.percentage),
+        cefrBand: placementBand?.cefr || undefined,
+        metrics: {
+          score: metrics.score,
+          percentage: metrics.percentage,
+          answeredCount: metrics.answeredCount,
+          correctCount: metrics.correctCount,
+          wrongCount: metrics.wrongCount,
+          unansweredCount: metrics.unansweredCount,
+          placementLabel: placementBand?.label || undefined,
+        },
+        answers: submissionAnswers,
+      });
+      setIsSubmitted(true);
+    } catch {
+      reportSentRef.current = false;
       setSendError('Sınav sonucu gönderilirken bir hata oluştu. Lütfen danışmanla iletişime geçin.');
     }
 
     setIsSendingResult(false);
-    setIsSubmitted(true);
   };
 
   const sendLeaveReportIfNeeded = (leaveReason: string) => {
     if (!isStarted || isSubmitted || reportSentRef.current) return;
+    if (!attemptIdRef.current || !sessionTokenRef.current) return;
 
+    const snapshot = examSnapshotRef.current;
+    const snapshotMetrics = snapshot.metrics;
     reportSentRef.current = true;
     const durationSeconds = startedAtRef.current
       ? Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000))
       : undefined;
     trackEvent('placement_exam_complete', {
       completion_status: 'left_exam',
-      answered_count: metrics.answeredCount,
-      correct_count: metrics.correctCount,
-      wrong_count: metrics.wrongCount,
-      unanswered_count: metrics.unansweredCount,
-      score: metrics.score,
-      percentage: metrics.percentage,
-      question_count: questions.length,
-      exam_language: selectedLanguageLabel || selectedLanguage,
-      age_range: selectedAge,
+      answered_count: snapshotMetrics.answeredCount,
+      correct_count: snapshotMetrics.correctCount,
+      wrong_count: snapshotMetrics.wrongCount,
+      unanswered_count: snapshotMetrics.unansweredCount,
+      score: snapshotMetrics.score,
+      percentage: snapshotMetrics.percentage,
+      question_count: snapshot.questions.length,
+      exam_language: snapshot.selectedLanguageLabel || snapshot.selectedLanguage,
+      age_range: snapshot.selectedAge,
       duration_seconds: durationSeconds,
     });
-    openMailDraftOnUnload({
-      subject: 'Seviye Tespit Sınav Ayrilma Bildirimi',
-      lines: buildResultLines(snapshotRef.current, lead, 'left_exam', leaveReason),
+
+    const placementBand = snapshot.activeBank ? getPlacementBandForScore(snapshot.activeBank, snapshotMetrics.score) : null;
+    const submissionAnswers = buildSubmissionAnswers(snapshot.questions, snapshot.answers);
+    submitExamOnUnload(sessionTokenRef.current, {
+      attemptId: attemptIdRef.current,
+      completionStatus: 'left_exam',
+      durationSeconds: durationSeconds || 0,
+      placementLabel:
+        placementBand?.label ||
+        getPlacementLabel(snapshot.activeBank, snapshotMetrics.score, snapshotMetrics.percentage),
+      cefrBand: placementBand?.cefr || undefined,
+      metrics: {
+        score: snapshotMetrics.score,
+        percentage: snapshotMetrics.percentage,
+        answeredCount: snapshotMetrics.answeredCount,
+        correctCount: snapshotMetrics.correctCount,
+        wrongCount: snapshotMetrics.wrongCount,
+        unansweredCount: snapshotMetrics.unansweredCount,
+        placementLabel: leaveReason ? `${placementBand?.label || 'ABANDONED'} (${leaveReason})` : placementBand?.label,
+      },
+      answers: submissionAnswers,
     });
   };
 
@@ -429,7 +442,7 @@ export default function PlacementExamPage() {
     return () => window.clearInterval(timerId);
   }, [isStarted, isSubmitted, questions.length, remainingSeconds]);
 
-  const startExam = () => {
+  const startExam = async () => {
     if (!lead) {
       openLevelAssessment('placement_exam_start_without_lead');
       return;
@@ -438,6 +451,30 @@ export default function PlacementExamPage() {
     if (!activeBankInfo || !activeBankInfo.available) return;
 
     const nextQuestions = buildQuestions(activeBankInfo.bank);
+    setIsStartingExam(true);
+    setSendError(null);
+
+    try {
+      const sessionResponse = await startExamSession({
+        studentFullName: lead.fullName,
+        parentFullName: lead.fullName,
+        parentPhoneE164: lead.phone,
+        parentEmail: lead.email,
+        ageRange: selectedAge || lead.age,
+        language: selectedLanguageLabel || selectedLanguage || lead.language,
+        source: lead.source || 'placement_exam_page',
+        bankKey: activeBankInfo.bank.key,
+        questionCount: nextQuestions.length,
+      });
+
+      setAttemptId(sessionResponse.session.attemptId);
+      setSessionToken(sessionResponse.session.sessionToken);
+    } catch {
+      setSendError('Sınav oturumu başlatılamadı. Lütfen tekrar deneyin.');
+      setIsStartingExam(false);
+      return;
+    }
+
     setQuestions(nextQuestions);
     setActiveBank(activeBankInfo.bank);
     setAnswers({});
@@ -450,6 +487,7 @@ export default function PlacementExamPage() {
     reportSentRef.current = false;
     timerSubmissionTriggeredRef.current = false;
     startedAtRef.current = Date.now();
+    setIsStartingExam(false);
 
     trackEvent('placement_exam_start', {
       exam_language: selectedLanguageLabel || selectedLanguage,
@@ -460,7 +498,7 @@ export default function PlacementExamPage() {
   };
 
   const restartExam = () => {
-    startExam();
+    void startExam();
   };
 
   const handleSelectOption = (option: string) => {
@@ -611,10 +649,11 @@ export default function PlacementExamPage() {
             <div className="mt-6 flex flex-wrap items-center gap-3">
               {activeBankInfo?.available && (
                 <button
-                  onClick={startExam}
-                  className="h-[44px] px-6 rounded-full bg-[#00000B] hover:bg-[#68232E] text-white text-[12px] tracking-[0.1em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer"
+                  onClick={() => void startExam()}
+                  disabled={isStartingExam}
+                  className="h-[44px] px-6 rounded-full bg-[#00000B] hover:bg-[#68232E] text-white text-[12px] tracking-[0.1em] font-['Neutraface_2_Text:Demi',sans-serif] inline-flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  SINAVI BAŞLAT
+                  {isStartingExam ? 'OTURUM BAŞLATILIYOR...' : 'SINAVI BAŞLAT'}
                   <ArrowRight size={14} />
                 </button>
               )}
@@ -625,6 +664,12 @@ export default function PlacementExamPage() {
                 DANIŞMANA SOR
               </button>
             </div>
+
+            {sendError && (
+              <p className="mt-4 text-[12px] rounded-xl border border-[#E70000]/25 bg-[#FFF3F1] text-[#68232E] px-3 py-2 font-['Neutraface_2_Text:Demi',sans-serif]">
+                {sendError}
+              </p>
+            )}
           </motion.div>
         )}
 
@@ -797,6 +842,8 @@ export default function PlacementExamPage() {
                       setIsStarted(false);
                       setIsSubmitted(false);
                       setSubmissionStatus(null);
+                      setAttemptId(null);
+                      setSessionToken(null);
                       setSendError(null);
                     }}
                     className="h-[42px] px-5 rounded-full border border-[#324D47]/25 text-[#324D47] hover:bg-[#324D47]/10 text-[12px] tracking-[0.08em] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors inline-flex items-center"

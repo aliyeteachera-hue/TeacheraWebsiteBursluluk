@@ -1,3 +1,11 @@
+import {
+  assertNotBruteForceLocked,
+  clearBruteForceState,
+  registerBruteForceFailure,
+} from './_lib/abuseProtection.js';
+import { HttpError, isHttpError } from './_lib/errors.js';
+import { enforceRateLimit, getRequestIp } from './_lib/redisRateLimit.js';
+
 const DEFAULT_UPSTREAM_TEMPLATE = 'https://formsubmit.co/ajax/{to}';
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
@@ -56,9 +64,60 @@ function sanitizeFields(rawFields) {
   return sanitized;
 }
 
+function readCaptchaToken(body, req) {
+  const candidates = [
+    body?.captchaToken,
+    body?.turnstileToken,
+    body?.captcha_token,
+    body?.turnstile_token,
+    body?.['cf-turnstile-response'],
+    req?.headers?.['cf-turnstile-response'],
+  ];
+
+  for (const value of candidates) {
+    const token = safeTrim(value);
+    if (!token) continue;
+    const lowered = token.toLowerCase();
+    if (lowered === 'undefined' || lowered === 'null') continue;
+    return token;
+  }
+
+  return '';
+}
+
+function readBoundedInt(raw, fallback, min, max) {
+  const parsed = Number.parseInt(safeTrim(raw || ''), 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(min, Math.min(max, parsed));
+}
+
+function readBruteConfig(name, fallback) {
+  return readBoundedInt(process.env[name], fallback, 1, 24 * 60 * 60);
+}
+
+function resolveContactIdentity(fields, to, fallbackIp) {
+  const candidates = [
+    fields.parent_phone_e164,
+    fields.phone,
+    fields.telefon,
+    fields.mobile,
+    fields.email,
+    to,
+    fallbackIp,
+  ];
+
+  return candidates.map((value) => safeTrim(value)).find(Boolean) || fallbackIp || 'unknown';
+}
+
 async function verifyTurnstileToken(token, remoteIp) {
   const secret = safeTrim(process.env.TURNSTILE_SECRET_KEY);
-  if (!secret) return { enabled: false, ok: true };
+  if (!secret) {
+    throw new HttpError(
+      503,
+      'Turnstile server validation is not configured.',
+      'turnstile_not_configured',
+    );
+  }
 
   const responseToken = safeTrim(token);
   if (!responseToken) return { enabled: true, ok: false, reason: 'missing_token' };
@@ -126,57 +185,117 @@ async function parseBody(req) {
 }
 
 export default async function handler(req, res) {
-  const allowedOrigins = parseAllowedOrigins();
-  const origin = safeTrim(req.headers.origin);
-
-  if (!isOriginAllowed(origin, allowedOrigins)) {
-    sendJson(res, 403, { ok: false, error: 'origin_not_allowed' });
-    return;
-  }
-
-  if (req.method === 'OPTIONS') {
-    res.status(204).end();
-    return;
-  }
-
-  if (req.method !== 'POST') {
-    sendJson(res, 405, { ok: false, error: 'method_not_allowed' });
-    return;
-  }
-
-  const body = await parseBody(req);
-  if (!body || typeof body !== 'object') {
-    sendJson(res, 400, { ok: false, error: 'invalid_json' });
-    return;
-  }
-
-  const to = safeTrim(body.to || 'data@teachera.com.tr').slice(0, 200);
-  const subject = safeTrim(body.subject).slice(0, 200);
-  const formSource = safeTrim(body.formSource).slice(0, 500);
-  const fields = sanitizeFields(body.fields);
-  const captchaToken = safeTrim(body.captchaToken);
-
-  if (!subject) {
-    sendJson(res, 400, { ok: false, error: 'missing_subject' });
-    return;
-  }
-
-  const turnstile = await verifyTurnstileToken(captchaToken, safeTrim(req.headers['x-forwarded-for']));
-  if (!turnstile.ok) {
-    sendJson(res, 403, { ok: false, error: 'captcha_failed', reason: turnstile.reason || 'unknown' });
-    return;
-  }
-
-  const upstreamEndpoint = resolveUpstreamEndpoint(to);
-  const upstreamPayload = {
-    _subject: subject,
-    _captcha: 'false',
-    _template: 'table',
-    form_source: formSource || 'server_proxy',
-    ...fields,
-  };
-
   try {
+    const allowedOrigins = parseAllowedOrigins();
+    const origin = safeTrim(req.headers.origin);
+
+    if (!isOriginAllowed(origin, allowedOrigins)) {
+      sendJson(res, 403, { ok: false, error: 'origin_not_allowed' });
+      return;
+    }
+
+    if (req.method === 'OPTIONS') {
+      res.status(204).end();
+      return;
+    }
+
+    if (req.method !== 'POST') {
+      sendJson(res, 405, { ok: false, error: 'method_not_allowed' });
+      return;
+    }
+
+    const body = await parseBody(req);
+    if (!body || typeof body !== 'object') {
+      sendJson(res, 400, { ok: false, error: 'invalid_json' });
+      return;
+    }
+
+    const requestIp = getRequestIp(req);
+    const to = safeTrim(body.to || 'data@teachera.com.tr').slice(0, 200);
+    const subject = safeTrim(body.subject).slice(0, 200);
+    const formSource = safeTrim(body.formSource).slice(0, 500);
+    const fields = sanitizeFields(body.fields);
+    const captchaToken = readCaptchaToken(body, req);
+    const contactIdentity = resolveContactIdentity(fields, to, requestIp);
+
+    await assertNotBruteForceLocked({
+      scope: 'forms_submit_ip',
+      identity: requestIp,
+      errorCode: 'forms_submit_ip_locked',
+      errorMessage: 'Too many failed form submissions from this IP. Please retry later.',
+    });
+    await assertNotBruteForceLocked({
+      scope: 'forms_submit_contact',
+      identity: contactIdentity,
+      errorCode: 'forms_submit_contact_locked',
+      errorMessage: 'Too many failed form submissions for this contact. Please retry later.',
+    });
+
+    await enforceRateLimit(req, res, {
+      scope: 'forms_submit_ip',
+      identity: requestIp,
+      limitEnv: 'RL_FORMS_IP_LIMIT',
+      windowSecondsEnv: 'RL_FORMS_IP_WINDOW_SECONDS',
+      defaultLimit: 20,
+      defaultWindowSeconds: 60,
+      requireRedis: true,
+      errorCode: 'forms_submit_ip_rate_limited',
+      errorMessage: 'Too many form requests from this IP. Please retry shortly.',
+    });
+
+    await enforceRateLimit(req, res, {
+      scope: 'forms_submit_contact',
+      identity: contactIdentity,
+      limitEnv: 'RL_FORMS_CONTACT_LIMIT',
+      windowSecondsEnv: 'RL_FORMS_CONTACT_WINDOW_SECONDS',
+      defaultLimit: 10,
+      defaultWindowSeconds: 10 * 60,
+      requireRedis: true,
+      errorCode: 'forms_submit_contact_rate_limited',
+      errorMessage: 'Too many form requests for this contact. Please retry later.',
+    });
+
+    if (!subject) {
+      sendJson(res, 400, { ok: false, error: 'missing_subject' });
+      return;
+    }
+
+    const turnstile = await verifyTurnstileToken(captchaToken, requestIp);
+    if (!turnstile.ok) {
+      await registerBruteForceFailure({
+        scope: 'forms_submit_ip',
+        identity: requestIp,
+        threshold: readBruteConfig('BRUTE_FORMS_IP_THRESHOLD', 10),
+        failWindowSeconds: readBruteConfig('BRUTE_FORMS_IP_WINDOW_SECONDS', 10 * 60),
+        lockSeconds: readBruteConfig('BRUTE_FORMS_IP_LOCK_SECONDS', 15 * 60),
+      });
+      await registerBruteForceFailure({
+        scope: 'forms_submit_contact',
+        identity: contactIdentity,
+        threshold: readBruteConfig('BRUTE_FORMS_CONTACT_THRESHOLD', 6),
+        failWindowSeconds: readBruteConfig('BRUTE_FORMS_CONTACT_WINDOW_SECONDS', 15 * 60),
+        lockSeconds: readBruteConfig('BRUTE_FORMS_CONTACT_LOCK_SECONDS', 30 * 60),
+      });
+
+      sendJson(res, 403, { ok: false, error: 'captcha_failed', reason: turnstile.reason || 'unknown' });
+      return;
+    }
+
+    // Defensive fail-closed guard: never forward form payload upstream without a validated captcha token.
+    if (!captchaToken) {
+      sendJson(res, 403, { ok: false, error: 'captcha_failed', reason: 'missing_token' });
+      return;
+    }
+
+    const upstreamEndpoint = resolveUpstreamEndpoint(to);
+    const upstreamPayload = {
+      _subject: subject,
+      _captcha: 'false',
+      _template: 'table',
+      form_source: formSource || 'server_proxy',
+      ...fields,
+    };
+
     const upstreamResponse = await fetch(upstreamEndpoint, {
       method: 'POST',
       headers: {
@@ -191,8 +310,26 @@ export default async function handler(req, res) {
       return;
     }
 
-    sendJson(res, 200, { ok: true, captcha: turnstile.enabled ? 'verified' : 'not_configured' });
-  } catch {
+    await clearBruteForceState({
+      scope: 'forms_submit_ip',
+      identity: requestIp,
+    });
+    await clearBruteForceState({
+      scope: 'forms_submit_contact',
+      identity: contactIdentity,
+    });
+
+    sendJson(res, 200, { ok: true, captcha: 'verified' });
+  } catch (error) {
+    if (isHttpError(error)) {
+      sendJson(res, error.status, {
+        ok: false,
+        error: error.code,
+        message: error.message,
+        ...(error.details ? { details: error.details } : {}),
+      });
+      return;
+    }
     sendJson(res, 502, { ok: false, error: 'upstream_network_error' });
   }
 }
