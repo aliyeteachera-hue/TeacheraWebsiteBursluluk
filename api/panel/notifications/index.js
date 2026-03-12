@@ -1,4 +1,5 @@
 import { requireRole } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import {
   JOB_STATUS,
   NOTIFICATION_CHANNELS,
@@ -7,6 +8,7 @@ import {
 } from '../../_lib/constants.js';
 import { query } from '../../_lib/db.js';
 import { buildListResponse } from '../../_lib/listResponse.js';
+import { isPrivilegedPiiRole, maskPiiPhone } from '../../_lib/piiCrypto.js';
 import {
   handleRequest,
   methodGuard,
@@ -79,7 +81,7 @@ function buildFilters(listQuery) {
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['GET']);
-    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
+    const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
 
     const listQuery = parseListQuery(req, NOTIFICATION_GRID_COLUMNS, 'next_retry_at', 'desc');
     const { whereClause, params } = buildFilters(listQuery);
@@ -137,15 +139,38 @@ export default async function handler(req, res) {
       params.slice(0, -2),
     );
 
+    const piiScopeFull = isPrivilegedPiiRole(identity.role);
+    const items = dataResult.rows.map((row) => ({
+      ...row,
+      recipient: piiScopeFull ? row.recipient : maskPiiPhone(row.recipient),
+    }));
+
     ok(
       res,
       buildListResponse({
-        items: dataResult.rows,
+        items,
         total: Number(countResult.rows[0]?.total || 0),
         page: listQuery.page,
         perPage: listQuery.perPage,
         summary: summaryResult.rows[0] || {},
       }),
     );
+
+    const ctx = readRequestContext(req);
+    await appendAuditLog({
+      ...buildPanelActor(identity),
+      action: 'PANEL_NOTIFICATIONS_READ',
+      targetType: 'NOTIFICATION_LIST',
+      targetId: `${listQuery.page}:${listQuery.perPage}`,
+      requestId: ctx.requestId,
+      ipAddress: ctx.ipAddress,
+      userAgent: ctx.userAgent,
+      metadata: {
+        q: listQuery.q || null,
+        filters: listQuery.filters,
+        returned: items.length,
+        piiScope: piiScopeFull ? 'FULL' : 'MASKED',
+      },
+    });
   });
 }

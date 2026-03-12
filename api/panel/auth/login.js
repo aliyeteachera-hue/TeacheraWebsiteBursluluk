@@ -4,6 +4,7 @@ import {
   clearBruteForceState,
   registerBruteForceFailure,
 } from '../../_lib/abuseProtection.js';
+import { appendAuditLog, readRequestContext } from '../../_lib/auditLog.js';
 import { ROLES } from '../../_lib/constants.js';
 import { withTransaction } from '../../_lib/db.js';
 import { HttpError } from '../../_lib/errors.js';
@@ -123,6 +124,7 @@ export default async function handler(req, res) {
     const ttlMinutes = readPanelSessionTtlMinutes();
     const ipAddress = getRequestIp(req) || readRequestIp(req) || 'unknown';
     const userAgent = readUserAgent(req);
+    const requestContext = readRequestContext(req);
     await assertLoginNotLocked(ipAddress, email);
 
     await enforceRateLimit(req, res, {
@@ -290,6 +292,24 @@ export default async function handler(req, res) {
           await registerLoginFailure(ipAddress, email);
         }
       }
+
+      try {
+        await appendAuditLog({
+          actorType: 'PANEL_USER',
+          actorId: email || 'unknown',
+          action: 'PANEL_LOGIN_FAILED',
+          targetType: 'ADMIN_SESSION',
+          requestId: requestContext.requestId,
+          ipAddress: requestContext.ipAddress || ipAddress,
+          userAgent: requestContext.userAgent || userAgent,
+          metadata: {
+            email: email || null,
+            reason: error instanceof HttpError ? error.code : 'unexpected_error',
+          },
+        });
+      } catch (auditError) {
+        console.error('[panel_login_failed_audit_error]', auditError);
+      }
       throw error;
     }
 
@@ -311,5 +331,26 @@ export default async function handler(req, res) {
         mfa_verified: true,
       },
     });
+
+    try {
+      await appendAuditLog({
+        actorType: 'PANEL_USER',
+        actorId: session.user.id,
+        actorRole: session.role,
+        action: 'PANEL_LOGIN_SUCCESS',
+        targetType: 'ADMIN_SESSION',
+        targetId: session.sessionId,
+        requestId: requestContext.requestId,
+        ipAddress: requestContext.ipAddress || ipAddress,
+        userAgent: requestContext.userAgent || userAgent,
+        metadata: {
+          email: session.user.email,
+          mfaVerified: true,
+          expiresAt: session.expiresAt,
+        },
+      });
+    } catch (auditError) {
+      console.error('[panel_login_success_audit_error]', auditError);
+    }
   });
 }

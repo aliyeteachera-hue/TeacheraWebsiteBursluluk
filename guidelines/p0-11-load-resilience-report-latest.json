@@ -1,0 +1,349 @@
+{
+  "run_id": "2026-03-12T08-57-54-118Z",
+  "generated_at_utc": "2026-03-12T08:58:53.687Z",
+  "doD_target": "P0-11 Run certified load and resilience tests",
+  "config": {
+    "exam_api_base_url": "https://exam-api.teachera.com.tr",
+    "worker_base_url": "https://exam-api.teachera.com.tr",
+    "users": 80,
+    "start_concurrency": 6,
+    "answer_submit_concurrency": 8,
+    "results_concurrency": 8,
+    "outage_jobs": 12,
+    "outage_dlq_seed": 3,
+    "worker_batch": 120,
+    "worker_max_loops": 12,
+    "timeout_ms": 30000,
+    "scenario_min_users": 10000,
+    "scenario_max_users": 15000,
+    "scenario_window_minutes": 180,
+    "min_start_success_pct": 95,
+    "min_results_success_pct": 95,
+    "max_start_p95_ms": 2500,
+    "max_results_p95_ms": 2200,
+    "max_outage_residual_pct": 5,
+    "allow_shared_campaign": false,
+    "simulate_client_ips": true,
+    "include_result_pii": false,
+    "prewarm_requests": 24,
+    "load_test_key": "8f1eede17fed5beb93fb1606865e04b6bb446c65d89d27aee2e2418486c045ad",
+    "campaign_code": "P0_11_CERT_20260312_TUNE8",
+    "users_executed": 80,
+    "worker_secret_present": true,
+    "signing_key_present": true
+  },
+  "metrics": {
+    "start_burst": {
+      "users": 80,
+      "concurrency": 6,
+      "duration_ms": 15991,
+      "requests_per_second": 5.003,
+      "success_count": 80,
+      "failure_count": 0,
+      "success_rate_pct": 100,
+      "latency_ms": {
+        "count": 80,
+        "min_ms": 897,
+        "p50_ms": 966,
+        "p95_ms": 1830,
+        "p99_ms": 3060,
+        "max_ms": 3060,
+        "avg_ms": 1166.33
+      },
+      "status_codes": {
+        "200": 80
+      },
+      "failures": []
+    },
+    "answer_submit": {
+      "total_attempts": 80,
+      "concurrency": 8,
+      "duration_ms": 16574,
+      "requests_per_second": 4.827,
+      "success_count": 80,
+      "failure_count": 0,
+      "success_rate_pct": 100,
+      "latency_ms": {
+        "count": 160,
+        "min_ms": 443,
+        "p50_ms": 910,
+        "p95_ms": 1496,
+        "p99_ms": 1660,
+        "max_ms": 1677,
+        "avg_ms": 789.18
+      },
+      "status_codes": {
+        "answer:200": 80,
+        "submit:200": 80
+      },
+      "failures": []
+    },
+    "results_burst": {
+      "total_attempts": 80,
+      "concurrency": 8,
+      "duration_ms": 8599,
+      "requests_per_second": 9.303,
+      "success_count": 80,
+      "failure_count": 0,
+      "success_rate_pct": 100,
+      "latency_ms": {
+        "count": 80,
+        "min_ms": 626,
+        "p50_ms": 691,
+        "p95_ms": 1257,
+        "p99_ms": 1275,
+        "max_ms": 1275,
+        "avg_ms": 838.09
+      },
+      "status_codes": {
+        "200": 80
+      },
+      "failures": []
+    },
+    "prewarm": {
+      "requests": 28,
+      "success_count": 28,
+      "failure_count": 0,
+      "endpoint_warmup": {
+        "total": 4,
+        "success_count": 4,
+        "statuses": [
+          400,
+          400,
+          400,
+          401
+        ]
+      }
+    },
+    "notification_resilience": {
+      "seeded": {
+        "jobIds": [
+          "c8eec176-f38f-477d-b783-d78b9d5f051c",
+          "1d2d60af-a37e-43bf-af67-c797728d63cf",
+          "5a7c40a3-32ec-431b-8409-4358426ba950",
+          "85c9c2ac-06d7-4c03-87f9-5e1ce09597b9",
+          "cc32c354-a561-4ab4-82cf-fd21d02fce3a",
+          "ff37a0b4-7dda-4872-b573-0a9cc2b13445",
+          "462cc613-b9f2-4520-9138-85e2fa510ef6",
+          "7826c396-6aca-4ce9-83db-94e4b412f9bb",
+          "b6d0d8c7-8c10-46f6-8e4a-340276cc0ecd",
+          "e7012be2-f3d9-4a3e-ab39-5d109fb7174f",
+          "5ab2a9c6-894d-4e74-8788-b424db8a1357",
+          "728bea78-6d85-4354-b0a0-f7eb44d97254"
+        ],
+        "seeded_count": 12,
+        "dlq_seed_count": 3
+      },
+      "outage_runs": [
+        {
+          "loop": 1,
+          "status": 200,
+          "ok": true,
+          "payload": {
+            "ok": true,
+            "requested_limit": 120,
+            "campaign_code_filter": "P0_11_CERT_20260312_TUNE8",
+            "lease_seconds": 90,
+            "fetched": 12,
+            "sent": 0,
+            "delivered": 0,
+            "failed": 9,
+            "dlq": 3,
+            "reconciliation": {
+              "fetched": 0,
+              "applied": 0,
+              "pending": 0,
+              "dropped": 0,
+              "failed": 0
+            }
+          },
+          "error": null
+        }
+      ],
+      "outage_state": {
+        "total": 12,
+        "queued": 0,
+        "retrying": 9,
+        "dlq": 3,
+        "sent": 0,
+        "delivered": 0,
+        "read": 0,
+        "cancelled": 0,
+        "outage_errors": 12,
+        "dlq_open": 3,
+        "dlq_requeued": 0,
+        "dlq_closed": 0
+      },
+      "dlq_replay": {
+        "status": 200,
+        "ok": true,
+        "payload": {
+          "ok": true,
+          "limit": 120,
+          "campaign_code": "P0_11_CERT_20260312_TUNE8",
+          "channel": null,
+          "replayed": 3,
+          "replayed_job_ids": [
+            "c8eec176-f38f-477d-b783-d78b9d5f051c",
+            "1d2d60af-a37e-43bf-af67-c797728d63cf",
+            "5a7c40a3-32ec-431b-8409-4358426ba950"
+          ]
+        },
+        "error": null
+      },
+      "retrying_requeued_count": 9,
+      "recovery_runs": [
+        {
+          "loop": 1,
+          "status": 200,
+          "ok": true,
+          "payload": {
+            "ok": true,
+            "requested_limit": 120,
+            "campaign_code_filter": "P0_11_CERT_20260312_TUNE8",
+            "lease_seconds": 90,
+            "fetched": 12,
+            "sent": 12,
+            "delivered": 0,
+            "failed": 0,
+            "dlq": 0,
+            "reconciliation": {
+              "fetched": 0,
+              "applied": 0,
+              "pending": 0,
+              "dropped": 0,
+              "failed": 0
+            }
+          },
+          "error": null
+        }
+      ],
+      "final_state": {
+        "total": 12,
+        "queued": 0,
+        "retrying": 0,
+        "dlq": 0,
+        "sent": 12,
+        "delivered": 0,
+        "read": 0,
+        "cancelled": 0,
+        "outage_errors": 12,
+        "dlq_open": 0,
+        "dlq_requeued": 3,
+        "dlq_closed": 0
+      },
+      "final_pending_count": 0
+    },
+    "scenario_projection": {
+      "effective_rps": 5.003,
+      "projected_capacity_users": 54032
+    }
+  },
+  "checks": [
+    {
+      "id": "burst_exam_start_success_rate",
+      "status": "PASS",
+      "detail": "Start success 100% (target >= 95%).",
+      "evidence": {
+        "success_rate_pct": 100,
+        "target_pct": 95
+      }
+    },
+    {
+      "id": "burst_exam_start_p95_latency",
+      "status": "PASS",
+      "detail": "Start p95 1830ms (target <= 2500ms).",
+      "evidence": {
+        "p95_ms": 1830,
+        "target_ms": 2500
+      }
+    },
+    {
+      "id": "burst_results_success_rate",
+      "status": "PASS",
+      "detail": "Results success 100% (target >= 95%).",
+      "evidence": {
+        "success_rate_pct": 100,
+        "target_pct": 95
+      }
+    },
+    {
+      "id": "burst_results_p95_latency",
+      "status": "PASS",
+      "detail": "Results p95 1257ms (target <= 2200ms).",
+      "evidence": {
+        "p95_ms": 1257,
+        "target_ms": 2200
+      }
+    },
+    {
+      "id": "provider_outage_simulation",
+      "status": "PASS",
+      "detail": "Outage simulation captured failures (error-tagged=12, worker_failed_or_dlq=12).",
+      "evidence": {
+        "outage_errors": 12,
+        "worker_failed_or_dlq": 12
+      }
+    },
+    {
+      "id": "dlq_replay_recovery",
+      "status": "PASS",
+      "detail": "DLQ replay returned 3 requeued jobs (seeded immediate-DLQ: 3).",
+      "evidence": {
+        "replayed": 3,
+        "dlq_seed_count": 3
+      }
+    },
+    {
+      "id": "queue_backlog_recovery",
+      "status": "PASS",
+      "detail": "Backlog residual 0/12 (0%) after recovery (target <= 5%).",
+      "evidence": {
+        "pending_jobs": 0,
+        "outage_jobs": 12,
+        "residual_pct": 0,
+        "max_residual_pct": 5
+      }
+    },
+    {
+      "id": "scenario_10k_projection",
+      "status": "PASS",
+      "detail": "Projected capacity 54032 users in 180m (target >= 10000).",
+      "evidence": {
+        "projected_capacity_users": 54032,
+        "target_users": 10000
+      }
+    },
+    {
+      "id": "scenario_15k_projection",
+      "status": "PASS",
+      "detail": "Projected capacity 54032 users in 180m (target >= 15000).",
+      "evidence": {
+        "projected_capacity_users": 54032,
+        "target_users": 15000
+      }
+    },
+    {
+      "id": "signed_report",
+      "status": "PASS",
+      "detail": "Signed report generated with HMAC-SHA256.",
+      "evidence": {
+        "signer": "teachera-ops",
+        "signed": true
+      }
+    }
+  ],
+  "signature": {
+    "algorithm": "HMAC-SHA256",
+    "signer": "teachera-ops",
+    "signed_at_utc": "2026-03-12T08:58:53.688Z",
+    "canonical_sha256": "c9f58e517a6b2959d112b3367ee4dbd14ac6a8639705ed324ce3ab7ec6421c8d",
+    "signature": "c92b11560bc976831079888c537e48a27c56ae3ed974caf1768d2b247386a07e"
+  },
+  "totals": {
+    "pass": 10,
+    "fail": 0,
+    "warn": 0
+  },
+  "overall_ready_for_p0_11": true
+}

@@ -120,9 +120,11 @@ npm run panel:create-admin -- --email admin@teachera.com --name "Panel Admin" --
 - `POST /api/panel/auth/login`
 - `GET /api/panel/auth/me`
 - `POST /api/panel/auth/logout`
+- `GET /api/panel/audit`
 - `POST /api/notifications/worker`
 - `POST /api/notifications/provider-webhook`
 - `GET|POST /api/notifications/dlq-replay`
+- `GET|POST /api/ops/observability/collect`
 - `GET /api/health`
 
 ### Frontend Entegrasyonu
@@ -165,6 +167,81 @@ curl -X POST "https://teachera.com.tr/api/notifications/worker?limit=100&reconci
 - Turnstile server doğrulaması zorunludur:
   - `TURNSTILE_SECRET_KEY` yoksa `/api/forms` istekleri `503 turnstile_not_configured` döner.
   - Geçersiz/eksik token `403 captcha_failed` döner.
+
+### PII Protection + Audit (P0-8)
+- PII alanları (öğrenci/veli ad-soyad, veli telefon/e-posta) artık şifreli kolonlarda tutulur:
+  - `candidates.full_name_enc`, `candidates.full_name_hash`
+  - `guardians.full_name_enc`, `guardians.phone_e164_enc`, `guardians.email_enc`, `guardians.phone_e164_hash`
+- Şifreleme modeli KMS-backed data-key envelope yapısıdır:
+  - `PII_KMS_ENCRYPTED_DATA_KEY_B64`, `PII_KMS_REGION`, `PII_KMS_KEY_ID`
+  - lookup/dedupe için `PII_LOOKUP_HMAC_KEY`
+- Panelde PII erişimi role-scoped:
+  - `SUPER_ADMIN`, `OPERATIONS`: full PII
+  - `READ_ONLY`: masked PII
+- Audit log append-only + hash-chain:
+  - `audit_log_entries`, `audit_log_chain_head`
+  - update/delete trigger ile engellenir
+  - panel operasyonları actor-bound olarak zincire yazılır
+
+Backfill (mevcut plain PII satırlarını şifreli alana taşı + redakte et):
+```bash
+npm run p0:backfill-pii -- --limit 1000
+```
+
+### P0-9 Speed Run (Infra Topology Audit)
+- Time-saving quality bundle:
+```bash
+npm run p0:quick
+```
+- Consolidated topology audit (boundaries + managed infra evidence):
+```bash
+npm run p0:topology:audit -- --http --aws
+```
+- Autodiscover + audit (single command, fastest):
+```bash
+npm run p0:topology:autodiscover
+```
+- Required topology spec:
+  - `guidelines/p0-9-target-topology-10k-15k.md`
+
+### P0-10 Speed Run (Observability + SLO Alarms)
+- Dashboard + alarm seti oluştur/güncelle:
+```bash
+npm run p0:observability:provision
+```
+- Collector endpoint + AWS kaynak doğrulama:
+```bash
+npm run p0:observability:audit -- --http --aws
+```
+- Tek komutlu hızlı P0-10 akışı:
+```bash
+npm run p0:observability:all
+```
+- Kılavuz:
+  - `guidelines/p0-10-observability-slo.md`
+
+Collector endpoint:
+- `GET|POST /api/ops/observability/collect` (CRON_SECRET/Bearer auth)
+- Vercel cron ile 5 dakikada bir tetiklenir (`vercel.json`).
+
+### P0-11 Speed Run (Certified Load + Resilience)
+- Tek komutta burst + outage + backlog recovery + signed report:
+```bash
+npm run p0:load-resilience:certify
+```
+- İmza doğrulama:
+```bash
+npm run p0:load-resilience:verify-signature
+```
+- Tek satır full akış:
+```bash
+npm run p0:load-resilience:all
+```
+- Üretilen dosyalar:
+  - `guidelines/p0-11-load-resilience-report-latest.json`
+  - `guidelines/p0-11-load-resilience-report-latest.md`
+- Kılavuz:
+  - `guidelines/p0-11-load-resilience-certification.md`
 
 ## 📂 Proje Yapısı
 

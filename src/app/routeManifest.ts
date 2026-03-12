@@ -19,6 +19,8 @@ export const STATIC_ROUTE_PATHS = [
   '/hukuki',
   '/metodoloji',
   '/seviye-tespit-sinavi',
+  '/bursluluk-2026',
+  '/panel/login',
   '/speakup',
   '/is-firsatlari',
   '/musteri-temsilcisi-ol',

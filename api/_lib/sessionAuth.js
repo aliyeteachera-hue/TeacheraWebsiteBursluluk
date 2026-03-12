@@ -91,37 +91,37 @@ async function registerSessionFailure({ ip, fingerprint }) {
 
 export async function requireExamSession(req, attemptId) {
   const token = readTokenFromRequest(req);
-  const bruteForceIdentity = await enforceSessionBruteForceGuards(req, token);
   if (!token) {
+    const bruteForceIdentity = await enforceSessionBruteForceGuards(req, token);
     await registerSessionFailure(bruteForceIdentity);
     throw new HttpError(401, 'Exam session token is required.', 'missing_exam_session_token');
   }
 
   const tokenHash = hashSessionToken(token);
   const expectedAttemptId = safeTrim(attemptId);
+  let bruteForceIdentity;
 
   if (isRedisConfigured()) {
     try {
       const cached = await readExamSessionCache(tokenHash);
       if (cached) {
         if (cached.attempt_id !== expectedAttemptId) {
+          bruteForceIdentity = await enforceSessionBruteForceGuards(req, token);
           await registerSessionFailure(bruteForceIdentity);
           throw new HttpError(401, 'Exam session token is invalid.', 'invalid_exam_session_token');
         }
         if (cached.revoked_at) {
+          bruteForceIdentity = await enforceSessionBruteForceGuards(req, token);
           await registerSessionFailure(bruteForceIdentity);
           throw new HttpError(401, 'Exam session token is revoked.', 'revoked_exam_session_token');
         }
         if (new Date(cached.expires_at).getTime() < Date.now()) {
+          bruteForceIdentity = await enforceSessionBruteForceGuards(req, token);
           await registerSessionFailure(bruteForceIdentity);
           throw new HttpError(401, 'Exam session token is expired.', 'expired_exam_session_token');
         }
 
         await touchExamSessionCache(tokenHash, cached.expires_at);
-        await clearBruteForceState({
-          scope: 'exam_session_auth_token',
-          identity: bruteForceIdentity.fingerprint,
-        });
         return cached;
       }
     } catch (error) {
@@ -134,6 +134,8 @@ export async function requireExamSession(req, attemptId) {
       throw error;
     }
   }
+
+  bruteForceIdentity = await enforceSessionBruteForceGuards(req, token);
 
   const { rows } = await query(
     `

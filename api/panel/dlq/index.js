@@ -1,4 +1,5 @@
 import { requireRole } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { NOTIFICATION_CHANNELS, ROLES } from '../../_lib/constants.js';
 import { query } from '../../_lib/db.js';
 import { buildListResponse } from '../../_lib/listResponse.js';
@@ -86,7 +87,7 @@ function buildFilters(listQuery) {
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['GET']);
-    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
+    const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
 
     const listQuery = parseListQuery(req, SORTABLE_COLUMNS, 'created_at', 'desc');
     const { whereClause, params } = buildFilters(listQuery);
@@ -154,6 +155,21 @@ export default async function handler(req, res) {
         summary: summaryResult.rows[0] || {},
       }),
     );
+
+    const ctx = readRequestContext(req);
+    await appendAuditLog({
+      ...buildPanelActor(identity),
+      action: 'PANEL_DLQ_READ',
+      targetType: 'DLQ_LIST',
+      targetId: `${listQuery.page}:${listQuery.perPage}`,
+      requestId: ctx.requestId,
+      ipAddress: ctx.ipAddress,
+      userAgent: ctx.userAgent,
+      metadata: {
+        q: listQuery.q || null,
+        filters: listQuery.filters,
+        returned: dataResult.rows.length,
+      },
+    });
   });
 }
-

@@ -1,4 +1,5 @@
 import { requireRole } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { ROLES } from '../../_lib/constants.js';
 import { query, withTransaction } from '../../_lib/db.js';
 import { HttpError } from '../../_lib/errors.js';
@@ -22,8 +23,9 @@ function normalizeSettingsInput(body) {
 
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
+    const ctx = readRequestContext(req);
     if (req.method === 'GET') {
-      await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
+      const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
       const keysRaw = safeTrim(req.query?.keys);
       const keys = keysRaw
         ? keysRaw
@@ -53,6 +55,20 @@ export default async function handler(req, res) {
 
       ok(res, {
         items: result.rows,
+      });
+
+      await appendAuditLog({
+        ...buildPanelActor(identity),
+        action: 'PANEL_SETTINGS_READ',
+        targetType: 'APP_SETTINGS',
+        requestId: ctx.requestId,
+        ipAddress: ctx.ipAddress,
+        userAgent: ctx.userAgent,
+        metadata: {
+          keyCount: keys.length,
+          keys,
+          returned: result.rows.length,
+        },
       });
       return;
     }
@@ -95,6 +111,18 @@ export default async function handler(req, res) {
       updated: items.length,
       keys: items.map((item) => item.key),
     });
+
+    await appendAuditLog({
+      ...buildPanelActor(identity),
+      action: 'PANEL_SETTINGS_UPDATE',
+      targetType: 'APP_SETTINGS',
+      targetId: String(items.length),
+      requestId: ctx.requestId,
+      ipAddress: ctx.ipAddress,
+      userAgent: ctx.userAgent,
+      metadata: {
+        keys: items.map((item) => item.key),
+      },
+    });
   });
 }
-

@@ -1,4 +1,5 @@
 import { requireRole } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import {
   APPLICATION_STATUS,
   CREDENTIALS_SMS_STATUS,
@@ -16,6 +17,7 @@ import {
   parseFiltersFromQuery,
   safeTrim,
 } from '../../_lib/http.js';
+import { decryptPii, isPrivilegedPiiRole, maskPiiName, maskPiiPhone } from '../../_lib/piiCrypto.js';
 import { buildWhereClause } from '../../_lib/sql.js';
 
 function escapeCsvCell(value) {
@@ -105,7 +107,7 @@ function buildFilterState(req) {
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['GET']);
-    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
+    const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
 
     const { whereClause, params } = buildFilterState(req);
     const result = await query(
@@ -113,11 +115,14 @@ export default async function handler(req, res) {
         SELECT
           candidate_id,
           application_no,
-          student_full_name,
+          student_full_name AS student_full_name_legacy,
+          student_full_name_enc,
           grade,
           school_name,
-          parent_full_name,
-          parent_phone_e164,
+          parent_full_name AS parent_full_name_legacy,
+          parent_full_name_enc,
+          parent_phone_e164 AS parent_phone_e164_legacy,
+          parent_phone_e164_enc,
           application_status,
           credentials_sms_status,
           first_login_at,
@@ -160,8 +165,25 @@ export default async function handler(req, res) {
       'updated_at',
     ];
 
+    const piiScopeFull = isPrivilegedPiiRole(identity.role);
+    const mappedRows = await Promise.all(
+      result.rows.map(async (row) => {
+        const [studentFullNameRaw, parentFullNameRaw, parentPhoneRaw] = await Promise.all([
+          decryptPii(row.student_full_name_enc, row.student_full_name_legacy),
+          decryptPii(row.parent_full_name_enc, row.parent_full_name_legacy),
+          decryptPii(row.parent_phone_e164_enc, row.parent_phone_e164_legacy),
+        ]);
+        return {
+          ...row,
+          student_full_name: piiScopeFull ? studentFullNameRaw : maskPiiName(studentFullNameRaw),
+          parent_full_name: piiScopeFull ? parentFullNameRaw : maskPiiName(parentFullNameRaw),
+          parent_phone_e164: piiScopeFull ? parentPhoneRaw : maskPiiPhone(parentPhoneRaw),
+        };
+      }),
+    );
+
     const lines = [headers.join(',')];
-    for (const row of result.rows) {
+    for (const row of mappedRows) {
       lines.push(headers.map((header) => escapeCsvCell(row[header])).join(','));
     }
 
@@ -170,6 +192,22 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="candidate-operations-${now}.csv"`);
     res.end(lines.join('\n'));
+
+    const ctx = readRequestContext(req);
+    await appendAuditLog({
+      ...buildPanelActor(identity),
+      action: 'PANEL_CANDIDATES_EXPORT',
+      targetType: 'CANDIDATE_EXPORT',
+      targetId: now,
+      requestId: ctx.requestId,
+      ipAddress: ctx.ipAddress,
+      userAgent: ctx.userAgent,
+      metadata: {
+        q: safeTrim(req.query?.q) || null,
+        filters: parseFiltersFromQuery(req.query?.filters),
+        rowCount: mappedRows.length,
+        piiScope: piiScopeFull ? 'FULL' : 'MASKED',
+      },
+    });
   });
 }
-

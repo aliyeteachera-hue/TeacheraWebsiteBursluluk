@@ -1,9 +1,11 @@
 import { requireRole } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { ROLES } from '../../_lib/constants.js';
 import { query, withTransaction } from '../../_lib/db.js';
 import { HttpError } from '../../_lib/errors.js';
 import { handleRequest, methodGuard, ok, parseBody, safeTrim } from '../../_lib/http.js';
 import { enqueueNotification } from '../../_lib/notifications.js';
+import { decryptPii } from '../../_lib/piiCrypto.js';
 
 function normalizeCandidateIds(raw) {
   if (!Array.isArray(raw)) return [];
@@ -16,7 +18,8 @@ async function getCandidatesByIds(candidateIds) {
       SELECT
         c.id AS candidate_id,
         c.campaign_code,
-        g.phone_e164 AS parent_phone_e164,
+        g.phone_e164 AS parent_phone_e164_legacy,
+        g.phone_e164_enc AS parent_phone_e164_enc,
         ea.id AS attempt_id,
         r.id AS result_id
       FROM candidates c
@@ -38,7 +41,7 @@ async function getCandidatesByIds(candidateIds) {
 
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
-    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS]);
+    const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS]);
     methodGuard(req, ['POST']);
 
     const body = await parseBody(req);
@@ -56,7 +59,13 @@ export default async function handler(req, res) {
       throw new HttpError(400, 'Unsupported action.', 'invalid_action');
     }
 
-    const candidates = await getCandidatesByIds(candidateIds);
+    const candidateRows = await getCandidatesByIds(candidateIds);
+    const candidates = await Promise.all(
+      candidateRows.map(async (row) => ({
+        ...row,
+        parent_phone_e164: await decryptPii(row.parent_phone_e164_enc, row.parent_phone_e164_legacy),
+      })),
+    );
     if (candidates.length === 0) {
       throw new HttpError(404, 'No matching candidates found.', 'candidates_not_found');
     }
@@ -90,6 +99,21 @@ export default async function handler(req, res) {
         action,
         processed: candidates.length,
       });
+
+      const ctx = readRequestContext(req);
+      await appendAuditLog({
+        ...buildPanelActor(identity),
+        action: 'PANEL_CANDIDATE_NOTE_ADD',
+        targetType: 'CANDIDATE_BATCH',
+        targetId: String(candidates.length),
+        requestId: ctx.requestId,
+        ipAddress: ctx.ipAddress,
+        userAgent: ctx.userAgent,
+        metadata: {
+          candidateIds: candidates.map((item) => item.candidate_id),
+          noteLength: note.length,
+        },
+      });
       return;
     }
 
@@ -122,6 +146,20 @@ export default async function handler(req, res) {
       skipped: candidateIds.length - enqueued.length,
       job_ids: enqueued.map((item) => item.jobId),
     });
+
+    const ctx = readRequestContext(req);
+    await appendAuditLog({
+      ...buildPanelActor(identity),
+      action: action === 'sms_retry' ? 'PANEL_CANDIDATE_SMS_RETRY' : 'PANEL_CANDIDATE_WA_SEND',
+      targetType: 'CANDIDATE_BATCH',
+      targetId: String(candidateIds.length),
+      requestId: ctx.requestId,
+      ipAddress: ctx.ipAddress,
+      userAgent: ctx.userAgent,
+      metadata: {
+        candidateIds,
+        enqueuedJobIds: enqueued.map((item) => item.jobId),
+      },
+    });
   });
 }
-

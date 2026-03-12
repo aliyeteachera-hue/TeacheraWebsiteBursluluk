@@ -1,7 +1,9 @@
 import { requireRole } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { ROLES, UNVIEWED_RESULTS_COLUMNS, WA_RESULT_STATUS } from '../../_lib/constants.js';
 import { query } from '../../_lib/db.js';
 import { buildListResponse } from '../../_lib/listResponse.js';
+import { decryptPii, isPrivilegedPiiRole, maskPiiName } from '../../_lib/piiCrypto.js';
 import {
   handleRequest,
   methodGuard,
@@ -74,7 +76,7 @@ function buildFilters(listQuery) {
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['GET']);
-    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
+    const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
 
     const listQuery = parseListQuery(req, UNVIEWED_RESULTS_COLUMNS, 'result_published_at', 'desc');
     const { whereClause, params } = buildFilters(listQuery);
@@ -90,7 +92,8 @@ export default async function handler(req, res) {
       `
         SELECT
           candidate_id,
-          student_full_name,
+          student_full_name AS student_full_name_legacy,
+          student_full_name_enc,
           school_name,
           grade,
           result_published_at,
@@ -127,16 +130,50 @@ export default async function handler(req, res) {
       params.slice(0, -2),
     );
 
+    const piiScopeFull = isPrivilegedPiiRole(identity.role);
+    const items = await Promise.all(
+      dataResult.rows.map(async (row) => {
+        const studentFullNameRaw = await decryptPii(row.student_full_name_enc, row.student_full_name_legacy);
+        return {
+          ...row,
+          student_full_name: piiScopeFull ? studentFullNameRaw : maskPiiName(studentFullNameRaw),
+        };
+      }),
+    );
+
     ok(
       res,
       buildListResponse({
-        items: dataResult.rows,
+        items: items.map((item) => {
+          const {
+            student_full_name_legacy: _legacy,
+            student_full_name_enc: _enc,
+            ...rest
+          } = item;
+          return rest;
+        }),
         total: Number(countResult.rows[0]?.total || 0),
         page: listQuery.page,
         perPage: listQuery.perPage,
         summary: summaryResult.rows[0] || {},
       }),
     );
+
+    const ctx = readRequestContext(req);
+    await appendAuditLog({
+      ...buildPanelActor(identity),
+      action: 'PANEL_UNVIEWED_RESULTS_READ',
+      targetType: 'UNVIEWED_RESULTS',
+      targetId: `${listQuery.page}:${listQuery.perPage}`,
+      requestId: ctx.requestId,
+      ipAddress: ctx.ipAddress,
+      userAgent: ctx.userAgent,
+      metadata: {
+        q: listQuery.q || null,
+        filters: listQuery.filters,
+        returned: items.length,
+        piiScope: piiScopeFull ? 'FULL' : 'MASKED',
+      },
+    });
   });
 }
-

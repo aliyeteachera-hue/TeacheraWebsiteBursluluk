@@ -1,9 +1,11 @@
 import { requireRole } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { ROLES } from '../../_lib/constants.js';
 import { query } from '../../_lib/db.js';
 import { HttpError } from '../../_lib/errors.js';
 import { handleRequest, methodGuard, ok, parseBody, safeTrim } from '../../_lib/http.js';
 import { enqueueNotification } from '../../_lib/notifications.js';
+import { decryptPii } from '../../_lib/piiCrypto.js';
 
 function normalizeCandidateIds(raw) {
   if (!Array.isArray(raw)) return [];
@@ -13,7 +15,7 @@ function normalizeCandidateIds(raw) {
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['POST']);
-    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS]);
+    const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS]);
 
     const body = await parseBody(req);
     if (!body || typeof body !== 'object') {
@@ -36,7 +38,8 @@ export default async function handler(req, res) {
         SELECT
           c.id AS candidate_id,
           c.campaign_code,
-          g.phone_e164 AS parent_phone_e164,
+          g.phone_e164 AS parent_phone_e164_legacy,
+          g.phone_e164_enc AS parent_phone_e164_enc,
           ea.id AS attempt_id,
           r.id AS result_id
         FROM candidates c
@@ -56,7 +59,14 @@ export default async function handler(req, res) {
       [candidateIds],
     );
 
-    const jobs = rows
+    const rowsWithPhone = await Promise.all(
+      rows.map(async (row) => ({
+        ...row,
+        parent_phone_e164: await decryptPii(row.parent_phone_e164_enc, row.parent_phone_e164_legacy),
+      })),
+    );
+
+    const jobs = rowsWithPhone
       .filter((row) => row.parent_phone_e164)
       .map((row) =>
         enqueueNotification({
@@ -83,6 +93,21 @@ export default async function handler(req, res) {
       skipped: candidateIds.length - created.length,
       job_ids: created.map((item) => item.jobId),
     });
+
+    const ctx = readRequestContext(req);
+    await appendAuditLog({
+      ...buildPanelActor(identity),
+      action: 'PANEL_UNVIEWED_RESULTS_WA_SEND',
+      targetType: 'CANDIDATE_BATCH',
+      targetId: String(candidateIds.length),
+      requestId: ctx.requestId,
+      ipAddress: ctx.ipAddress,
+      userAgent: ctx.userAgent,
+      metadata: {
+        candidateIds,
+        templateCode,
+        enqueuedJobIds: created.map((item) => item.jobId),
+      },
+    });
   });
 }
-

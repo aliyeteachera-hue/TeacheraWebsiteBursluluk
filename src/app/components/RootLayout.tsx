@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense, type CSSProperties } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { Outlet, useLocation } from 'react-router';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -131,28 +131,38 @@ export default function RootLayout() {
     currentSectionRef.current = currentSection;
   }, [currentSection]);
 
-  const isAuthPage = location.pathname === '/giris';
+  const isPanelLoginPage = location.pathname === '/panel/login';
+  const isAuthPage = location.pathname === '/giris' || isPanelLoginPage;
+  const rootStyle =
+    location.pathname === '/bursluluk-2026'
+      ? ({ '--fill-0': '#FFFFFF' } as CSSProperties)
+      : undefined;
 
   return (
     <FreeTrialProvider>
       <LevelAssessmentProvider>
-        <div className="relative min-h-screen bg-[#00000B]">
+        <div className="relative min-h-screen bg-[#00000B]" style={rootStyle}>
           <SeoManager />
-          <Navigation
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            currentSection={currentSection}
-          />
 
-          <AnimatePresence mode="wait" initial={false}>
-            {isMenuOpen ? (
-              <MobileMenu
-                key="mobile-menu"
-                onClose={() => setIsMenuOpen(false)}
-                currentSection={currentSection}
-              />
-            ) : null}
-          </AnimatePresence>
+          {!isPanelLoginPage && (
+            <Navigation
+              isMenuOpen={isMenuOpen}
+              setIsMenuOpen={setIsMenuOpen}
+              currentSection={currentSection}
+            />
+          )}
+
+          {!isPanelLoginPage && (
+            <AnimatePresence mode="wait" initial={false}>
+              {isMenuOpen ? (
+                <MobileMenu
+                  key="mobile-menu"
+                  onClose={() => setIsMenuOpen(false)}
+                  currentSection={currentSection}
+                />
+              ) : null}
+            </AnimatePresence>
+          )}
 
           <main className="relative">
             <Outlet />
@@ -160,14 +170,20 @@ export default function RootLayout() {
 
           {!isAuthPage && <Footer />}
 
-          <LevelAssessmentModal />
-          <FreeTrialModal />
+          {!isPanelLoginPage && (
+            <>
+              <LevelAssessmentModal />
+              <FreeTrialModal />
+            </>
+          )}
           <AppToaster />
 
-          <Suspense fallback={null}>
-            <WhatsAppButton />
-            {showDeferredUi && <CookieConsent />}
-          </Suspense>
+          {!isPanelLoginPage && (
+            <Suspense fallback={null}>
+              <WhatsAppButton />
+              {showDeferredUi && <CookieConsent />}
+            </Suspense>
+          )}
 
           <SpeedInsights sampleRate={0.5} />
         </div>

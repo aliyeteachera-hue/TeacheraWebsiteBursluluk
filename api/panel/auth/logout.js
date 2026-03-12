@@ -1,3 +1,5 @@
+import { getPanelIdentity } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { query } from '../../_lib/db.js';
 import { handleRequest, methodGuard, ok } from '../../_lib/http.js';
 import {
@@ -29,6 +31,8 @@ async function revokeSessionFromToken(token) {
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['POST']);
+    const ctx = readRequestContext(req);
+    const identity = await getPanelIdentity(req);
 
     const token = extractPanelSessionToken(req);
     if (token) {
@@ -39,5 +43,21 @@ export default async function handler(req, res) {
     ok(res, {
       logged_out: true,
     });
+
+    try {
+      await appendAuditLog({
+        ...(identity.authenticated
+          ? buildPanelActor(identity)
+          : { actorType: 'PANEL_USER', actorId: 'anonymous' }),
+        action: 'PANEL_LOGOUT',
+        targetType: 'ADMIN_SESSION',
+        targetId: identity.sessionId || null,
+        requestId: ctx.requestId,
+        ipAddress: ctx.ipAddress,
+        userAgent: ctx.userAgent,
+      });
+    } catch (auditError) {
+      console.error('[panel_logout_audit_error]', auditError);
+    }
   });
 }

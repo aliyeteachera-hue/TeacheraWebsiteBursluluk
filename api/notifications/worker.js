@@ -38,6 +38,25 @@ function resolveProviderConfig(channel) {
   };
 }
 
+function resolveFaultRecipientBehavior(job) {
+  const recipient = safeTrim(job?.recipient).toLowerCase();
+  if (!recipient.startsWith('fault://')) {
+    return null;
+  }
+
+  if (recipient.startsWith('fault://provider-outage/')) {
+    throw new Error('simulated_provider_outage');
+  }
+
+  if (recipient.startsWith('fault://provider-ok/')) {
+    return {
+      providerMessageId: `simulated-${safeTrim(job?.id)}`,
+    };
+  }
+
+  throw new Error('simulated_fault_recipient_invalid');
+}
+
 function shouldAssumeDelivered() {
   return safeTrim(process.env.NOTIFICATION_ASSUME_DELIVERED || 'false').toLowerCase() === 'true';
 }
@@ -57,7 +76,7 @@ function resolveWorkerLeaseSeconds(raw) {
   );
 }
 
-async function lockPendingJobs(limit, leaseSeconds) {
+async function lockPendingJobs(limit, leaseSeconds, campaignCode = '') {
   return withTransaction(async (client) => {
     const result = await client.query(
       `
@@ -66,6 +85,7 @@ async function lockPendingJobs(limit, leaseSeconds) {
           FROM notification_jobs
           WHERE status IN ('QUEUED', 'RETRYING')
             AND (next_retry_at IS NULL OR next_retry_at <= NOW())
+            AND ($3::text = '' OR campaign_code = $3)
           ORDER BY created_at ASC
           LIMIT $1
           FOR UPDATE SKIP LOCKED
@@ -79,7 +99,7 @@ async function lockPendingJobs(limit, leaseSeconds) {
         WHERE nj.id = pending.id
         RETURNING nj.id, nj.channel, nj.template_code, nj.recipient, nj.payload, nj.retry_count
       `,
-      [limit, leaseSeconds],
+      [limit, leaseSeconds, campaignCode],
     );
 
     return result.rows;
@@ -87,6 +107,11 @@ async function lockPendingJobs(limit, leaseSeconds) {
 }
 
 async function sendJobToProvider(job) {
+  const faultBehavior = resolveFaultRecipientBehavior(job);
+  if (faultBehavior) {
+    return faultBehavior;
+  }
+
   const config = resolveProviderConfig(job.channel);
   if (!config.endpoint) {
     throw new Error(`missing_provider_endpoint_${job.channel}`);
@@ -160,6 +185,7 @@ export default async function handler(req, res) {
 
     const body = req.method === 'GET' ? null : await parseBody(req);
     const limit = readBoundedInt(body?.limit ?? req.query?.limit ?? 50, 50, 1, 200);
+    const campaignCode = safeTrim(body?.campaign_code ?? body?.campaignCode ?? req.query?.campaign_code).slice(0, 120);
     const reconcileLimit = readBoundedInt(
       body?.reconcile_limit ?? body?.reconcileLimit ?? req.query?.reconcile_limit ?? process.env.NOTIFICATION_RECONCILE_LIMIT ?? 50,
       50,
@@ -168,9 +194,10 @@ export default async function handler(req, res) {
     );
     const leaseSeconds = resolveWorkerLeaseSeconds(body?.lease_seconds ?? req.query?.lease_seconds);
     const assumeDelivered = shouldAssumeDelivered();
-    const jobs = await lockPendingJobs(limit, leaseSeconds);
+    const jobs = await lockPendingJobs(limit, leaseSeconds, campaignCode);
     const summary = {
       requested_limit: limit,
+      campaign_code_filter: campaignCode || null,
       lease_seconds: leaseSeconds,
       fetched: jobs.length,
       sent: 0,

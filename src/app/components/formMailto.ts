@@ -7,8 +7,20 @@ export interface MailDraftOptions {
   lines: string[];
 }
 
+function normalizeConfiguredValue(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+}
+
 export function applyRecipientToConfiguredEndpoint(configured: string, to: string) {
-  const trimmed = configured.trim();
+  const trimmed = normalizeConfiguredValue(configured);
   if (!trimmed) return `https://formsubmit.co/ajax/${to}`;
 
   if (trimmed.includes('{{to}}')) {
@@ -37,32 +49,6 @@ export function applyRecipientToConfiguredEndpoint(configured: string, to: strin
   } catch {
     return trimmed;
   }
-}
-
-function resolveEndpoint(to: string) {
-  if (typeof window === 'undefined') {
-    return {
-      endpoint: `https://formsubmit.co/ajax/${to}`,
-      endpointDomain: 'server_runtime',
-    };
-  }
-
-  const configuredEndpoint =
-    import.meta.env.VITE_FORMS_ENDPOINT_TEMPLATE ||
-    import.meta.env.VITE_FORMS_ENDPOINT ||
-    '';
-  const endpoint = configuredEndpoint
-    ? applyRecipientToConfiguredEndpoint(configuredEndpoint, to)
-    : `https://formsubmit.co/ajax/${to}`;
-  const endpointDomain = (() => {
-    try {
-      return new URL(endpoint, window.location.origin).hostname;
-    } catch {
-      return 'invalid_endpoint';
-    }
-  })();
-
-  return { endpoint, endpointDomain };
 }
 
 export function buildFields(lines: string[]) {
@@ -96,46 +82,7 @@ export function toSubjectKey(subject: string) {
 }
 
 function getProxyEndpoint() {
-  return (import.meta.env.VITE_FORMS_PROXY_ENDPOINT || '/api/forms').trim();
-}
-
-async function submitViaDirectFallback(
-  options: MailDraftOptions,
-  subjectKey: string,
-  fieldCount: number,
-  reason: string,
-): Promise<boolean> {
-  const { to = 'data@teachera.com.tr', subject, lines } = options;
-  const { endpoint, endpointDomain } = resolveEndpoint(to);
-  const payload = buildLegacyPayload(subject, lines);
-
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    });
-
-    if (!response.ok) {
-      throw new Error(`dev_fallback_status_${response.status}`);
-    }
-
-    trackEvent('lead_form_submit_success', {
-      form_subject: subjectKey,
-      form_id: `lead_${subjectKey}`,
-      field_count: fieldCount,
-      delivery_method: 'direct_fallback',
-      endpoint_domain: endpointDomain,
-      fallback_reason: reason,
-    });
-    return true;
-  } catch {
-    return false;
-  }
+  return normalizeConfiguredValue(import.meta.env.VITE_FORMS_PROXY_ENDPOINT || '/api/forms');
 }
 
 export async function openMailDraft({ to = 'data@teachera.com.tr', subject, lines }: MailDraftOptions): Promise<boolean> {
@@ -154,6 +101,18 @@ export async function openMailDraft({ to = 'data@teachera.com.tr', subject, line
   const subjectKey = toSubjectKey(subject);
   const captchaEnabled = isCaptchaEnabled();
   const captchaToken = await resolveCaptchaToken('lead_form');
+
+  if (captchaEnabled && !captchaToken) {
+    trackEvent('lead_form_submit_failure', {
+      form_subject: subjectKey,
+      form_id: `lead_${subjectKey}`,
+      field_count: fieldCount,
+      delivery_method: 'proxy_fetch',
+      captcha_enabled: true,
+      error_message: 'captcha_token_unavailable',
+    });
+    return false;
+  }
 
   trackEvent('lead_form_submit_attempt', {
     form_subject: subjectKey,
@@ -181,16 +140,30 @@ export async function openMailDraft({ to = 'data@teachera.com.tr', subject, line
       keepalive: true,
     });
 
-    if (!response.ok) {
-      let proxyReason = `proxy_status_${response.status}`;
-      try {
-        const payload = await response.clone().json() as { error?: string; reason?: string };
-        const parts = [proxyReason, payload?.error, payload?.reason].filter(Boolean);
-        proxyReason = parts.join('_');
-      } catch {
-        // Keep generic status message.
-      }
-      throw new Error(proxyReason);
+    let proxyPayload: {
+      ok?: boolean;
+      error?: string;
+      reason?: string;
+      delivery?: string;
+      upstream_status?: number;
+    } | null = null;
+    try {
+      proxyPayload = await response.clone().json() as {
+        ok?: boolean;
+        error?: string;
+        reason?: string;
+      };
+    } catch {
+      // Ignore non-JSON payload.
+    }
+
+    if (!response.ok || proxyPayload?.ok === false) {
+      const proxyReason = [
+        `proxy_status_${response.status}`,
+        proxyPayload?.error,
+        proxyPayload?.reason,
+      ].filter(Boolean).join('_');
+      throw new Error(proxyReason || `proxy_status_${response.status}`);
     }
 
     trackEvent('lead_form_submit_success', {
@@ -204,14 +177,6 @@ export async function openMailDraft({ to = 'data@teachera.com.tr', subject, line
   } catch (error) {
     const fallbackReason =
       error instanceof Error && error.message ? error.message.slice(0, 120) : 'proxy_unknown_error';
-    const fallbackSent = await submitViaDirectFallback(
-      { to, subject, lines },
-      subjectKey,
-      fieldCount,
-      fallbackReason,
-    );
-    if (fallbackSent) return true;
-
     trackEvent('lead_form_submit_failure', {
       form_subject: subjectKey,
       form_id: `lead_${subjectKey}`,

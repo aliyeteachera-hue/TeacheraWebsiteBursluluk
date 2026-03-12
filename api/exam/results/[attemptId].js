@@ -1,9 +1,21 @@
 import { getPanelIdentity } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { withTransaction } from '../../_lib/db.js';
 import { HttpError } from '../../_lib/errors.js';
 import { handleRequest, methodGuard, ok, safeTrim } from '../../_lib/http.js';
+import { isAuthorizedLoadTestMode } from '../../_lib/loadTestMode.js';
+import { decryptPii, isPrivilegedPiiRole, maskPiiName, maskPiiPhone } from '../../_lib/piiCrypto.js';
 import { enforceRateLimit, getRequestIp } from '../../_lib/redisRateLimit.js';
 import { requireExamSession } from '../../_lib/sessionAuth.js';
+
+function shouldIncludePii(req) {
+  const queryValue = Array.isArray(req.query?.include_pii) ? req.query.include_pii[0] : req.query?.include_pii;
+  const headerValue = req.headers?.['x-include-pii'];
+  const raw = safeTrim(queryValue || headerValue || '');
+  if (!raw) return true;
+  const normalized = raw.toLowerCase();
+  return !['0', 'false', 'no', 'off'].includes(normalized);
+}
 
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
@@ -17,6 +29,9 @@ export default async function handler(req, res) {
 
     const panelIdentity = await getPanelIdentity(req);
     const isPanelRequest = panelIdentity.authenticated;
+    const includePii = shouldIncludePii(req);
+    const loadTestMode = isAuthorizedLoadTestMode(req);
+    const effectiveIncludePii = loadTestMode && !isPanelRequest ? false : includePii;
 
     if (isPanelRequest) {
       await enforceRateLimit(req, res, {
@@ -31,69 +46,110 @@ export default async function handler(req, res) {
         errorMessage: 'Panel result requests are temporarily throttled.',
       });
     } else {
-      await enforceRateLimit(req, res, {
-        scope: 'exam_result_candidate_ip',
-        identity: getRequestIp(req),
-        limitEnv: 'RL_EXAM_RESULT_IP_LIMIT',
-        windowSecondsEnv: 'RL_EXAM_RESULT_IP_WINDOW_SECONDS',
-        defaultLimit: 90,
-        defaultWindowSeconds: 60,
-        requireRedis: true,
-        errorCode: 'exam_result_rate_limited',
-        errorMessage: 'Too many result requests. Please retry shortly.',
-      });
-
+      if (!loadTestMode) {
+        await enforceRateLimit(req, res, {
+          scope: 'exam_result_candidate_ip',
+          identity: getRequestIp(req),
+          limitEnv: 'RL_EXAM_RESULT_IP_LIMIT',
+          windowSecondsEnv: 'RL_EXAM_RESULT_IP_WINDOW_SECONDS',
+          defaultLimit: 90,
+          defaultWindowSeconds: 60,
+          requireRedis: true,
+          errorCode: 'exam_result_rate_limited',
+          errorMessage: 'Too many result requests. Please retry shortly.',
+        });
+      }
       await requireExamSession(req, attemptId);
-
-      await enforceRateLimit(req, res, {
-        scope: 'exam_result_candidate_attempt',
-        identity: attemptId,
-        limitEnv: 'RL_EXAM_RESULT_ATTEMPT_LIMIT',
-        windowSecondsEnv: 'RL_EXAM_RESULT_ATTEMPT_WINDOW_SECONDS',
-        defaultLimit: 30,
-        defaultWindowSeconds: 60,
-        requireRedis: true,
-        errorCode: 'exam_result_attempt_rate_limited',
-        errorMessage: 'Result view rate exceeded for this attempt. Please retry shortly.',
-      });
+      if (!loadTestMode) {
+        await enforceRateLimit(req, res, {
+          scope: 'exam_result_candidate_attempt',
+          identity: attemptId,
+          limitEnv: 'RL_EXAM_RESULT_ATTEMPT_LIMIT',
+          windowSecondsEnv: 'RL_EXAM_RESULT_ATTEMPT_WINDOW_SECONDS',
+          defaultLimit: 30,
+          defaultWindowSeconds: 60,
+          requireRedis: true,
+          errorCode: 'exam_result_attempt_rate_limited',
+          errorMessage: 'Result view rate exceeded for this attempt. Please retry shortly.',
+        });
+      }
     }
 
     const payload = await withTransaction(async (client) => {
       const resultLookup = await client.query(
-        `
-          SELECT
-            r.id AS result_id,
-            r.status,
-            r.score,
-            r.percentage,
-            r.correct_count,
-            r.wrong_count,
-            r.unanswered_count,
-            r.placement_label,
-            r.cefr_band,
-            r.published_at,
-            r.viewed_at,
-            ea.id AS attempt_id,
-            ea.status AS exam_status,
-            ea.exam_language,
-            ea.exam_age_range,
-            ea.question_count,
-            ea.started_at,
-            ea.submitted_at,
-            c.id AS candidate_id,
-            c.full_name AS student_full_name,
-            c.grade,
-            s.name AS school_name,
-            g.full_name AS parent_full_name,
-            g.phone_e164 AS parent_phone_e164
-          FROM results r
-          JOIN exam_attempts ea ON ea.id = r.attempt_id
-          JOIN candidates c ON c.id = r.candidate_id
-          LEFT JOIN schools s ON s.id = c.school_id
-          LEFT JOIN guardians g ON g.id = c.guardian_id
-          WHERE r.attempt_id = $1
-          LIMIT 1
-        `,
+        loadTestMode && !isPanelRequest
+          ? `
+              SELECT
+                r.id AS result_id,
+                r.status,
+                r.score,
+                r.percentage,
+                r.correct_count,
+                r.wrong_count,
+                r.unanswered_count,
+                r.placement_label,
+                r.cefr_band,
+                r.published_at,
+                r.viewed_at,
+                ea.id AS attempt_id,
+                ea.status AS exam_status,
+                ea.exam_language,
+                ea.exam_age_range,
+                ea.question_count,
+                ea.started_at,
+                ea.submitted_at,
+                c.id AS candidate_id,
+                NULL::text AS student_full_name_legacy,
+                NULL::bytea AS student_full_name_enc,
+                c.grade,
+                NULL::text AS school_name,
+                NULL::text AS parent_full_name_legacy,
+                NULL::bytea AS parent_full_name_enc,
+                NULL::text AS parent_phone_e164_legacy,
+                NULL::bytea AS parent_phone_e164_enc
+              FROM results r
+              JOIN exam_attempts ea ON ea.id = r.attempt_id
+              JOIN candidates c ON c.id = r.candidate_id
+              WHERE r.attempt_id = $1
+              LIMIT 1
+            `
+          : `
+              SELECT
+                r.id AS result_id,
+                r.status,
+                r.score,
+                r.percentage,
+                r.correct_count,
+                r.wrong_count,
+                r.unanswered_count,
+                r.placement_label,
+                r.cefr_band,
+                r.published_at,
+                r.viewed_at,
+                ea.id AS attempt_id,
+                ea.status AS exam_status,
+                ea.exam_language,
+                ea.exam_age_range,
+                ea.question_count,
+                ea.started_at,
+                ea.submitted_at,
+                c.id AS candidate_id,
+                c.full_name AS student_full_name_legacy,
+                c.full_name_enc AS student_full_name_enc,
+                c.grade,
+                s.name AS school_name,
+                g.full_name AS parent_full_name_legacy,
+                g.full_name_enc AS parent_full_name_enc,
+                g.phone_e164 AS parent_phone_e164_legacy,
+                g.phone_e164_enc AS parent_phone_e164_enc
+              FROM results r
+              JOIN exam_attempts ea ON ea.id = r.attempt_id
+              JOIN candidates c ON c.id = r.candidate_id
+              LEFT JOIN schools s ON s.id = c.school_id
+              LEFT JOIN guardians g ON g.id = c.guardian_id
+              WHERE r.attempt_id = $1
+              LIMIT 1
+            `,
         [attemptId],
       );
 
@@ -102,7 +158,7 @@ export default async function handler(req, res) {
       }
 
       const row = resultLookup.rows[0];
-      if (!isPanelRequest && !row.viewed_at) {
+      if (!loadTestMode && !isPanelRequest && !row.viewed_at) {
         await client.query(
           `
             UPDATE results
@@ -133,14 +189,49 @@ export default async function handler(req, res) {
       return row;
     });
 
+    const [studentFullNameRaw, parentFullNameRaw, parentPhoneRaw] = effectiveIncludePii
+      ? await Promise.all([
+          decryptPii(payload.student_full_name_enc, payload.student_full_name_legacy),
+          decryptPii(payload.parent_full_name_enc, payload.parent_full_name_legacy),
+          decryptPii(payload.parent_phone_e164_enc, payload.parent_phone_e164_legacy),
+        ])
+      : [
+          payload.student_full_name_legacy || null,
+          payload.parent_full_name_legacy || null,
+          payload.parent_phone_e164_legacy || null,
+        ];
+
+    const shouldMaskPii = isPanelRequest && !isPrivilegedPiiRole(panelIdentity.role);
+    const studentFullName = shouldMaskPii ? maskPiiName(studentFullNameRaw) : studentFullNameRaw;
+    const parentFullName = shouldMaskPii ? maskPiiName(parentFullNameRaw) : parentFullNameRaw;
+    const parentPhoneE164 = shouldMaskPii ? maskPiiPhone(parentPhoneRaw) : parentPhoneRaw;
+
+    if (isPanelRequest) {
+      const ctx = readRequestContext(req);
+      await appendAuditLog({
+        ...buildPanelActor(panelIdentity),
+        action: 'PANEL_RESULT_READ',
+        targetType: 'RESULT',
+        targetId: payload.result_id,
+        requestId: ctx.requestId,
+        ipAddress: ctx.ipAddress,
+        userAgent: ctx.userAgent,
+          metadata: {
+            attemptId: payload.attempt_id,
+            candidateId: payload.candidate_id,
+            piiScope: effectiveIncludePii ? (shouldMaskPii ? 'MASKED' : 'FULL') : 'SKIPPED',
+          },
+        });
+    }
+
     ok(res, {
       result: {
         result_id: payload.result_id,
         attempt_id: payload.attempt_id,
         candidate_id: payload.candidate_id,
-        student_full_name: payload.student_full_name,
-        parent_full_name: payload.parent_full_name,
-        parent_phone_e164: payload.parent_phone_e164,
+        student_full_name: studentFullName,
+        parent_full_name: parentFullName,
+        parent_phone_e164: parentPhoneE164,
         school_name: payload.school_name,
         grade: payload.grade,
         exam_status: payload.exam_status,
@@ -159,6 +250,7 @@ export default async function handler(req, res) {
         submitted_at: payload.submitted_at,
         published_at: payload.published_at,
         viewed_at: payload.viewed_at,
+        pii_included: effectiveIncludePii,
       },
     });
   });

@@ -109,6 +109,43 @@ function resolveContactIdentity(fields, to, fallbackIp) {
   return candidates.map((value) => safeTrim(value)).find(Boolean) || fallbackIp || 'unknown';
 }
 
+function normalizeAbsoluteUrl(value) {
+  const raw = safeTrim(value);
+  if (!raw) return null;
+
+  try {
+    return new URL(raw);
+  } catch {
+    return null;
+  }
+}
+
+function resolveUpstreamHeaders(req, formSource) {
+  const siteUrl = normalizeAbsoluteUrl(process.env.VITE_SITE_URL || 'https://teachera.com.tr');
+  const sourceUrl = normalizeAbsoluteUrl(formSource);
+  const requestOrigin = safeTrim(req.headers?.origin);
+  const requestReferer = safeTrim(req.headers?.referer);
+  const fallbackOrigin = siteUrl?.origin || '';
+  const origin = requestOrigin || sourceUrl?.origin || fallbackOrigin;
+  const referer = requestReferer || sourceUrl?.toString() || (origin ? `${origin}/` : '');
+  const headers = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Accept-Language': 'tr-TR,tr;q=0.9,en;q=0.8',
+    'User-Agent': 'Mozilla/5.0 (compatible; TeacheraFormsProxy/1.0; +https://teachera.com.tr)',
+  };
+
+  if (origin) {
+    headers.Origin = origin;
+  }
+  if (referer) {
+    headers.Referer = referer;
+  }
+
+  return headers;
+}
+
 async function verifyTurnstileToken(token, remoteIp) {
   const secret = safeTrim(process.env.TURNSTILE_SECRET_KEY);
   if (!secret) {
@@ -298,10 +335,7 @@ export default async function handler(req, res) {
 
     const upstreamResponse = await fetch(upstreamEndpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
+      headers: resolveUpstreamHeaders(req, formSource),
       body: JSON.stringify(upstreamPayload),
     });
 

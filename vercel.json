@@ -12,6 +12,10 @@
     {
       "path": "/api/notifications/worker?limit=100&reconcile_limit=100",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/ops/observability/collect?sample_size=5&timeout_ms=4500",
+      "schedule": "*/5 * * * *"
     }
   ],
   "redirects": [

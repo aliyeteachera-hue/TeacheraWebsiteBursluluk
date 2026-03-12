@@ -1,4 +1,5 @@
 import { requireRole } from '../../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { ROLES } from '../../_lib/constants.js';
 import { withTransaction } from '../../_lib/db.js';
 import { HttpError } from '../../_lib/errors.js';
@@ -12,7 +13,7 @@ function normalizeIds(raw) {
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['POST']);
-    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS]);
+    const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS]);
 
     const body = await parseBody(req);
     if (!body || typeof body !== 'object') {
@@ -92,6 +93,20 @@ export default async function handler(req, res) {
       requested: jobIds.length,
       updated,
     });
+
+    const ctx = readRequestContext(req);
+    await appendAuditLog({
+      ...buildPanelActor(identity),
+      action: `PANEL_NOTIFICATIONS_${action.toUpperCase()}`,
+      targetType: 'NOTIFICATION_JOB_BATCH',
+      targetId: String(jobIds.length),
+      requestId: ctx.requestId,
+      ipAddress: ctx.ipAddress,
+      userAgent: ctx.userAgent,
+      metadata: {
+        jobIds,
+        updated,
+      },
+    });
   });
 }
-

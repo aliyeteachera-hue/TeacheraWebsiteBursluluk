@@ -1,4 +1,5 @@
 import { requireRole } from '../_lib/auth.js';
+import { appendAuditLog, buildPanelActor, readRequestContext } from '../_lib/auditLog.js';
 import { ROLES } from '../_lib/constants.js';
 import { query } from '../_lib/db.js';
 import { handleRequest, methodGuard, ok, parseDateRange, parseFiltersFromQuery, safeTrim } from '../_lib/http.js';
@@ -25,7 +26,7 @@ function buildCampaignAndDateFilters(filters, params, columnPrefix = '') {
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['GET']);
-    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
+    const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
 
     const filters = parseFiltersFromQuery(req.query?.filters);
     const params = [];
@@ -199,6 +200,19 @@ export default async function handler(req, res) {
         .reverse(),
       channel_status_distribution: channelsResult.rows,
       school_grade_distribution: schoolDistributionResult.rows,
+    });
+
+    const ctx = readRequestContext(req);
+    await appendAuditLog({
+      ...buildPanelActor(identity),
+      action: 'PANEL_DASHBOARD_READ',
+      targetType: 'DASHBOARD',
+      requestId: ctx.requestId,
+      ipAddress: ctx.ipAddress,
+      userAgent: ctx.userAgent,
+      metadata: {
+        filters,
+      },
     });
   });
 }

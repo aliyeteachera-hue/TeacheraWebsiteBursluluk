@@ -22,6 +22,14 @@ function hashIdentity(identity) {
   return createHash('sha256').update(identity).digest('hex').slice(0, 40);
 }
 
+function readLoadTestBypassKey() {
+  return safeTrim(
+    process.env.LOAD_TEST_BYPASS_KEY
+    || process.env.CRON_SECRET
+    || process.env.NOTIFICATION_WORKER_SECRET,
+  );
+}
+
 function buildRateLimitKey(scope, identity) {
   const prefix = readRedisKeyPrefix();
   return `${prefix}:rl:${scope}:${hashIdentity(identity)}`;
@@ -34,6 +42,13 @@ function normalizeTtl(ttl, fallbackWindowSeconds) {
 }
 
 export function getRequestIp(req) {
+  const loadTestIp = safeTrim(req.headers?.['x-load-test-ip']);
+  const loadTestKey = safeTrim(req.headers?.['x-load-test-key']);
+  const expectedLoadTestKey = readLoadTestBypassKey();
+  if (loadTestIp && loadTestKey && expectedLoadTestKey && loadTestKey === expectedLoadTestKey) {
+    return loadTestIp;
+  }
+
   const xForwardedFor = safeTrim(req.headers?.['x-forwarded-for']);
   if (xForwardedFor) {
     return xForwardedFor
