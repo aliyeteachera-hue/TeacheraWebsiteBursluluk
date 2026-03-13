@@ -131,8 +131,8 @@ export default function RootLayout() {
     currentSectionRef.current = currentSection;
   }, [currentSection]);
 
-  const isPanelLoginPage = location.pathname === '/panel/login';
-  const isAuthPage = location.pathname === '/giris' || isPanelLoginPage;
+  const isPanelRoute = location.pathname.startsWith('/panel/');
+  const isAuthPage = location.pathname === '/giris' || isPanelRoute;
   const rootStyle =
     location.pathname === '/bursluluk-2026'
       ? ({ '--fill-0': '#FFFFFF' } as CSSProperties)
@@ -144,7 +144,7 @@ export default function RootLayout() {
         <div className="relative min-h-screen bg-[#00000B]" style={rootStyle}>
           <SeoManager />
 
-          {!isPanelLoginPage && (
+          {!isPanelRoute && (
             <Navigation
               isMenuOpen={isMenuOpen}
               setIsMenuOpen={setIsMenuOpen}
@@ -152,7 +152,7 @@ export default function RootLayout() {
             />
           )}
 
-          {!isPanelLoginPage && (
+          {!isPanelRoute && (
             <AnimatePresence mode="wait" initial={false}>
               {isMenuOpen ? (
                 <MobileMenu
@@ -170,7 +170,7 @@ export default function RootLayout() {
 
           {!isAuthPage && <Footer />}
 
-          {!isPanelLoginPage && (
+          {!isPanelRoute && (
             <>
               <LevelAssessmentModal />
               <FreeTrialModal />
@@ -178,7 +178,7 @@ export default function RootLayout() {
           )}
           <AppToaster />
 
-          {!isPanelLoginPage && (
+          {!isPanelRoute && (
             <Suspense fallback={null}>
               <WhatsAppButton />
               {showDeferredUi && <CookieConsent />}

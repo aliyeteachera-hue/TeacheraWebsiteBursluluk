@@ -1,0 +1,55 @@
+name: Ops Audit Env Preflight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: P0-9 + P0-10 Required Env Preflight
+    runs-on: ubuntu-latest
+
+    env:
+      WWW_BASE_URL: ${{ vars.WWW_BASE_URL }}
+      EXAM_API_BASE_URL: ${{ vars.EXAM_API_BASE_URL }}
+      PANEL_API_BASE_URL: ${{ vars.PANEL_API_BASE_URL }}
+      OPS_API_BASE_URL: ${{ vars.OPS_API_BASE_URL }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AURORA_CLUSTER_ID: ${{ vars.AURORA_CLUSTER_ID }}
+      RDS_INSTANCE_ID: ${{ vars.RDS_INSTANCE_ID }}
+      ELASTICACHE_REPLICATION_GROUP_ID: ${{ vars.ELASTICACHE_REPLICATION_GROUP_ID }}
+      SQS_QUEUE_URL: ${{ vars.SQS_QUEUE_URL }}
+      S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+      OBSERVABILITY_DASHBOARD_NAME: ${{ vars.OBSERVABILITY_DASHBOARD_NAME }}
+      OBSERVABILITY_ALARM_PREFIX: ${{ vars.OBSERVABILITY_ALARM_PREFIX }}
+      OBSERVABILITY_COLLECTOR_SECRET: ${{ secrets.OBSERVABILITY_COLLECTOR_SECRET }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      NOTIFICATION_WORKER_SECRET: ${{ secrets.NOTIFICATION_WORKER_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: P0-9 preflight (fail-fast)
+        run: pnpm p0:topology:preflight
+
+      - name: P0-10 preflight (fail-fast)
+        run: pnpm p0:observability:preflight

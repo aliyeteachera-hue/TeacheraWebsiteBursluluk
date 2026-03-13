@@ -4,6 +4,15 @@ type ApiResponse = {
   ok?: boolean;
   error?: string;
   message?: string;
+  next_step?: string;
+  session?: {
+    password_reset_required?: boolean;
+    force_password_reset?: boolean;
+  };
+  user?: {
+    password_reset_required?: boolean;
+    force_password_reset?: boolean;
+  };
 };
 
 function normalizeMessage(payload: ApiResponse | null, fallback: string) {
@@ -12,6 +21,22 @@ function normalizeMessage(payload: ApiResponse | null, fallback: string) {
   const error = String(payload?.error || '').trim();
   if (error) return error;
   return fallback;
+}
+
+function readRequiresPasswordReset(payload: ApiResponse | null) {
+  if (!payload) return false;
+  if (String(payload.next_step || '').toLowerCase() === 'password_reset') return true;
+  if (payload.session?.password_reset_required || payload.session?.force_password_reset) return true;
+  if (payload.user?.password_reset_required || payload.user?.force_password_reset) return true;
+  return false;
+}
+
+function resolveSafeNextPath() {
+  const params = new URLSearchParams(window.location.search);
+  const next = String(params.get('next') || '').trim();
+  if (!next) return '/panel/dashboard';
+  if (!next.startsWith('/panel/')) return '/panel/dashboard';
+  return next;
 }
 
 async function readJsonSafe(response: Response) {
@@ -71,9 +96,16 @@ export default function PanelLoginPage() {
         return;
       }
 
-      setSuccessMessage('Giriş başarılı. Yönlendiriliyor...');
+      const requiresPasswordReset = readRequiresPasswordReset(loginPayload);
+      const targetPath = requiresPasswordReset ? '/panel/password-reset' : resolveSafeNextPath();
+      setSuccessMessage(
+        requiresPasswordReset
+          ? 'Geçici şifre algılandı. Şifre yenileme ekranına yönlendiriliyorsunuz...'
+          : 'Giriş başarılı. Operasyon paneline yönlendiriliyorsunuz...',
+      );
+
       window.setTimeout(() => {
-        window.location.assign('/panel/dashboard');
+        window.location.assign(targetPath);
       }, 450);
     } catch {
       setErrorMessage('Ağ hatası nedeniyle giriş tamamlanamadı.');
@@ -99,7 +131,7 @@ export default function PanelLoginPage() {
             <div className="rounded-[22px] border border-[#1A273A] bg-[#071021]/82 p-5">
               <p className="text-[13px] font-semibold uppercase tracking-[0.21em] text-white/45">Giriş Sonrası</p>
               <p className="mt-2 text-[25px] leading-[1.8] text-white/38 sm:text-[17px]">
-                CRM inbox, bursluluk operasyonu, görevler ve ayar ekranları aynı panelde açılır.
+                CRM/Mobikob inbox, bursluluk operasyonu, görevler ve ayar ekranları aynı panelde açılır.
               </p>
             </div>
 

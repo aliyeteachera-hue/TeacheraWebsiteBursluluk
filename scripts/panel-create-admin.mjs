@@ -21,6 +21,15 @@ function normalizeEmail(value) {
   return value.trim().toLowerCase();
 }
 
+function parseBooleanArg(name, fallback = false) {
+  const raw = readArg(name);
+  if (!raw) return fallback;
+  const normalized = raw.trim().toLowerCase();
+  if (['1', 'true', 'yes', 'y', 'on'].includes(normalized)) return true;
+  if (['0', 'false', 'no', 'n', 'off'].includes(normalized)) return false;
+  throw new Error(`Invalid boolean for --${name}: ${raw}`);
+}
+
 function parseRole(value) {
   const role = value.trim().toUpperCase();
   if (!ALLOWED_ROLES.has(role)) {
@@ -31,6 +40,33 @@ function parseRole(value) {
 
 function resolveConnectionString() {
   return (process.env.DATABASE_URL || process.env.POSTGRES_URL || '').trim();
+}
+
+async function readAdminUserColumnAvailability(client) {
+  const result = await client.query(
+    `
+      SELECT
+        EXISTS (
+          SELECT 1
+          FROM information_schema.columns
+          WHERE table_schema = 'public'
+            AND table_name = 'admin_users'
+            AND column_name = 'password_reset_required'
+        ) AS has_password_reset_required,
+        EXISTS (
+          SELECT 1
+          FROM information_schema.columns
+          WHERE table_schema = 'public'
+            AND table_name = 'admin_users'
+            AND column_name = 'password_updated_at'
+        ) AS has_password_updated_at
+    `,
+  );
+
+  return {
+    hasPasswordResetRequired: Boolean(result.rows[0]?.has_password_reset_required),
+    hasPasswordUpdatedAt: Boolean(result.rows[0]?.has_password_updated_at),
+  };
 }
 
 async function main() {
@@ -44,6 +80,7 @@ async function main() {
   const password = requireArg('password');
   const role = parseRole(requireArg('role'));
   const totpSecret = requireArg('totp-secret').replace(/[\s-]/g, '').toUpperCase();
+  const requirePasswordReset = parseBooleanArg('require-password-reset', false);
 
   const pool = new Pool({
     connectionString,
@@ -53,6 +90,7 @@ async function main() {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    const availability = await readAdminUserColumnAvailability(client);
 
     await client.query(
       `
@@ -70,6 +108,8 @@ async function main() {
           email,
           full_name,
           password_hash,
+          ${availability.hasPasswordResetRequired ? 'password_reset_required,' : ''}
+          ${availability.hasPasswordUpdatedAt ? 'password_updated_at,' : ''}
           status,
           mfa_enabled,
           mfa_totp_secret,
@@ -79,22 +119,26 @@ async function main() {
           lower($1),
           $2,
           crypt($3, gen_salt('bf', 12)),
+          ${availability.hasPasswordResetRequired ? '$4,' : ''}
+          ${availability.hasPasswordUpdatedAt ? 'NOW(),' : ''}
           'ACTIVE',
           TRUE,
-          $4,
+          $5,
           NOW()
         )
         ON CONFLICT (email)
         DO UPDATE SET
           full_name = EXCLUDED.full_name,
           password_hash = EXCLUDED.password_hash,
+          ${availability.hasPasswordResetRequired ? 'password_reset_required = EXCLUDED.password_reset_required,' : ''}
+          ${availability.hasPasswordUpdatedAt ? 'password_updated_at = EXCLUDED.password_updated_at,' : ''}
           status = 'ACTIVE',
           mfa_enabled = TRUE,
           mfa_totp_secret = EXCLUDED.mfa_totp_secret,
           updated_at = NOW()
         RETURNING id, email
       `,
-      [email, fullName, password, totpSecret],
+      [email, fullName, password, requirePasswordReset, totpSecret],
     );
 
     const user = userResult.rows[0];
@@ -119,6 +163,7 @@ async function main() {
     await client.query('COMMIT');
     console.log(`Admin user ready: ${user.email} (${role})`);
     console.log('MFA: enabled');
+    console.log(`password_reset_required: ${requirePasswordReset ? 'true' : 'false'}`);
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;

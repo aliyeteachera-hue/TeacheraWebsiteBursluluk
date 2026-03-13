@@ -1,0 +1,14 @@
+{
+  "version": "2026-03-12",
+  "approved": true,
+  "approved_at_utc": "2026-03-12T12:30:33.620Z",
+  "change_ticket": "GO-LIVE-2026-03-12",
+  "approvers": {
+    "incident_commander": "Aliye Teachera",
+    "ops_lead": "Aliye Teachera",
+    "backend_lead": "Aliye Teachera",
+    "qa_lead": "Aliye Teachera",
+    "comms_owner": "Aliye Teachera"
+  },
+  "notes": "Set approved=true only after final war-room sign-off."
+}

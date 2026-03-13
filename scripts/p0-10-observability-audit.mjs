@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 const args = new Set(process.argv.slice(2));
 const enableHttpChecks = args.has('--http');
 const enableAwsChecks = args.has('--aws');
+const preflightOnly = args.has('--preflight-only');
 
 const STATUS = {
   PASS: 'PASS',
@@ -53,6 +54,85 @@ function runAwsJson(region, argsList) {
   return JSON.parse(output);
 }
 
+function emitResultAndExit({ checks, mode, readyKey }) {
+  const totals = summarize(checks);
+  const output = {
+    timestamp: new Date().toISOString(),
+    mode,
+    totals,
+    [readyKey]: totals.fail === 0,
+    checks,
+  };
+
+  console.log(JSON.stringify(output, null, 2));
+  if (totals.fail > 0) {
+    process.exit(1);
+  }
+}
+
+function buildPreflightSnapshot() {
+  const env = {
+    http: {
+      opsApiBase: readEnv('OPS_API_BASE_URL'),
+      collectorSecret: readEnv('OBSERVABILITY_COLLECTOR_SECRET', 'CRON_SECRET', 'NOTIFICATION_WORKER_SECRET'),
+    },
+    aws: {
+      region: readEnv('AWS_REGION', 'AWS_DEFAULT_REGION', 'OBSERVABILITY_AWS_REGION'),
+      dashboardName: readEnv('OBSERVABILITY_DASHBOARD_NAME'),
+      alarmPrefix: readEnv('OBSERVABILITY_ALARM_PREFIX'),
+    },
+  };
+
+  const missing = [];
+  if (enableHttpChecks) {
+    if (!env.http.opsApiBase) missing.push('OPS_API_BASE_URL');
+    if (!env.http.collectorSecret) missing.push('OBSERVABILITY_COLLECTOR_SECRET|CRON_SECRET|NOTIFICATION_WORKER_SECRET');
+  }
+  if (enableAwsChecks) {
+    if (!env.aws.region) missing.push('AWS_REGION');
+    if (!env.aws.dashboardName) missing.push('OBSERVABILITY_DASHBOARD_NAME');
+    if (!env.aws.alarmPrefix) missing.push('OBSERVABILITY_ALARM_PREFIX');
+  }
+
+  return { env, missing };
+}
+
+function runPreflightOrExit() {
+  const checks = [];
+  const mode = { http: enableHttpChecks, aws: enableAwsChecks };
+  const snapshot = buildPreflightSnapshot();
+
+  if (snapshot.missing.length > 0) {
+    pushCheck(
+      checks,
+      'preflight_required_env',
+      STATUS.FAIL,
+      `Missing required env: ${snapshot.missing.join(', ')}`,
+      {
+        missing: snapshot.missing,
+        mode,
+      },
+    );
+    emitResultAndExit({ checks, mode, readyKey: 'overall_ready_for_p0_10' });
+  }
+
+  pushCheck(checks, 'preflight_required_env', STATUS.PASS, 'Required env preflight passed.', {
+    mode,
+    has_ops_api_base: Boolean(snapshot.env.http.opsApiBase),
+    has_collector_secret: Boolean(snapshot.env.http.collectorSecret),
+    has_aws_region: Boolean(snapshot.env.aws.region),
+    has_dashboard_name: Boolean(snapshot.env.aws.dashboardName),
+    has_alarm_prefix: Boolean(snapshot.env.aws.alarmPrefix),
+  });
+
+  if (preflightOnly) {
+    emitResultAndExit({ checks, mode, readyKey: 'overall_ready_for_p0_10' });
+    process.exit(0);
+  }
+
+  return snapshot.env;
+}
+
 function expectedAlarmNames(prefix) {
   const endpointKeys = ['exam_api', 'panel_api', 'ops_api', 'www_root'];
   const names = [];
@@ -91,7 +171,7 @@ async function runCollectorHttpCheck(checks) {
     return;
   }
 
-  const opsBase = normalizeBase(readEnv('OPS_API_BASE_URL'), 'https://ops-api.teachera.com.tr');
+  const opsBase = normalizeBase(readEnv('OPS_API_BASE_URL'), '');
   const collectorUrl = `${opsBase}/api/ops/observability/collect?sample_size=3&timeout_ms=3000`;
   const secret = readEnv('OBSERVABILITY_COLLECTOR_SECRET', 'CRON_SECRET', 'NOTIFICATION_WORKER_SECRET');
 
@@ -153,8 +233,8 @@ function runAwsChecks(checks) {
   }
 
   const region = readEnv('AWS_REGION', 'AWS_DEFAULT_REGION', 'OBSERVABILITY_AWS_REGION');
-  const dashboardName = readEnv('OBSERVABILITY_DASHBOARD_NAME') || 'teachera-p0-10-observability';
-  const alarmPrefix = readEnv('OBSERVABILITY_ALARM_PREFIX') || 'teachera-p0-10';
+  const dashboardName = readEnv('OBSERVABILITY_DASHBOARD_NAME');
+  const alarmPrefix = readEnv('OBSERVABILITY_ALARM_PREFIX');
 
   if (!region) {
     pushCheck(checks, 'aws_region', STATUS.FAIL, 'AWS region is missing (AWS_REGION).');
@@ -263,27 +343,19 @@ function runAwsChecks(checks) {
 
 async function main() {
   const checks = [];
+  runPreflightOrExit();
 
   await runCollectorHttpCheck(checks);
   runAwsChecks(checks);
 
-  const totals = summarize(checks);
-  const output = {
-    timestamp: new Date().toISOString(),
+  emitResultAndExit({
+    checks,
     mode: {
       http: enableHttpChecks,
       aws: enableAwsChecks,
     },
-    totals,
-    overall_ready_for_p0_10: totals.fail === 0,
-    checks,
-  };
-
-  console.log(JSON.stringify(output, null, 2));
-
-  if (totals.fail > 0) {
-    process.exitCode = 1;
-  }
+    readyKey: 'overall_ready_for_p0_10',
+  });
 }
 
 main().catch((error) => {

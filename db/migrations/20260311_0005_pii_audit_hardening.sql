@@ -95,7 +95,10 @@ BEFORE UPDATE OR DELETE ON audit_log_entries
 FOR EACH ROW
 EXECUTE FUNCTION prevent_audit_log_mutation();
 
-CREATE OR REPLACE VIEW v_candidate_operations AS
+DROP VIEW IF EXISTS v_candidate_operations;
+DROP VIEW IF EXISTS v_unviewed_results;
+
+CREATE VIEW v_candidate_operations AS
 SELECT
   c.id AS candidate_id,
   a.application_no,
@@ -165,7 +168,7 @@ LEFT JOIN LATERAL (
   LIMIT 1
 ) ne_last ON TRUE;
 
-CREATE OR REPLACE VIEW v_unviewed_results AS
+CREATE VIEW v_unviewed_results AS
 SELECT
   c.id AS candidate_id,
   c.full_name AS student_full_name,

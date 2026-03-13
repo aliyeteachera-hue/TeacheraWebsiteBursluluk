@@ -161,6 +161,7 @@ export default async function handler(req, res) {
             u.email,
             u.full_name,
             u.password_hash,
+            COALESCE((to_jsonb(u)->>'password_reset_required')::boolean, FALSE) AS password_reset_required,
             u.status,
             u.mfa_enabled,
             u.mfa_totp_secret,
@@ -206,6 +207,8 @@ export default async function handler(req, res) {
         if (!role) {
           throw new HttpError(403, 'Panel user does not have an assigned role.', 'panel_role_missing');
         }
+
+        const passwordResetRequired = Boolean(user.password_reset_required);
 
         const sessionId = randomUUID();
         const tokenPayload = createPanelSessionToken({
@@ -272,6 +275,7 @@ export default async function handler(req, res) {
           role,
           expiresAt: tokenPayload.expiresAt,
           sessionId,
+          passwordResetRequired,
           user: {
             id: user.id,
             email: normalizeEmail(user.email),
@@ -318,10 +322,12 @@ export default async function handler(req, res) {
     const ttlSeconds = ttlMinutes * 60;
     res.setHeader('Set-Cookie', buildPanelSessionCookie(session.token, req, ttlSeconds));
     ok(res, {
+      next_step: session.passwordResetRequired ? 'password_reset' : null,
       session: {
         token: session.token,
         expires_at: session.expiresAt,
         session_id: session.sessionId,
+        password_reset_required: session.passwordResetRequired,
       },
       user: {
         id: session.user.id,
@@ -329,6 +335,7 @@ export default async function handler(req, res) {
         full_name: session.user.fullName,
         role: session.role,
         mfa_verified: true,
+        password_reset_required: session.passwordResetRequired,
       },
     });
 

@@ -1,66 +1,132 @@
 # P0-12 Final Go-Live Operations Package (Teachera)
 
-Bu doküman, canlıya geçiş için operasyonel kontrol paketidir.
-Hedef: kesintisiz cutover, hızlı rollback, net sorumluluk ve SLA ile war-room yönetimi.
+Bu doküman canlıya geçişte tek referans operasyon paketidir.
+Amaç: kesintisiz cutover, hızlı geri dönüş, net sorumluluk, ölçülebilir SLA.
+
+## Paket Metadata
+- Version: `2026-03-12`
+- Scope: `teachera.com.tr` (`www` + `exam-api` + `panel-api` + `ops-api`)
+- Source of truth:
+  - `guidelines/p0-12-final-go-live-operations-package.md`
+  - `guidelines/p0-12-cutover-checklist.json`
+  - `guidelines/p0-12-go-live-approval.json`
+
+## Hızlı Konsolide Doğrulama (Zaman Kazandıran)
+1. Tek komutlu paket audit:
+```bash
+npm run p0:go-live:package:audit -- --http
+```
+2. AWS tarafı da aynı koşuda doğrulansın istersen:
+```bash
+npm run p0:go-live:package:audit -- --http --aws
+```
+
+Not: Bu audit, ağır yük testlerini yeniden koşturmaz; P0-9/10/11 mevcut artefaktlarını ve canlı health gate’lerini konsolide kontrol eder.
 
 ## 1) Runbook (Go-Live)
-1. Deploy freeze başlat (feature freeze + only hotfix).
-2. Prod env freeze snapshot al (`vercel env pull`, AWS resource IDs, alarm state).
-3. Health gates kontrol et:
-   - `https://exam-api.teachera.com.tr/api/health`
-   - `https://panel-api.teachera.com.tr/api/panel/auth/me` (401/403 expected)
-   - `https://ops-api.teachera.com.tr/api/health`
-4. Worker + webhook live path doğrula:
-   - worker trigger
-   - provider callback signature doğrulaması
-5. Smoke set çalıştır:
-   - start -> answer -> submit -> results
-   - queue fail/recovery
-   - panel dashboard read
-6. Alarm ack kanallarını doğrula (SNS/email).
-7. Cutover onayı ve trafik geçişi.
+### T-24h
+1. Deploy freeze başlat (feature freeze + sadece IC onaylı hotfix).
+2. Prod env snapshot al:
+   - `npx --yes vercel env pull .env.production.local --environment production`
+   - Kritik AWS resource ID ve alarm durumlarını kaydet.
+3. War-room bridge aç, rol atamalarını netleştir.
+
+### T-2h
+1. Health gates:
+   - `https://exam-api.teachera.com.tr/api/health` (200)
+   - `https://panel-api.teachera.com.tr/api/panel/auth/me` (401/403 beklenen)
+   - `https://ops-api.teachera.com.tr/api/health` (200)
+2. Worker + webhook path kontrolü:
+   - scheduler tetikleme
+   - signature-verified provider callback
+3. Alarm kanalları (SNS/email) alarm-test ile doğrulanır.
+
+### T-0 (Cutover)
+1. Son deploy alınır (`npx --yes vercel --prod`).
+2. Cutover checklist tüm kapılar DONE ise IC onayıyla live trafiğe geçilir.
+3. İlk 30 dk war-room sürekli açık tutulur (5 dk aralıklarla durum raporu).
+
+### T+24h
+1. Freeze kaldırma kararı IC + Ops + Backend ortak onayı ile verilir.
+2. Post-cutover raporu oluşturulur.
 
 ## 2) War-Room Roles
-- Incident Commander (IC): karar ve iletişim sorumlusu
-- Ops Lead: infra, DB/Redis/SQS/CloudFront
-- Backend Lead: API/worker/webhook
-- Frontend Lead: form/exam/panel UI
-- QA Lead: smoke/load check gatekeeper
-- Comms Owner: stakeholder güncellemeleri
+- Incident Commander (IC): karar, öncelik, final onay
+- Ops Lead: AWS/infra, DB/Redis/SQS/CloudFront, alarm takibi
+- Backend Lead: API/worker/webhook durumu ve düzeltmeler
+- Frontend Lead: kullanıcı akışları ve panel UI doğrulaması
+- QA Lead: smoke ve gatekeeper onayı
+- Comms Owner: stakeholder bilgilendirmeleri
+
+Rol atamaları ve primary/backup kişileri `guidelines/p0-12-go-live-approval.json` içinde tutulur.
 
 ## 3) Escalation SLA
-- P0 (tam kesinti/veri kaybı riski): 5 dk içinde bridge, 15 dk içinde mitigation plan
-- P1 (kritik akış bozulması): 10 dk içinde bridge, 30 dk içinde workaround
-- P2 (degrade ama servis ayakta): 30 dk içinde triage, 4 saat içinde kalıcı düzeltme planı
+- P0 (tam kesinti/veri kaybı riski):
+  - 5 dk içinde bridge
+  - 15 dk içinde mitigation plan
+- P1 (kritik akış bozulması):
+  - 10 dk içinde bridge
+  - 30 dk içinde workaround
+- P2 (degrade ama servis ayakta):
+  - 30 dk içinde triage
+  - 4 saat içinde kalıcı düzeltme planı
 
 ## 4) Deploy-Freeze Window
-- Freeze başlangıç: T-24 saat
-- Freeze bitiş: T+24 saat (stabilite sonrası)
-- Freeze sırasında sadece IC onaylı hotfix
+- Freeze başlangıç: `T-24 saat`
+- Freeze bitiş: `T+24 saat` (stabilite koşulu ile)
+- Freeze sırasında yalnızca IC onaylı hotfix
 
 ## 5) Rollback Plan
-1. Son stabil Vercel deployment ID hazır tutulur.
-2. Env rollback listesi hazır tutulur (DB/Redis/worker/webhook secrets).
-3. Geri dönüş sırası:
-   - app alias rollback
-   - worker cron disable
-   - webhook fallback endpoint switch (gerekirse)
-4. Rollback sonrası zorunlu smoke:
-   - health, exam flow, panel auth, worker noop
+### Rollback Trigger (herhangi biri)
+- P0 incident ve 15 dk içinde stabilize edilememe
+- Hatalı deploy sonrası kritik akışta geri dönülemez bozulma
+- DB/queue/worker tarafında operasyonel riskin artması
+
+### Rollback Sequence
+1. Son stabil deployment referansı hazır tutulur.
+2. App alias/stable deployment geri dönüşü uygulanır.
+3. Worker scheduler durdurulur (gerekirse).
+4. Webhook fallback endpoint devreye alınır (gerekirse).
+5. Rollback smoke set zorunlu:
+   - health
+   - exam start -> answer -> submit -> results
+   - panel auth
+   - worker noop/queue stabilization
 
 ## 6) Cutover Checklist (Approval Gates)
-- [ ] P0-1..P0-11 audit raporları PASS
-- [ ] P0-10 dashboard + 19 alarm aktif
-- [ ] SNS alarm subscription confirmed
-- [ ] Turnstile secret active ve forms captcha zorunlu
-- [ ] Panel MFA zorunlu ve admin login doğrulandı
-- [ ] Queue DLQ replay doğrulandı
-- [ ] Runbook ve rollback adımları dry-run edildi
-- [ ] IC + Ops Lead + Backend Lead ortak onay verdi
+Machine-readable kaynak: `guidelines/p0-12-cutover-checklist.json`
 
-## 7) Evidence Attachment List
-- P0-9 topology audit JSON
-- P0-10 observability audit JSON
-- P0-11 certified load report JSON + signature
-- Worker/webhook reconciliation sample logs
-- Final deploy URL + timestamp
+Aşağıdaki kapılar `DONE` olmalı:
+- P0-1..P0-11 audit raporları PASS
+- P0-10 dashboard + alarm set aktif
+- SNS alarm subscription confirmed
+- Turnstile secret active ve forms captcha zorunlu
+- Panel MFA zorunlu ve admin login doğrulandı
+- Queue DLQ replay doğrulandı
+- Runbook ve rollback adımları dry-run edildi
+- War-room rol ataması tamamlandı
+- Final approval imzalandı
+
+## 7) Approval (DoD için zorunlu)
+Approval artefaktı: `guidelines/p0-12-go-live-approval.json`
+
+Onay komutu:
+```bash
+npm run p0:go-live:approve -- \
+  --incident-commander "Aliye Teachera" \
+  --ops-lead "Ops Lead Name" \
+  --backend-lead "Backend Lead Name" \
+  --qa-lead "QA Lead Name" \
+  --comms-owner "Comms Owner Name" \
+  --change-ticket "GO-LIVE-2026-03-12"
+```
+
+## 8) Evidence Attachment List
+- `guidelines/p0-9-target-topology-10k-15k.md`
+- `guidelines/p0-10-observability-slo.md`
+- `guidelines/p0-11-load-resilience-certification.md`
+- `guidelines/p0-11-load-resilience-report-latest.json`
+- `guidelines/p0-11-load-resilience-report-latest.md`
+- `guidelines/p0-5-go-live-evidence-2026-03-11.md`
+- `guidelines/p0-12-go-live-package-audit-latest.json`
+- `guidelines/p0-12-go-live-approval.json`

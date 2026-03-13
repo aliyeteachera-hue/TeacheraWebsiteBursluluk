@@ -257,7 +257,11 @@ INSERT INTO campaigns (code, name, is_active)
 VALUES ('2026_BURSLULUK', '2026 Bursluluk Kampanyası', TRUE)
 ON CONFLICT (code) DO NOTHING;
 
-CREATE OR REPLACE VIEW v_candidate_operations AS
+DROP VIEW IF EXISTS v_candidate_operations;
+DROP VIEW IF EXISTS v_unviewed_results;
+DROP VIEW IF EXISTS v_notifications;
+
+CREATE VIEW v_candidate_operations AS
 SELECT
   c.id AS candidate_id,
   a.application_no,
@@ -322,7 +326,7 @@ LEFT JOIN LATERAL (
   LIMIT 1
 ) ne_last ON TRUE;
 
-CREATE OR REPLACE VIEW v_notifications AS
+CREATE VIEW v_notifications AS
 SELECT
   nj.id AS job_id,
   nj.channel,
@@ -347,7 +351,7 @@ LEFT JOIN LATERAL (
   LIMIT 1
 ) ne ON TRUE;
 
-CREATE OR REPLACE VIEW v_unviewed_results AS
+CREATE VIEW v_unviewed_results AS
 SELECT
   c.id AS candidate_id,
   c.full_name AS student_full_name,

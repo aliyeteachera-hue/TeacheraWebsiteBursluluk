@@ -26,4 +26,17 @@ describe('route manifest', () => {
     expect(isKnownAppRoutePath('/egitimlerimiz/ingilizce/grup-programi')).toBe(true);
     expect(isKnownAppRoutePath('/yok/boyle/bir/route')).toBe(false);
   });
+
+  it('keeps document-compatible bursluluk and panel route aliases routable', () => {
+    expect(isKnownAppRoutePath('/bursluluk/giris')).toBe(true);
+    expect(isKnownAppRoutePath('/bursluluk/onay')).toBe(true);
+    expect(isKnownAppRoutePath('/bursluluk/bekleme')).toBe(true);
+    expect(isKnownAppRoutePath('/bursluluk/sinav')).toBe(true);
+    expect(isKnownAppRoutePath('/bursluluk/sonuc')).toBe(true);
+    expect(isKnownAppRoutePath('/panel/inbox')).toBe(true);
+    expect(isKnownAppRoutePath('/panel/candidates')).toBe(true);
+    expect(isKnownAppRoutePath('/panel/notifications')).toBe(true);
+    expect(isKnownAppRoutePath('/panel/dlq')).toBe(true);
+    expect(isKnownAppRoutePath('/panel/settings')).toBe(true);
+  });
 });

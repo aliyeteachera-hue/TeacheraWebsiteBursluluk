@@ -16,13 +16,27 @@ function buildPool() {
   const idleTimeoutMillis = Number.parseInt(process.env.PG_IDLE_TIMEOUT_MS || '30000', 10);
   const connectionTimeoutMillis = Number.parseInt(process.env.PG_CONNECTION_TIMEOUT_MS || '5000', 10);
   const sslMode = (process.env.PG_SSL_MODE || '').trim().toLowerCase();
+  const nodeEnv = (process.env.NODE_ENV || '').trim().toLowerCase();
+  const isProduction = nodeEnv === 'production';
 
-  const ssl =
-    sslMode === 'disable'
-      ? false
-      : sslMode === 'strict'
-        ? { rejectUnauthorized: true }
-        : { rejectUnauthorized: false };
+  let ssl;
+  if (sslMode === 'disable') {
+    if (isProduction) {
+      throw new Error('PG_SSL_MODE=disable is not allowed in production.');
+    }
+    ssl = false;
+  } else if (sslMode === 'relaxed') {
+    if (isProduction) {
+      throw new Error('PG_SSL_MODE=relaxed is not allowed in production.');
+    }
+    ssl = { rejectUnauthorized: false };
+  } else if (sslMode === 'strict') {
+    ssl = { rejectUnauthorized: true };
+  } else if (!sslMode) {
+    ssl = isProduction ? { rejectUnauthorized: true } : { rejectUnauthorized: false };
+  } else {
+    throw new Error('Invalid PG_SSL_MODE. Allowed values: strict, relaxed, disable.');
+  }
 
   return new Pool({
     connectionString,
@@ -60,4 +74,3 @@ export async function withTransaction(callback) {
     client.release();
   }
 }
-

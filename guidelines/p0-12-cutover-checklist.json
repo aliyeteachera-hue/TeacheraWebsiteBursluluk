@@ -1,0 +1,72 @@
+{
+  "version": "2026-03-12",
+  "timezone": "Europe/Istanbul",
+  "gates": [
+    {
+      "id": "p0_1_to_p0_11_audits_pass",
+      "status": "DONE",
+      "evidence": [
+        "guidelines/p0-9-target-topology-10k-15k.md",
+        "guidelines/p0-10-observability-slo.md",
+        "guidelines/p0-11-load-resilience-report-latest.md"
+      ]
+    },
+    {
+      "id": "p0_10_dashboard_alarm_set_active",
+      "status": "DONE",
+      "evidence": [
+        "guidelines/p0-10-observability-slo.md"
+      ]
+    },
+    {
+      "id": "sns_alarm_subscription_confirmed",
+      "status": "DONE",
+      "evidence": [
+        "guidelines/p0-10-observability-slo.md"
+      ]
+    },
+    {
+      "id": "turnstile_mandatory_forms",
+      "status": "DONE",
+      "evidence": [
+        "README.md"
+      ]
+    },
+    {
+      "id": "panel_mfa_enforced",
+      "status": "DONE",
+      "evidence": [
+        "api/panel/auth/login.js"
+      ]
+    },
+    {
+      "id": "queue_dlq_replay_verified",
+      "status": "DONE",
+      "evidence": [
+        "api/notifications/worker.js",
+        "guidelines/p0-11-load-resilience-report-latest.md"
+      ]
+    },
+    {
+      "id": "runbook_rollback_dry_run",
+      "status": "DONE",
+      "evidence": [
+        "guidelines/p0-12-final-go-live-operations-package.md"
+      ]
+    },
+    {
+      "id": "war_room_roles_assigned",
+      "status": "DONE",
+      "evidence": [
+        "guidelines/p0-12-go-live-approval.json"
+      ]
+    },
+    {
+      "id": "final_approval_signed",
+      "status": "DONE",
+      "evidence": [
+        "guidelines/p0-12-go-live-approval.json"
+      ]
+    }
+  ]
+}

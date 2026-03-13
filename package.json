@@ -15,8 +15,10 @@
     "db:migrate": "node scripts/db-migrate.mjs",
     "p0:generate-pii-key-material": "node scripts/p0-8-generate-pii-key-material.mjs",
     "p0:backfill-pii": "node scripts/p0-8-backfill-pii.mjs",
+    "p0:topology:preflight": "node scripts/p0-9-topology-audit.mjs --http --aws --preflight-only",
     "p0:topology:audit": "node scripts/p0-9-topology-audit.mjs",
     "p0:topology:autodiscover": "node scripts/p0-9-autodiscover-and-audit.mjs",
+    "p0:observability:preflight": "node scripts/p0-10-observability-audit.mjs --http --aws --preflight-only",
     "p0:observability:provision": "node scripts/p0-10-observability-provision.mjs",
     "p0:observability:audit": "node scripts/p0-10-observability-audit.mjs",
     "p0:observability:all": "npm run p0:observability:provision && npm run p0:observability:audit -- --http --aws",
@@ -25,7 +27,12 @@
     "p0:load-resilience:all": "npm run p0:load-resilience:certify && npm run p0:load-resilience:verify-signature",
     "panel:create-admin": "node scripts/panel-create-admin.mjs",
     "panel:generate-totp-secret": "node scripts/panel-generate-totp-secret.mjs",
-    "panel:generate-totp-code": "node scripts/panel-generate-totp-code.mjs"
+    "panel:generate-totp-code": "node scripts/panel-generate-totp-code.mjs",
+    "p0:go-live:package:audit": "node scripts/p0-12-go-live-package-audit.mjs",
+    "p0:go-live:approve": "node scripts/p0-12-go-live-approve.mjs",
+    "p0:go-live:all": "npm run p0:go-live:package:audit -- --http",
+    "p0:go-live:checklist:set": "node scripts/p0-12-go-live-checklist-set.mjs",
+    "p0:evidence:gate": "node scripts/p0-evidence-gate.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.1007.0",
