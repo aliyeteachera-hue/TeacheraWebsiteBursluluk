@@ -1,19 +1,89 @@
-name: CI
+name: CI/CD
 
 on:
+  pull_request:
   push:
     branches:
-      - "**"
-  pull_request:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  changes:
+    name: Detect Changed Areas
+    runs-on: ubuntu-latest
+    outputs:
+      www: ${{ steps.filter.outputs.www }}
+      exam_api: ${{ steps.filter.outputs.exam_api }}
+      panel_api: ${{ steps.filter.outputs.panel_api }}
+      ops_api: ${{ steps.filter.outputs.ops_api }}
+      force_all: ${{ steps.filter.outputs.force_all }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Path Filter
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            www:
+              - 'apps/www/**'
+              - 'src/**'
+              - 'public/**'
+              - 'index.html'
+              - 'vite.config.ts'
+              - 'vercel.www.json'
+            exam_api:
+              - 'apps/exam-api/**'
+              - 'api/exam/**'
+              - 'api/health.js'
+              - 'db/**'
+              - 'vercel.exam-api.json'
+              - 'packages/shared/backend/**'
+            panel_api:
+              - 'apps/panel-api/**'
+              - 'api/panel/**'
+              - 'vercel.panel-api.json'
+              - 'packages/shared/backend/**'
+            ops_api:
+              - 'apps/ops-api/**'
+              - 'api/ops/**'
+              - 'api/notifications/worker.js'
+              - 'vercel.ops-api.json'
+              - 'packages/shared/backend/**'
+            force_all:
+              - '.github/workflows/**'
+              - 'config/**'
+              - 'scripts/**'
+              - 'packages/shared/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'tsconfig.json'
+              - 'eslint.config.mjs'
+              - 'vercel.json'
+
+      - name: Print Change Summary
+        run: |
+          echo "www=${{ steps.filter.outputs.www }}"
+          echo "exam_api=${{ steps.filter.outputs.exam_api }}"
+          echo "panel_api=${{ steps.filter.outputs.panel_api }}"
+          echo "ops_api=${{ steps.filter.outputs.ops_api }}"
+          echo "force_all=${{ steps.filter.outputs.force_all }}"
+
   quality:
     name: Lint, Typecheck, Test, Build
     runs-on: ubuntu-latest
-
+    needs: [changes]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +103,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify shared backend sync
+        run: pnpm check:shared-backend-sync
+
       - name: Lint
         run: pnpm lint
 
@@ -44,3 +117,191 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Runtime Boundaries Audit
+        run: pnpm runtime-boundaries:audit
+
+  preflight:
+    name: P0 Preflight (Topology + Observability)
+    runs-on: ubuntu-latest
+    needs: [quality]
+    env:
+      WWW_BASE_URL: ${{ vars.WWW_BASE_URL }}
+      EXAM_API_BASE_URL: ${{ vars.EXAM_API_BASE_URL }}
+      PANEL_API_BASE_URL: ${{ vars.PANEL_API_BASE_URL }}
+      OPS_API_BASE_URL: ${{ vars.OPS_API_BASE_URL }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+      AURORA_CLUSTER_ID: ${{ vars.AURORA_CLUSTER_ID }}
+      RDS_INSTANCE_ID: ${{ vars.RDS_INSTANCE_ID }}
+      ELASTICACHE_REPLICATION_GROUP_ID: ${{ vars.ELASTICACHE_REPLICATION_GROUP_ID }}
+      SQS_QUEUE_URL: ${{ vars.SQS_QUEUE_URL }}
+      S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+      OBSERVABILITY_DASHBOARD_NAME: ${{ vars.OBSERVABILITY_DASHBOARD_NAME }}
+      OBSERVABILITY_ALARM_PREFIX: ${{ vars.OBSERVABILITY_ALARM_PREFIX }}
+      OBSERVABILITY_ALARM_SNS_TOPIC_ARN: ${{ vars.OBSERVABILITY_ALARM_SNS_TOPIC_ARN }}
+      OBSERVABILITY_COLLECTOR_SECRET: ${{ secrets.OBSERVABILITY_COLLECTOR_SECRET }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      NOTIFICATION_WORKER_SECRET: ${{ secrets.NOTIFICATION_WORKER_SECRET }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: P0-9 preflight (fail-fast)
+        run: pnpm p0:topology:preflight
+
+      - name: P0-10 preflight (fail-fast)
+        run: pnpm p0:observability:preflight
+
+  evidence_gate:
+    name: Evidence Gate (P0-10 + P0-11 + P0-12)
+    runs-on: ubuntu-latest
+    needs: [preflight]
+    env:
+      WWW_BASE_URL: ${{ vars.WWW_BASE_URL }}
+      EXAM_API_BASE_URL: ${{ vars.EXAM_API_BASE_URL }}
+      PANEL_API_BASE_URL: ${{ vars.PANEL_API_BASE_URL }}
+      OPS_API_BASE_URL: ${{ vars.OPS_API_BASE_URL }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+      OBSERVABILITY_AWS_REGION: ${{ vars.AWS_REGION }}
+      OBSERVABILITY_DASHBOARD_NAME: ${{ vars.OBSERVABILITY_DASHBOARD_NAME }}
+      OBSERVABILITY_ALARM_PREFIX: ${{ vars.OBSERVABILITY_ALARM_PREFIX }}
+      OBSERVABILITY_ALARM_SNS_TOPIC_ARN: ${{ vars.OBSERVABILITY_ALARM_SNS_TOPIC_ARN }}
+      P0_11_REPORT_SIGNING_KEY: ${{ secrets.P0_11_REPORT_SIGNING_KEY }}
+      OBSERVABILITY_COLLECTOR_SECRET: ${{ secrets.OBSERVABILITY_COLLECTOR_SECRET }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      NOTIFICATION_WORKER_SECRET: ${{ secrets.NOTIFICATION_WORKER_SECRET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Mandatory evidence gate (fail-fast)
+        run: pnpm p0:evidence:gate -- --aws
+
+  deploy_www:
+    name: Deploy www (path-based)
+    runs-on: ubuntu-latest
+    needs: [changes, quality, preflight, evidence_gate]
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      (needs.changes.outputs.www == 'true' || needs.changes.outputs.force_all == 'true')
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm deploy:www:prod
+
+  deploy_exam_api:
+    name: Deploy exam-api (path-based)
+    runs-on: ubuntu-latest
+    needs: [changes, quality, preflight, evidence_gate]
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      (needs.changes.outputs.exam_api == 'true' || needs.changes.outputs.force_all == 'true')
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm deploy:exam-api:prod
+
+  deploy_panel_api:
+    name: Deploy panel-api (path-based)
+    runs-on: ubuntu-latest
+    needs: [changes, quality, preflight, evidence_gate]
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      (needs.changes.outputs.panel_api == 'true' || needs.changes.outputs.force_all == 'true')
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm deploy:panel-api:prod
+
+  deploy_ops_api:
+    name: Deploy ops-api (path-based)
+    runs-on: ubuntu-latest
+    needs: [changes, quality, preflight, evidence_gate]
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      (needs.changes.outputs.ops_api == 'true' || needs.changes.outputs.force_all == 'true')
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm deploy:ops-api:prod

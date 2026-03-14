@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -53,6 +54,154 @@ function loadEnvFile(filePath) {
   return { loaded: true, filePath, count };
 }
 
+function pullOpsProjectEnv() {
+  const tempEnvPath = resolve(tmpdir(), `teachera-ops-prod-${Date.now()}.env`);
+  try {
+    execFileSync(
+      'npx',
+      [
+        '--yes',
+        'vercel',
+        'env',
+        'pull',
+        tempEnvPath,
+        '--environment=production',
+        '--cwd',
+        'apps/ops-api',
+      ],
+      {
+        cwd: ROOT,
+        env: process.env,
+        stdio: ['ignore', 'ignore', 'ignore'],
+      },
+    );
+  } catch {
+    return { loaded: false, values: {} };
+  }
+
+  if (!existsSync(tempEnvPath)) {
+    return { loaded: false, values: {} };
+  }
+
+  try {
+    const raw = readFileSync(tempEnvPath, 'utf8');
+    const values = {};
+    for (const line of raw.split(/\r?\n/)) {
+      const parsed = parseDotenvLine(line);
+      if (!parsed) continue;
+      values[parsed.key] = parsed.value;
+    }
+    return { loaded: true, values };
+  } catch {
+    return { loaded: false, values: {} };
+  }
+}
+
+function tryReadAwsConfiguredRegion() {
+  try {
+    const output = execFileSync('aws', ['configure', 'get', 'region'], {
+      cwd: ROOT,
+      env: process.env,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    return trim(output);
+  } catch {
+    return '';
+  }
+}
+
+function readLatestObservabilityTopic() {
+  const path = resolve(ROOT, 'guidelines', 'p0-10-observability-audit-latest.json');
+  if (!existsSync(path)) return '';
+
+  try {
+    const payload = JSON.parse(readFileSync(path, 'utf8'));
+    const checks = Array.isArray(payload?.checks) ? payload.checks : [];
+    for (const check of checks) {
+      const topic = trim(check?.evidence?.expected_alarm_topic);
+      if (topic) return topic;
+    }
+  } catch {
+    return '';
+  }
+  return '';
+}
+
+function tryDiscoverAlarmTopicArn(regionHint) {
+  const region = trim(regionHint) || 'eu-north-1';
+  try {
+    const output = execFileSync(
+      'aws',
+      ['sns', 'list-topics', '--region', region, '--output', 'json'],
+      {
+        cwd: ROOT,
+        env: process.env,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      },
+    );
+    const payload = JSON.parse(output || '{}');
+    const topics = Array.isArray(payload?.Topics) ? payload.Topics : [];
+    const arns = topics.map((item) => trim(item?.TopicArn)).filter(Boolean);
+    const exact = arns.find((arn) => arn.endsWith(':teachera-p0-10-alarms'));
+    if (exact) return exact;
+    return arns.find((arn) => arn.includes('p0-10') && arn.includes('alarm')) || '';
+  } catch {
+    return '';
+  }
+}
+
+function applyObservabilityDefaults() {
+  const applied = [];
+  const opsEnv = pullOpsProjectEnv();
+  const getOpsValue = (key) => trim(opsEnv.values?.[key]).replace(/\\[rn]/g, '').trim();
+
+  if (!trim(process.env.OPS_API_BASE_URL)) {
+    process.env.OPS_API_BASE_URL =
+      getOpsValue('OPS_API_BASE_URL') || 'https://ops-api.teachera.com.tr';
+    applied.push('OPS_API_BASE_URL');
+  }
+
+  if (!trim(process.env.AWS_REGION)) {
+    const region =
+      trim(process.env.OBSERVABILITY_AWS_REGION) ||
+      getOpsValue('AWS_REGION') ||
+      getOpsValue('OBSERVABILITY_AWS_REGION') ||
+      tryReadAwsConfiguredRegion() ||
+      'eu-north-1';
+    process.env.AWS_REGION = region;
+    applied.push('AWS_REGION');
+  }
+
+  if (!trim(process.env.OBSERVABILITY_COLLECTOR_SECRET)) {
+    const collectorSecret =
+      getOpsValue('OBSERVABILITY_COLLECTOR_SECRET') ||
+      getOpsValue('CRON_SECRET') ||
+      getOpsValue('NOTIFICATION_WORKER_SECRET');
+    if (collectorSecret) {
+      process.env.OBSERVABILITY_COLLECTOR_SECRET = collectorSecret;
+      applied.push('OBSERVABILITY_COLLECTOR_SECRET');
+    }
+  }
+
+  if (!trim(process.env.OBSERVABILITY_ALARM_SNS_TOPIC_ARN)) {
+    const topic =
+      getOpsValue('OBSERVABILITY_ALARM_SNS_TOPIC_ARN') ||
+      readLatestObservabilityTopic() ||
+      tryDiscoverAlarmTopicArn(trim(process.env.AWS_REGION) || trim(process.env.OBSERVABILITY_AWS_REGION));
+    if (topic) {
+      process.env.OBSERVABILITY_ALARM_SNS_TOPIC_ARN = topic;
+      applied.push('OBSERVABILITY_ALARM_SNS_TOPIC_ARN');
+    }
+  }
+
+  return {
+    applied,
+    ops_project_env_loaded: opsEnv.loaded,
+  };
+}
+
 function runStep(label, command, commandArgs) {
   console.log(`[p0:evidence:gate] ${label}...`);
   try {
@@ -75,6 +224,7 @@ function runStep(label, command, commandArgs) {
 
 function main() {
   const envMeta = loadEnvFile(resolve(ROOT, '.env.production.local'));
+  const defaultsMeta = applyObservabilityDefaults();
 
   const signingKey = trim(process.env.P0_11_REPORT_SIGNING_KEY || process.env.CRON_SECRET);
   if (!signingKey) {
@@ -95,9 +245,15 @@ function main() {
   const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const steps = [];
 
-  steps.push(runStep('p0-11-verify-signature', npmCmd, ['run', 'p0:load-resilience:verify-signature']));
+  const observabilityArgs = ['run', 'p0:observability:audit', '--', '--http'];
+  if (enableAws) observabilityArgs.push('--aws');
+  steps.push(runStep('p0-10-observability-audit', npmCmd, observabilityArgs));
 
   if (steps[0].ok) {
+    steps.push(runStep('p0-11-verify-signature', npmCmd, ['run', 'p0:load-resilience:verify-signature']));
+  }
+
+  if (steps[0].ok && steps[1]?.ok) {
     const auditArgs = ['run', 'p0:go-live:package:audit', '--', '--http'];
     if (enableAws) auditArgs.push('--aws');
     steps.push(runStep('p0-12-go-live-package-audit', npmCmd, auditArgs));
@@ -109,12 +265,15 @@ function main() {
     mode: {
       http: true,
       aws: enableAws,
+      observability_included: true,
     },
     env: {
       production_env_file_loaded: envMeta.loaded,
       loaded_variable_count: envMeta.count,
       env_file: envMeta.filePath,
       signing_key_present: Boolean(signingKey),
+      applied_observability_defaults: defaultsMeta.applied,
+      ops_project_env_loaded: defaultsMeta.ops_project_env_loaded,
     },
     steps,
   };

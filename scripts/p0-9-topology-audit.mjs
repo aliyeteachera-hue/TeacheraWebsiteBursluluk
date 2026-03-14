@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 
 const args = new Set(process.argv.slice(2));
 const enableHttpChecks = args.has('--http');
@@ -12,6 +13,8 @@ const STATUS = {
   WARN: 'WARN',
   SKIP: 'SKIP',
 };
+
+const LATEST_ARTIFACT_PATH = resolve(process.cwd(), 'guidelines', 'p0-9-topology-audit-latest.json');
 
 function trim(value) {
   return String(value || '').trim();
@@ -68,97 +71,75 @@ function pushCheck(checks, id, status, detail, evidence = {}) {
   });
 }
 
-function emitResultAndExit({ checks, mode, readyKey }) {
-  const totals = summarize(checks);
-  const output = {
-    timestamp: new Date().toISOString(),
-    mode,
-    totals,
-    [readyKey]: totals.fail === 0,
-    checks,
-  };
-
-  console.log(JSON.stringify(output, null, 2));
-  if (totals.fail > 0) {
-    process.exit(1);
-  }
-}
-
-function buildPreflightSnapshot() {
-  const env = {
-    http: {
-      wwwBase: readEnv('WWW_BASE_URL', 'VITE_SITE_URL', 'PUBLIC_WWW_BASE_URL'),
-      examApiBase: readEnv('EXAM_API_BASE_URL'),
-      panelApiBase: readEnv('PANEL_API_BASE_URL'),
-      opsApiBase: readEnv('OPS_API_BASE_URL'),
-    },
-    aws: {
-      region: readEnv('AWS_REGION', 'AWS_DEFAULT_REGION', 'P0_AWS_REGION'),
-      auroraClusterId: readEnv('AURORA_CLUSTER_ID', 'P0_AURORA_CLUSTER_ID'),
-      rdsInstanceId: readEnv('RDS_INSTANCE_ID', 'P0_RDS_INSTANCE_ID'),
-      redisGroupId: readEnv('ELASTICACHE_REPLICATION_GROUP_ID', 'P0_REDIS_REPLICATION_GROUP_ID'),
-      queueUrl: readEnv('SQS_QUEUE_URL', 'P0_SQS_QUEUE_URL'),
-      bucket: readEnv('S3_BUCKET_NAME', 'P0_S3_BUCKET_NAME'),
-      cloudfrontDistributionId: readEnv('CLOUDFRONT_DISTRIBUTION_ID', 'P0_CLOUDFRONT_DISTRIBUTION_ID'),
-    },
-  };
-
+function runRequiredEnvPreflight(checks) {
   const missing = [];
+
   if (enableHttpChecks) {
-    if (!env.http.wwwBase) missing.push('WWW_BASE_URL');
-    if (!env.http.examApiBase) missing.push('EXAM_API_BASE_URL');
-    if (!env.http.panelApiBase) missing.push('PANEL_API_BASE_URL');
-    if (!env.http.opsApiBase) missing.push('OPS_API_BASE_URL');
+    if (!readEnv('EXAM_API_BASE_URL')) missing.push('EXAM_API_BASE_URL');
+    if (!readEnv('PANEL_API_BASE_URL')) missing.push('PANEL_API_BASE_URL');
+    if (!readEnv('OPS_API_BASE_URL')) missing.push('OPS_API_BASE_URL');
   }
 
   if (enableAwsChecks) {
-    if (!env.aws.region) missing.push('AWS_REGION');
-    if (!env.aws.auroraClusterId && !env.aws.rdsInstanceId) missing.push('AURORA_CLUSTER_ID|RDS_INSTANCE_ID');
-    if (!env.aws.redisGroupId) missing.push('ELASTICACHE_REPLICATION_GROUP_ID');
-    if (!env.aws.queueUrl) missing.push('SQS_QUEUE_URL');
-    if (!env.aws.bucket) missing.push('S3_BUCKET_NAME');
-    if (!env.aws.cloudfrontDistributionId) missing.push('CLOUDFRONT_DISTRIBUTION_ID');
+    if (!readEnv('AWS_REGION', 'AWS_DEFAULT_REGION', 'P0_AWS_REGION')) missing.push('AWS_REGION');
+    if (!readEnv('AURORA_CLUSTER_ID', 'P0_AURORA_CLUSTER_ID') && !readEnv('RDS_INSTANCE_ID', 'P0_RDS_INSTANCE_ID')) {
+      missing.push('AURORA_CLUSTER_ID|RDS_INSTANCE_ID');
+    }
+    if (!readEnv('ELASTICACHE_REPLICATION_GROUP_ID', 'P0_REDIS_REPLICATION_GROUP_ID')) {
+      missing.push('ELASTICACHE_REPLICATION_GROUP_ID');
+    }
+    if (!readEnv('SQS_QUEUE_URL', 'P0_SQS_QUEUE_URL')) missing.push('SQS_QUEUE_URL');
+    if (!readEnv('S3_BUCKET_NAME', 'P0_S3_BUCKET_NAME')) missing.push('S3_BUCKET_NAME');
+    if (!readEnv('CLOUDFRONT_DISTRIBUTION_ID', 'P0_CLOUDFRONT_DISTRIBUTION_ID')) {
+      missing.push('CLOUDFRONT_DISTRIBUTION_ID');
+    }
   }
 
-  return { env, missing };
+  pushCheck(
+    checks,
+    'preflight_required_env',
+    missing.length === 0 ? STATUS.PASS : STATUS.FAIL,
+    missing.length === 0
+      ? 'All required environment variables are present for selected mode.'
+      : `Missing required env: ${missing.join(', ')}`,
+    {
+      missing,
+      mode: {
+        http: enableHttpChecks,
+        aws: enableAwsChecks,
+      },
+    },
+  );
+
+  return missing.length === 0;
 }
 
-function runPreflightOrExit() {
-  const checks = [];
-  const mode = { http: enableHttpChecks, aws: enableAwsChecks };
-  const snapshot = buildPreflightSnapshot();
+function emitOutput(checks) {
+  const totals = summarize(checks);
+  const output = {
+    timestamp: new Date().toISOString(),
+    mode: {
+      http: enableHttpChecks,
+      aws: enableAwsChecks,
+    },
+    totals,
+    overall_ready_for_p0_9: totals.fail === 0,
+    checks,
+  };
 
-  if (snapshot.missing.length > 0) {
-    pushCheck(
-      checks,
-      'preflight_required_env',
-      STATUS.FAIL,
-      `Missing required env: ${snapshot.missing.join(', ')}`,
-      {
-        missing: snapshot.missing,
-        mode,
-      },
-    );
-    emitResultAndExit({ checks, mode, readyKey: 'overall_ready_for_p0_9' });
+  writeLatestArtifact(output);
+  console.log(JSON.stringify(output, null, 2));
+  if (totals.fail > 0) {
+    process.exitCode = 1;
   }
+}
 
-  pushCheck(checks, 'preflight_required_env', STATUS.PASS, 'Required env preflight passed.', {
-    mode,
-    has_http_bases: Boolean(snapshot.env.http.wwwBase && snapshot.env.http.examApiBase && snapshot.env.http.panelApiBase && snapshot.env.http.opsApiBase),
-    has_aws_region: Boolean(snapshot.env.aws.region),
-    has_postgres_target: Boolean(snapshot.env.aws.auroraClusterId || snapshot.env.aws.rdsInstanceId),
-    has_redis_target: Boolean(snapshot.env.aws.redisGroupId),
-    has_queue_target: Boolean(snapshot.env.aws.queueUrl),
-    has_object_store_target: Boolean(snapshot.env.aws.bucket),
-    has_cdn_target: Boolean(snapshot.env.aws.cloudfrontDistributionId),
-  });
-
-  if (preflightOnly) {
-    emitResultAndExit({ checks, mode, readyKey: 'overall_ready_for_p0_9' });
-    process.exit(0);
+function writeLatestArtifact(payload) {
+  const targetDir = dirname(LATEST_ARTIFACT_PATH);
+  if (!existsSync(targetDir)) {
+    mkdirSync(targetDir, { recursive: true });
   }
-
-  return snapshot.env;
+  writeFileSync(LATEST_ARTIFACT_PATH, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 }
 
 function runAwsJson(region, argsList) {
@@ -199,10 +180,10 @@ async function runHttpCheck(checks, id, url, okStatuses = [200]) {
 }
 
 function runTopologyBoundaryChecks(checks) {
-  const wwwBase = readEnv('WWW_BASE_URL', 'VITE_SITE_URL', 'PUBLIC_WWW_BASE_URL');
-  const examApiBase = readEnv('EXAM_API_BASE_URL');
-  const panelApiBase = readEnv('PANEL_API_BASE_URL');
-  const opsApiBase = readEnv('OPS_API_BASE_URL');
+  const wwwBase = readEnv('WWW_BASE_URL', 'VITE_SITE_URL', 'PUBLIC_WWW_BASE_URL') || 'https://teachera.com.tr';
+  const examApiBase = readEnv('EXAM_API_BASE_URL') || wwwBase;
+  const panelApiBase = readEnv('PANEL_API_BASE_URL') || wwwBase;
+  const opsApiBase = readEnv('OPS_API_BASE_URL') || examApiBase;
 
   const hosts = {
     www: parseHost(wwwBase),
@@ -505,7 +486,13 @@ function runDocsChecks(checks) {
 
 async function main() {
   const checks = [];
-  runPreflightOrExit();
+  const preflightOk = runRequiredEnvPreflight(checks);
+
+  if (preflightOnly || !preflightOk) {
+    emitOutput(checks);
+    return;
+  }
+
   const boundaries = runTopologyBoundaryChecks(checks);
 
   await runHttpCheck(checks, 'www_root_http', boundaries.wwwBase, [200, 301, 302, 308]);
@@ -516,14 +503,7 @@ async function main() {
   runAwsChecks(checks);
   runDocsChecks(checks);
 
-  emitResultAndExit({
-    checks,
-    mode: {
-      http: enableHttpChecks,
-      aws: enableAwsChecks,
-    },
-    readyKey: 'overall_ready_for_p0_9',
-  });
+  emitOutput(checks);
 }
 
 main().catch((error) => {

@@ -31,6 +31,9 @@ const DEFAULTS = {
   simulateClientIps: true,
   includeResultPii: false,
   prewarmRequests: 8,
+  directEvidenceMinUsers: 200,
+  directEvidenceMinStartConcurrency: 20,
+  allowProjectionOnly: false,
 };
 
 function trim(value) {
@@ -155,6 +158,10 @@ function pushCheck(checks, id, status, detail, evidence = {}) {
   checks.push({ id, status, detail, evidence });
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function buildSyntheticIp(index) {
   // RFC 2544 benchmark block (198.18.0.0/15), deterministic per virtual user.
   const second = 18 + (index % 2);
@@ -268,6 +275,17 @@ function buildStartPayload({ runId, index, campaignCode }) {
     source: 'p0_11_load_resilience',
     bankKey: 'placement_en_default',
     questionCount: 60,
+    consent: {
+      kvkkApproved: true,
+      contactConsent: true,
+      consentVersion: 'KVKK_v1_2026-03-13',
+      legalTextVersion: 'KVKK_v1_2026-03-13',
+      source: 'p0_11_load_resilience',
+    },
+    kvkkConsent: true,
+    kvkkConsentVersion: 'KVKK_v1_2026-03-13',
+    kvkkLegalTextVersion: 'KVKK_v1_2026-03-13',
+    contactConsent: true,
   };
 }
 
@@ -931,6 +949,9 @@ async function runNotificationResilience({
   let postOutage = await readJobState(jobIds);
 
   for (let loop = 0; loop < workerMaxLoops; loop += 1) {
+    // Keep retriable jobs eligible in test mode so recovery convergence can be measured deterministically.
+    await requeueRetryingJobs(jobIds);
+
     const queuedOrRetrying = Number(postOutage.queued || 0) + Number(postOutage.retrying || 0);
     if (queuedOrRetrying === 0) break;
 
@@ -949,6 +970,10 @@ async function runNotificationResilience({
       payload: workerResp.payload,
       error: workerResp.error,
     });
+
+    if (workerResp.payload?.reason === 'worker_lock_held') {
+      await sleep(1200);
+    }
 
     postOutage = await readJobState(jobIds);
 
@@ -972,6 +997,9 @@ async function runNotificationResilience({
   const recoveryRuns = [];
   let finalState = await readJobState(jobIds);
   for (let loop = 0; loop < workerMaxLoops; loop += 1) {
+    // Re-queue RETRYING jobs before each recovery attempt to avoid waiting real backoff windows.
+    await requeueRetryingJobs(jobIds);
+
     const pending = Number(finalState.queued || 0) + Number(finalState.retrying || 0) + Number(finalState.dlq || 0);
     if (pending === 0) break;
 
@@ -1001,6 +1029,10 @@ async function runNotificationResilience({
       payload: workerResp.payload,
       error: workerResp.error,
     });
+
+    if (workerResp.payload?.reason === 'worker_lock_held') {
+      await sleep(1200);
+    }
 
     finalState = await readJobState(jobIds);
   }
@@ -1036,6 +1068,8 @@ function buildMarkdownSummary(report) {
     '',
     '## Burst Metrics',
     '',
+    `- Direct executed users: **${report.config.users_executed}**`,
+    `- Start concurrency: **${report.config.start_concurrency}**`,
     `- Start success: **${report.metrics.start_burst.success_rate_pct}%**`,
     `- Start p95: **${report.metrics.start_burst.latency_ms.p95_ms} ms**`,
     `- Results success: **${report.metrics.results_burst.success_rate_pct}%**`,
@@ -1104,6 +1138,26 @@ async function main() {
     simulate_client_ips: readBool(cli.simulate_client_ips || readEnv('P0_11_SIMULATE_CLIENT_IPS'), DEFAULTS.simulateClientIps),
     include_result_pii: readBool(cli.include_result_pii || readEnv('P0_11_INCLUDE_RESULT_PII'), DEFAULTS.includeResultPii),
     prewarm_requests: readInt(cli.prewarm_requests || readEnv('P0_11_PREWARM_REQUESTS'), DEFAULTS.prewarmRequests, 0, 200),
+    direct_evidence_min_users: readInt(
+      cli.direct_evidence_min_users || readEnv('P0_11_DIRECT_EVIDENCE_MIN_USERS'),
+      DEFAULTS.directEvidenceMinUsers,
+      1,
+      50000,
+    ),
+    direct_evidence_min_start_concurrency: readInt(
+      cli.direct_evidence_min_start_concurrency || readEnv('P0_11_DIRECT_EVIDENCE_MIN_START_CONCURRENCY'),
+      DEFAULTS.directEvidenceMinStartConcurrency,
+      1,
+      5000,
+    ),
+    independent_evidence_uri: trim(cli.independent_evidence_uri || readEnv('P0_11_INDEPENDENT_EVIDENCE_URI')),
+    independent_evidence_reference: trim(
+      cli.independent_evidence_reference || readEnv('P0_11_INDEPENDENT_EVIDENCE_REFERENCE'),
+    ),
+    allow_projection_only: readBool(
+      cli.allow_projection_only || readEnv('P0_11_ALLOW_PROJECTION_ONLY'),
+      DEFAULTS.allowProjectionOnly,
+    ),
     load_test_key: trim(
       cli.load_test_key
       || readEnv('P0_11_LOAD_TEST_KEY', 'LOAD_TEST_BYPASS_KEY')
@@ -1187,6 +1241,10 @@ async function main() {
     resultsBurst.requests_per_second || 0,
   );
   const projectedCapacityUsers = Math.floor(effectiveRps * config.scenario_window_minutes * 60);
+  const directEvidenceUserOk = config.users >= config.direct_evidence_min_users;
+  const directEvidenceConcurrencyOk = config.start_concurrency >= config.direct_evidence_min_start_concurrency;
+  const hasIndependentEvidence = Boolean(config.independent_evidence_uri || config.independent_evidence_reference);
+  const directEvidencePass = (directEvidenceUserOk && directEvidenceConcurrencyOk) || hasIndependentEvidence;
 
   const checks = [];
   const { sessions: _startSessions, ...startBurstPublic } = startBurst;
@@ -1284,6 +1342,34 @@ async function main() {
 
   pushCheck(
     checks,
+    'direct_peak_evidence',
+    directEvidencePass
+      ? STATUS.PASS
+      : (config.allow_projection_only ? STATUS.WARN : STATUS.FAIL),
+    directEvidencePass
+      ? (
+          hasIndependentEvidence
+            ? 'Independent peak-evidence attached (external/distributed proof provided).'
+            : `Direct execution evidence met (${config.users} users, start concurrency ${config.start_concurrency}).`
+        )
+      : (
+          config.allow_projection_only
+            ? `Projection-only mode enabled; direct evidence below threshold (${config.users}/${config.direct_evidence_min_users} users, start concurrency ${config.start_concurrency}/${config.direct_evidence_min_start_concurrency}).`
+            : `Direct peak evidence is insufficient (${config.users}/${config.direct_evidence_min_users} users, start concurrency ${config.start_concurrency}/${config.direct_evidence_min_start_concurrency}). Re-run with higher direct load or attach independent evidence.`
+        ),
+    {
+      users_executed: config.users,
+      min_users_required: config.direct_evidence_min_users,
+      start_concurrency: config.start_concurrency,
+      min_start_concurrency_required: config.direct_evidence_min_start_concurrency,
+      independent_evidence_uri_present: Boolean(config.independent_evidence_uri),
+      independent_evidence_reference_present: Boolean(config.independent_evidence_reference),
+      allow_projection_only: config.allow_projection_only,
+    },
+  );
+
+  pushCheck(
+    checks,
     'scenario_10k_projection',
     projectedCapacityUsers >= config.scenario_min_users ? STATUS.PASS : STATUS.FAIL,
     `Projected capacity ${projectedCapacityUsers} users in ${config.scenario_window_minutes}m (target >= ${config.scenario_min_users}).`,
@@ -1321,6 +1407,17 @@ async function main() {
       results_burst: resultsBurst,
       prewarm,
       notification_resilience: notificationResilience,
+      direct_execution_evidence: {
+        users_executed: config.users,
+        start_concurrency: config.start_concurrency,
+        min_users_required: config.direct_evidence_min_users,
+        min_start_concurrency_required: config.direct_evidence_min_start_concurrency,
+        direct_user_gate_ok: directEvidenceUserOk,
+        direct_concurrency_gate_ok: directEvidenceConcurrencyOk,
+        independent_evidence_uri: config.independent_evidence_uri || null,
+        independent_evidence_reference: config.independent_evidence_reference || null,
+        allow_projection_only: config.allow_projection_only,
+      },
       scenario_projection: {
         effective_rps: effectiveRps,
         projected_capacity_users: projectedCapacityUsers,

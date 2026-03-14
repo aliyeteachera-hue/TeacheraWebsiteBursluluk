@@ -77,6 +77,56 @@ pnpm dev
 pnpm build
 ```
 
+## 🧱 Monorepo Runtime Split (Active)
+
+Repo artık runtime-bazlı fiziksel ayrımı içerir:
+
+- `apps/www` → `teachera.com.tr` (frontend)
+- `apps/exam-api` → `exam-api.teachera.com.tr`
+- `apps/panel-api` → `panel-api.teachera.com.tr`
+- `apps/ops-api` → `ops-api.teachera.com.tr`
+- `packages/shared/backend` → API runtime’ların ortak backend modülleri
+
+Hızlı runtime doğrulama:
+```bash
+npm run runtime:verify
+```
+
+Shared backend tek kaynak doğrulaması:
+```bash
+npm run sync:shared-backend
+npm run check:shared-backend-sync
+```
+
+Not:
+- `packages/shared/backend` canonical kaynaktır.
+- `api/_lib` ve `apps/*/api/_lib` içerikleri otomatik üretilir; manuel düzenleme yapılmaz.
+
+App bazlı deploy komutları:
+```bash
+npm run deploy:www:prod
+npm run deploy:exam-api:prod
+npm run deploy:panel-api:prod
+npm run deploy:ops-api:prod
+```
+
+Vercel multi-project link/bootstrap (aynı repodan 4 ayrı proje):
+```bash
+npm run vercel:setup:multi-project
+```
+
+Tek komutta domain attach + deploy + smoke:
+```bash
+npm run vercel:setup:multi-project:full
+```
+
+Domain + DNS + TLS doğrulama (DoD audit):
+```bash
+npm run domain:dns:tls:audit
+```
+
+Ek not: `ops-api` tarafında cron başlık doğrulaması (`CRON_SECRET`) için değerlerin whitespace içermemesi zorunludur.
+
 ## 🧩 Online Sınav Backend (V1)
 
 Bu repo artık seviye tespit/bursluluk operasyonu için backend endpoint’lerini içerir.
@@ -84,6 +134,7 @@ Bu repo artık seviye tespit/bursluluk operasyonu için backend endpoint’lerin
 ### Migration
 `db/migrations/*.sql` dosyaları aşağıdaki tabloları ve panel view’larını oluşturur/günceller:
 - `campaigns`, `schools`, `guardians`, `candidates`, `applications`
+- `consent_records` (KVKK versioned consent kayıtları)
 - `exam_attempts`, `exam_answers`, `exam_session_tokens`, `results`
 - `notification_jobs`, `notification_events`, `dlq_jobs`, `activity_events`, `app_settings`
 - `notification_webhook_inbox` (webhook reconciliation için)
@@ -127,6 +178,30 @@ npm run panel:create-admin -- --email admin@teachera.com --name "Panel Admin" --
 - `GET|POST /api/ops/observability/collect`
 - `GET /api/health`
 
+### Hybrid Phase-2: Host Boundary Guard + Service Env Preflight
+- API host + route boundary guard merkezi olarak aktiftir (`api/_lib/http.js`).
+- Guard parametreleri:
+  - `SERVICE_RUNTIME=exam-api|panel-api|ops-api`
+  - `EXPECTED_SERVICE_HOST` (zorunlu, runtime canonical host)
+  - `EXPECTED_SERVICE_HOSTS` (opsiyonel legacy allowlist; set edilirse `EXPECTED_SERVICE_HOST` içermeli)
+  - `EXPECTED_EXAM_API_HOSTS`, `EXPECTED_PANEL_API_HOSTS`, `EXPECTED_OPS_API_HOSTS` (önerilen strict runtime host mapping)
+  - `SERVICE_HOST_GUARD_MODE=off|warn|enforce`
+  - `SERVICE_ROUTE_GUARD_MODE=off|warn|enforce` (default: SERVICE_HOST_GUARD_MODE)
+- `SERVICE_RUNTIME` set edilmediğinde runtime path’ten infer edilir:
+  - `/api/exam/*`, `/api/forms` → `exam-api`
+  - `/api/panel/*` → `panel-api`
+  - `/api/notifications/*`, `/api/ops/*` → `ops-api`
+- Önerilen production ayarı: `SERVICE_HOST_GUARD_MODE=enforce`.
+
+Service-level env preflight (fail-fast):
+```bash
+npm run service-env:preflight
+npm run service-env:preflight:exam-api
+npm run service-env:preflight:panel-api
+npm run service-env:preflight:ops-api
+npm run service-env:preflight:www
+```
+
 ### Frontend Entegrasyonu
 `src/app/components/PlacementExamPage.tsx` dosyası artık sınav oturumunu backend’den başlatır ve submit işlemini
 `/api/exam/session/submit` ile tamamlar.
@@ -134,6 +209,8 @@ npm run panel:create-admin -- --email admin@teachera.com --name "Panel Admin" --
 ### Ölçekleme Notu (10.000 aday)
 - DB sorguları sözleşme kolonlarına göre indekslenmiştir.
 - Bildirimler `notification_jobs` + worker akışı ile asenkron işlenir.
+- Queue-first runtime sözleşmesi: **otoritatif kuyruk `notification_jobs` (PostgreSQL)** tablosudur.
+- `SQS_QUEUE_URL` tanımlı olsa bile bu sürümde SQS, runtime dequeue kaynağı değil; infra/ops entegrasyonu içindir.
 - Retry/backoff politikası: `1m -> 5m -> 15m -> 60m -> 6h`, ardından DLQ.
 - Eşleşmeyen provider callback’leri `notification_webhook_inbox` tablosuna alınır; worker her koşuda reconcile eder.
 - Retry / DLQ yönetimi panel aksiyonlarıyla desteklenir.
@@ -143,6 +220,9 @@ npm run panel:create-admin -- --email admin@teachera.com --name "Panel Admin" --
 ### Worker / Cron
 - `api/notifications/worker` artık `GET` ve `POST` kabul eder.
 - Vercel cron her dakika worker’ı çağıracak şekilde `vercel.json` içinde tanımlıdır.
+- Worker doğrudan DB queue (`notification_jobs`) tüketir; SQS yokluğu worker doğruluğunu bozmaz.
+- Worker ownership `ops-api` runtime’a sabitlenmiştir (`SERVICE_RUNTIME=ops-api`, `NOTIFICATION_WORKER_RUNTIME=ops-api`).
+- Duplicate tetiklemelere karşı process-level advisory lock uygulanır; aynı anda tek worker koşusu aktif olur.
 - Güvenlik için `NOTIFICATION_WORKER_SECRET` veya `CRON_SECRET` set edilmelidir.
 - Provider webhook endpoint’i HMAC-SHA256 signature doğrular (`NOTIFICATION_PROVIDER_WEBHOOK_SIGNING_SECRET`).
 - Manuel tetikleme örneği:
@@ -156,10 +236,18 @@ curl -X POST "https://teachera.com.tr/api/notifications/worker?limit=100&reconci
 - Session claim’leri: `sub`, `sid`, `role`, `mfa`, `iat`, `exp`.
 - Token doğrulama sonrası DB’de `admin_sessions` + `admin_users` kontrolü yapılır.
 - MFA zorunludur: `/api/panel/auth/login` çağrısında geçerli TOTP kodu gerekir.
+- Session politikası (app-level):
+  - HttpOnly + Secure + SameSite + Priority cookie bayrakları zorunlu
+  - idle timeout (`PANEL_SESSION_IDLE_TIMEOUT_MINUTES`) ve absolute expiry (`PANEL_SESSION_TTL_MINUTES`) birlikte uygulanır
+  - eşzamanlı aktif oturum limiti (`PANEL_MAX_ACTIVE_SESSIONS`) aşıldığında eski oturumlar revoke edilir
+  - şifre reset sonrası session rotate edilir (yeni token + yeni `admin_sessions` kaydı)
 - `PANEL_API_KEYS` modeli kaldırılmıştır.
 
 ### Anti-Abuse (P0-7)
 - Kritik uçlarda Redis-backed rate limit fail-open değildir; Redis yoksa istek `503` ile reddedilir.
+- App-level CORS allowlist enforce edilir (`CORS_GUARD_MODE=enforce`):
+  - allowlist dışı origin istekleri `403 origin_not_allowed`
+  - preflight (`OPTIONS`) allowlist + yöntem/header kuralları ile doğrulanır
 - Brute-force koruması:
   - Panel login: IP + email bazlı fail counter/lock
   - Exam session auth: IP + token fingerprint bazlı fail counter/lock
@@ -302,3 +390,62 @@ src/
 ---
 
 **Teachera** - Konuşarak Öğren 🗣️
+`POST /api/exam/session/start` için versioned consent sözleşmesi:
+- `consent.kvkkApproved = true` (zorunlu)
+- `consent.consentVersion` (zorunlu, örn: `KVKK_v1_2026-03-13`)
+- `consent.legalTextVersion` (opsiyonel, default: consentVersion)
+- `consent.contactConsent` (opsiyonel)
+- `consent.source` (opsiyonel)
+
+### Env/Secret Segmentasyonu + Rotasyon (Prod)
+Bu repo, 4 ayrı runtime için secret scope zorlamasını ve rotasyon kanıtını tek komutta denetler:
+
+```bash
+npm run env:secret:gate
+```
+
+Scope/rotation audit tek başına:
+```bash
+npm run env:secret-scope:audit
+```
+
+Forbidden/deprecated env temizliği (önce dry-run, sonra apply):
+```bash
+npm run env:secret-scope:cleanup:dry
+npm run env:secret-scope:cleanup
+```
+
+Prod smoke tek başına:
+```bash
+npm run env:secret:smoke
+```
+
+Kaynak dosya:
+- `config/secret-scope-matrix.json`
+
+Notlar:
+- Audit, Vercel production env listesini proje bazında okur (`apps/www`, `apps/exam-api`, `apps/panel-api`, `apps/ops-api`).
+- Rotasyon doğrulaması için kritik key’lerin yanında `*_ROTATED_AT` marker env’leri zorunludur.
+- `deprecated.global` listesi eski env adlarının tüm projelerden kaldırıldığını doğrular.
+
+### P0-10 Servis Bazlı Dashboard + Alarm Ayrıştırması
+Observability artık servis bazlı ayrışır:
+- `www`
+- `exam`
+- `panel`
+- `ops`
+
+Provision:
+```bash
+npm run p0:observability:provision
+```
+
+Audit (collector + AWS):
+```bash
+npm run p0:observability:audit -- --http --aws
+```
+
+Notlar:
+- Dashboard/alarm isimleri global env’den türetilir (`OBSERVABILITY_DASHBOARD_NAME`, `OBSERVABILITY_ALARM_PREFIX`) ve servis-scope suffix ile ayrılır.
+- İstersen servis bazında override edebilirsin (`..._WWW`, `..._EXAM`, `..._PANEL`, `..._OPS`).
+- `OBSERVABILITY_ALARM_ACTIONS_REQUIRED=true` (default) iken her servis alarmı için SNS action zorunludur.

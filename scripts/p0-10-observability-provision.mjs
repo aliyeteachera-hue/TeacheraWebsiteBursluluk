@@ -1,5 +1,26 @@
 import { execFileSync } from 'node:child_process';
 
+const SERVICE_CONFIG = {
+  www: {
+    endpointKeys: ['www_root'],
+    includeOpsMetrics: false,
+  },
+  exam: {
+    endpointKeys: ['exam_api'],
+    includeOpsMetrics: false,
+  },
+  panel: {
+    endpointKeys: ['panel_api'],
+    includeOpsMetrics: false,
+  },
+  ops: {
+    endpointKeys: ['ops_api'],
+    includeOpsMetrics: true,
+  },
+};
+
+const SERVICE_ORDER = ['www', 'exam', 'panel', 'ops'];
+
 function trim(value) {
   return String(value || '').trim();
 }
@@ -24,6 +45,14 @@ function readFloatEnv(name, fallback, min, max) {
   return Math.max(min, Math.min(max, parsed));
 }
 
+function readBoolEnv(name, fallback) {
+  const raw = trim(process.env[name]).toLowerCase();
+  if (!raw) return fallback;
+  if (['1', 'true', 'yes', 'on'].includes(raw)) return true;
+  if (['0', 'false', 'no', 'off'].includes(raw)) return false;
+  return fallback;
+}
+
 function runAws(region, args, expectJson = true) {
   const commandArgs = [...args, '--region', region];
   if (expectJson) commandArgs.push('--output', 'json');
@@ -37,61 +66,93 @@ function runAws(region, args, expectJson = true) {
   return output ? JSON.parse(output) : null;
 }
 
-function buildDashboard({ namespace, endpointKeys, region }) {
-  return {
-    widgets: [
-      {
-        type: 'text',
-        x: 0,
-        y: 0,
-        width: 24,
-        height: 2,
-        properties: {
-          markdown:
-            '# Teachera P0-10 Observability\\nLatency, error-rate, queue, worker, DB/Redis ve SMS/WA başarı metrikleri.',
-        },
+function serviceUpper(service) {
+  return service.toUpperCase();
+}
+
+function sanitizeCloudWatchToken(value, fallback = '') {
+  const cleaned = trim(value)
+    .replace(/\\[rn]/g, '')
+    .replace(/[^A-Za-z0-9_-]/g, '');
+  return cleaned || fallback;
+}
+
+function resolveDashboardName(baseName, service) {
+  const raw =
+    readEnv(`OBSERVABILITY_DASHBOARD_NAME_${serviceUpper(service)}`) ||
+    `${baseName}-${service}`;
+  return sanitizeCloudWatchToken(raw, `teachera-p0-10-observability-${service}`);
+}
+
+function resolveAlarmPrefix(basePrefix, service) {
+  const raw =
+    readEnv(`OBSERVABILITY_ALARM_PREFIX_${serviceUpper(service)}`) ||
+    `${basePrefix}-${service}`;
+  return sanitizeCloudWatchToken(raw, `teachera-p0-10-${service}`);
+}
+
+function resolveAlarmTopic(defaultTopic, service) {
+  return readEnv(`OBSERVABILITY_ALARM_SNS_TOPIC_ARN_${serviceUpper(service)}`) || defaultTopic;
+}
+
+function buildDashboard({ namespace, endpointKeys, region, service, includeOpsMetrics }) {
+  const widgets = [
+    {
+      type: 'text',
+      x: 0,
+      y: 0,
+      width: 24,
+      height: 2,
+      properties: {
+        markdown:
+          `# Teachera P0-10 Observability (${service})\\nService-scoped latency/error metrics${includeOpsMetrics ? ' + queue/worker/db/redis/sms/wa' : ''}.`,
       },
-      {
-        type: 'metric',
-        x: 0,
-        y: 2,
-        width: 12,
-        height: 6,
-        properties: {
-          view: 'timeSeries',
-          stacked: false,
-          title: 'API Latency p95/p99 (ms)',
-          region,
-          stat: 'Average',
-          period: 300,
-          metrics: endpointKeys.flatMap((endpointKey) => [
-            [namespace, 'ApiLatencyP95Ms', 'Endpoint', endpointKey, { label: `${endpointKey} p95` }],
-            [namespace, 'ApiLatencyP99Ms', 'Endpoint', endpointKey, { label: `${endpointKey} p99` }],
-          ]),
-        },
+    },
+    {
+      type: 'metric',
+      x: 0,
+      y: 2,
+      width: 12,
+      height: 6,
+      properties: {
+        view: 'timeSeries',
+        stacked: false,
+        title: 'API Latency p95/p99 (ms)',
+        region,
+        stat: 'Average',
+        period: 300,
+        metrics: endpointKeys.flatMap((endpointKey) => [
+          [namespace, 'ApiLatencyP95Ms', 'Endpoint', endpointKey, { label: `${endpointKey} p95` }],
+          [namespace, 'ApiLatencyP99Ms', 'Endpoint', endpointKey, { label: `${endpointKey} p99` }],
+        ]),
       },
-      {
-        type: 'metric',
-        x: 12,
-        y: 2,
-        width: 12,
-        height: 6,
-        properties: {
-          view: 'timeSeries',
-          stacked: false,
-          title: 'API Error Rate (%)',
-          region,
-          stat: 'Average',
-          period: 300,
-          metrics: endpointKeys.map((endpointKey) => [
-            namespace,
-            'ApiErrorRatePct',
-            'Endpoint',
-            endpointKey,
-            { label: `${endpointKey} error` },
-          ]),
-        },
+    },
+    {
+      type: 'metric',
+      x: 12,
+      y: 2,
+      width: 12,
+      height: 6,
+      properties: {
+        view: 'timeSeries',
+        stacked: false,
+        title: 'API Error Rate (%)',
+        region,
+        stat: 'Average',
+        period: 300,
+        metrics: endpointKeys.map((endpointKey) => [
+          namespace,
+          'ApiErrorRatePct',
+          'Endpoint',
+          endpointKey,
+          { label: `${endpointKey} error` },
+        ]),
       },
+    },
+  ];
+
+  if (includeOpsMetrics) {
+    widgets.push(
       {
         type: 'metric',
         x: 0,
@@ -156,8 +217,10 @@ function buildDashboard({ namespace, endpointKeys, region }) {
           },
         },
       },
-    ],
-  };
+    );
+  }
+
+  return { widgets };
 }
 
 function buildAlarmDefinitions({
@@ -165,6 +228,7 @@ function buildAlarmDefinitions({
   alarmPrefix,
   endpointKeys,
   thresholds,
+  includeOpsMetrics,
 }) {
   const alarms = [];
 
@@ -200,71 +264,73 @@ function buildAlarmDefinitions({
     );
   }
 
-  alarms.push(
-    {
-      alarmName: `${alarmPrefix}-queue-depth`,
-      metricName: 'QueueDepth',
-      threshold: thresholds.queueDepth,
-      comparisonOperator: 'GreaterThanThreshold',
-      evaluationPeriods: 3,
-      period: 60,
-      dimensions: [],
-    },
-    {
-      alarmName: `${alarmPrefix}-queue-lag`,
-      metricName: 'QueueLagSeconds',
-      threshold: thresholds.queueLagSeconds,
-      comparisonOperator: 'GreaterThanThreshold',
-      evaluationPeriods: 3,
-      period: 60,
-      dimensions: [],
-    },
-    {
-      alarmName: `${alarmPrefix}-worker-fail-rate`,
-      metricName: 'WorkerFailRatePct15m',
-      threshold: thresholds.workerFailRatePct,
-      comparisonOperator: 'GreaterThanThreshold',
-      evaluationPeriods: 3,
-      period: 60,
-      dimensions: [],
-    },
-    {
-      alarmName: `${alarmPrefix}-db-health`,
-      metricName: 'DbHealth',
-      threshold: 1,
-      comparisonOperator: 'LessThanThreshold',
-      evaluationPeriods: 2,
-      period: 60,
-      dimensions: [],
-    },
-    {
-      alarmName: `${alarmPrefix}-redis-health`,
-      metricName: 'RedisHealth',
-      threshold: 1,
-      comparisonOperator: 'LessThanThreshold',
-      evaluationPeriods: 2,
-      period: 60,
-      dimensions: [],
-    },
-    {
-      alarmName: `${alarmPrefix}-sms-success-rate`,
-      metricName: 'NotificationSuccessRatePct60m',
-      threshold: thresholds.smsSuccessRatePct,
-      comparisonOperator: 'LessThanThreshold',
-      evaluationPeriods: 3,
-      period: 300,
-      dimensions: [{ Name: 'Channel', Value: 'SMS' }],
-    },
-    {
-      alarmName: `${alarmPrefix}-wa-success-rate`,
-      metricName: 'NotificationSuccessRatePct60m',
-      threshold: thresholds.waSuccessRatePct,
-      comparisonOperator: 'LessThanThreshold',
-      evaluationPeriods: 3,
-      period: 300,
-      dimensions: [{ Name: 'Channel', Value: 'WHATSAPP' }],
-    },
-  );
+  if (includeOpsMetrics) {
+    alarms.push(
+      {
+        alarmName: `${alarmPrefix}-queue-depth`,
+        metricName: 'QueueDepth',
+        threshold: thresholds.queueDepth,
+        comparisonOperator: 'GreaterThanThreshold',
+        evaluationPeriods: 3,
+        period: 60,
+        dimensions: [],
+      },
+      {
+        alarmName: `${alarmPrefix}-queue-lag`,
+        metricName: 'QueueLagSeconds',
+        threshold: thresholds.queueLagSeconds,
+        comparisonOperator: 'GreaterThanThreshold',
+        evaluationPeriods: 3,
+        period: 60,
+        dimensions: [],
+      },
+      {
+        alarmName: `${alarmPrefix}-worker-fail-rate`,
+        metricName: 'WorkerFailRatePct15m',
+        threshold: thresholds.workerFailRatePct,
+        comparisonOperator: 'GreaterThanThreshold',
+        evaluationPeriods: 3,
+        period: 60,
+        dimensions: [],
+      },
+      {
+        alarmName: `${alarmPrefix}-db-health`,
+        metricName: 'DbHealth',
+        threshold: 1,
+        comparisonOperator: 'LessThanThreshold',
+        evaluationPeriods: 2,
+        period: 60,
+        dimensions: [],
+      },
+      {
+        alarmName: `${alarmPrefix}-redis-health`,
+        metricName: 'RedisHealth',
+        threshold: 1,
+        comparisonOperator: 'LessThanThreshold',
+        evaluationPeriods: 2,
+        period: 60,
+        dimensions: [],
+      },
+      {
+        alarmName: `${alarmPrefix}-sms-success-rate`,
+        metricName: 'NotificationSuccessRatePct60m',
+        threshold: thresholds.smsSuccessRatePct,
+        comparisonOperator: 'LessThanThreshold',
+        evaluationPeriods: 3,
+        period: 300,
+        dimensions: [{ Name: 'Channel', Value: 'SMS' }],
+      },
+      {
+        alarmName: `${alarmPrefix}-wa-success-rate`,
+        metricName: 'NotificationSuccessRatePct60m',
+        threshold: thresholds.waSuccessRatePct,
+        comparisonOperator: 'LessThanThreshold',
+        evaluationPeriods: 3,
+        period: 300,
+        dimensions: [{ Name: 'Channel', Value: 'WHATSAPP' }],
+      },
+    );
+  }
 
   return alarms.map((alarm) => ({
     ...alarm,
@@ -309,12 +375,10 @@ function main() {
   }
 
   const namespace = readEnv('OBSERVABILITY_CLOUDWATCH_NAMESPACE') || 'Teachera/ExamPlatform';
-  const dashboardName = readEnv('OBSERVABILITY_DASHBOARD_NAME') || 'teachera-p0-10-observability';
-  const alarmPrefix = readEnv('OBSERVABILITY_ALARM_PREFIX') || 'teachera-p0-10';
-  const alarmTopic = readEnv('OBSERVABILITY_ALARM_SNS_TOPIC_ARN');
-  const alarmActions = alarmTopic ? [alarmTopic] : [];
-
-  const endpointKeys = ['exam_api', 'panel_api', 'ops_api', 'www_root'];
+  const dashboardBaseName = readEnv('OBSERVABILITY_DASHBOARD_NAME') || 'teachera-p0-10-observability';
+  const alarmBasePrefix = readEnv('OBSERVABILITY_ALARM_PREFIX') || 'teachera-p0-10';
+  const defaultAlarmTopic = readEnv('OBSERVABILITY_ALARM_SNS_TOPIC_ARN', 'OBSERVABILITY_ALARM_SNS_TOPIC_ARN_ALL');
+  const requireAlarmActions = readBoolEnv('OBSERVABILITY_ALARM_ACTIONS_REQUIRED', true);
 
   const thresholds = {
     p95: readFloatEnv('OBS_SLO_P95_MS', 1200, 50, 60000),
@@ -327,29 +391,63 @@ function main() {
     waSuccessRatePct: readFloatEnv('OBS_SLO_WA_SUCCESS_RATE_PCT', 80, 1, 100),
   };
 
-  const dashboardBody = buildDashboard({ namespace, endpointKeys, region });
+  const serviceSummaries = [];
+  let totalAlarmCount = 0;
 
-  runAws(region, [
-    'cloudwatch',
-    'put-dashboard',
-    '--dashboard-name',
-    dashboardName,
-    '--dashboard-body',
-    JSON.stringify(dashboardBody),
-  ]);
+  for (const service of SERVICE_ORDER) {
+    const cfg = SERVICE_CONFIG[service];
+    const dashboardName = resolveDashboardName(dashboardBaseName, service);
+    const alarmPrefix = resolveAlarmPrefix(alarmBasePrefix, service);
+    const alarmTopic = resolveAlarmTopic(defaultAlarmTopic, service);
+    const alarmActions = alarmTopic ? [alarmTopic] : [];
 
-  const alarms = buildAlarmDefinitions({
-    namespace,
-    alarmPrefix,
-    endpointKeys,
-    thresholds,
-  });
+    if (requireAlarmActions && alarmActions.length === 0) {
+      throw new Error(
+        `Missing SNS alarm action topic for service=${service}. Set OBSERVABILITY_ALARM_SNS_TOPIC_ARN_${serviceUpper(service)} or OBSERVABILITY_ALARM_SNS_TOPIC_ARN.`,
+      );
+    }
 
-  for (const alarm of alarms) {
-    putMetricAlarm({
+    const dashboardBody = buildDashboard({
+      namespace,
+      endpointKeys: cfg.endpointKeys,
       region,
-      alarm,
-      alarmActions,
+      service,
+      includeOpsMetrics: cfg.includeOpsMetrics,
+    });
+
+    runAws(region, [
+      'cloudwatch',
+      'put-dashboard',
+      '--dashboard-name',
+      dashboardName,
+      '--dashboard-body',
+      JSON.stringify(dashboardBody),
+    ]);
+
+    const alarms = buildAlarmDefinitions({
+      namespace,
+      alarmPrefix,
+      endpointKeys: cfg.endpointKeys,
+      thresholds,
+      includeOpsMetrics: cfg.includeOpsMetrics,
+    });
+
+    for (const alarm of alarms) {
+      putMetricAlarm({
+        region,
+        alarm,
+        alarmActions,
+      });
+    }
+
+    totalAlarmCount += alarms.length;
+    serviceSummaries.push({
+      service,
+      dashboard_name: dashboardName,
+      alarm_prefix: alarmPrefix,
+      alarm_count: alarms.length,
+      alarm_actions_attached: alarmActions.length > 0,
+      alarm_topic_arn: alarmTopic || null,
     });
   }
 
@@ -357,10 +455,10 @@ function main() {
     ok: true,
     region,
     namespace,
-    dashboard_name: dashboardName,
-    alarm_prefix: alarmPrefix,
-    alarm_count: alarms.length,
-    alarm_actions_attached: alarmActions.length > 0,
+    require_alarm_actions: requireAlarmActions,
+    dashboard_count: serviceSummaries.length,
+    alarm_count: totalAlarmCount,
+    services: serviceSummaries,
     thresholds,
   }, null, 2));
 }

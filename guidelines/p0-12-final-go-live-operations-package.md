@@ -23,6 +23,15 @@ npm run p0:go-live:package:audit -- --http --aws
 
 Not: Bu audit, ağır yük testlerini yeniden koşturmaz; P0-9/10/11 mevcut artefaktlarını ve canlı health gate’lerini konsolide kontrol eder.
 
+3. Cutover + Hypercare + Rollback dry-run tatbikatı (kanıt üretir):
+```bash
+npm run p0:cutover:hypercare:drill -- --aws --hypercare_minutes 120 --sample_every_seconds 60
+```
+
+Çıktı artefaktları:
+- `guidelines/p0-12-cutover-hypercare-rollback-latest.json`
+- `guidelines/p0-12-cutover-hypercare-rollback-latest.md`
+
 ## 1) Runbook (Go-Live)
 ### T-24h
 1. Deploy freeze başlat (feature freeze + sadece IC onaylı hotfix).
@@ -39,6 +48,7 @@ Not: Bu audit, ağır yük testlerini yeniden koşturmaz; P0-9/10/11 mevcut arte
 2. Worker + webhook path kontrolü:
    - scheduler tetikleme
    - signature-verified provider callback
+   - queue runtime contract doğrulaması: worker `notification_jobs` kuyruğundan tüketiyor olmalı
 3. Alarm kanalları (SNS/email) alarm-test ile doğrulanır.
 
 ### T-0 (Cutover)
@@ -103,6 +113,7 @@ Aşağıdaki kapılar `DONE` olmalı:
 - Turnstile secret active ve forms captcha zorunlu
 - Panel MFA zorunlu ve admin login doğrulandı
 - Queue DLQ replay doğrulandı
+- Queue çalışma modeli runbook ile uyumlu doğrulandı (`DB queue authoritative`, SQS infra optional)
 - Runbook ve rollback adımları dry-run edildi
 - War-room rol ataması tamamlandı
 - Final approval imzalandı

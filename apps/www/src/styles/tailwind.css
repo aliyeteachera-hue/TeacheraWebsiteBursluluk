@@ -1,0 +1,6 @@
+@import 'tailwindcss' source(none);
+@source '../app/**/*.{js,ts,jsx,tsx}';
+@source '../imports/TeacheraLogo.tsx';
+@source '../imports/Group1000004255.tsx';
+
+@import 'tw-animate-css';

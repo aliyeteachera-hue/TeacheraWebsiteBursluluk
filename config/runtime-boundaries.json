@@ -1,0 +1,51 @@
+{
+  "runtimes": {
+    "www": {
+      "description": "Public marketing site and candidate-facing frontend app",
+      "domains": [
+        "teachera.com.tr"
+      ],
+      "api_patterns": []
+    },
+    "exam-api": {
+      "description": "Candidate exam session and results API",
+      "domains": [
+        "exam-api.teachera.com.tr"
+      ],
+      "api_patterns": [
+        "api/exam/**/*.js",
+        "api/forms.js",
+        "api/health.js"
+      ]
+    },
+    "panel-api": {
+      "description": "Admin panel API",
+      "domains": [
+        "panel-api.teachera.com.tr"
+      ],
+      "api_patterns": [
+        "api/panel/*.js",
+        "api/panel/**/*.js",
+        "api/health.js"
+      ]
+    },
+    "ops-api": {
+      "description": "Worker, webhook reconciliation and observability collector",
+      "domains": [
+        "ops-api.teachera.com.tr"
+      ],
+      "api_patterns": [
+        "api/notifications/*.js",
+        "api/notifications/**/*.js",
+        "api/ops/*.js",
+        "api/ops/**/*.js",
+        "api/health.js"
+      ]
+    }
+  },
+  "notes": [
+    "api/health.js intentionally appears in exam-api, panel-api and ops-api.",
+    "api/_lib/** is shared library code and is excluded from ownership checks.",
+    "If a new endpoint is added, update this manifest and rerun runtime-boundaries:audit."
+  ]
+}

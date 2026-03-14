@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/notifications/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/ops/**/*.js": {
+      "maxDuration": 30
+    },
+    "api/health.js": {
+      "maxDuration": 30
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/notifications/worker?limit=100&reconcile_limit=100",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/ops/observability/collect?sample_size=5&timeout_ms=4500",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}

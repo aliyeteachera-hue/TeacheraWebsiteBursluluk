@@ -1,0 +1,712 @@
+{
+  "generated_at_utc": "2026-03-14T20:51:45.798Z",
+  "run_id": "2026-03-14T20-49-16-702Z",
+  "doD_target": "Cutover + Hypercare + Rollback Drill",
+  "config": {
+    "www_base_url": "https://teachera.com.tr",
+    "exam_api_base_url": "https://exam-api.teachera.com.tr",
+    "panel_api_base_url": "https://panel-api.teachera.com.tr",
+    "ops_api_base_url": "https://ops-api.teachera.com.tr",
+    "hypercare_minutes": 2,
+    "sample_every_seconds": 20,
+    "timeout_ms": 15000,
+    "aws_enabled": true,
+    "aws_region": "eu-north-1",
+    "alarm_prefix": "teachera-p0-10"
+  },
+  "checks": [
+    {
+      "id": "cutover_package_audit_latest",
+      "status": "PASS",
+      "detail": "Latest P0-12 package audit is ready.",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/p0-12-go-live-package-audit-latest.json",
+        "timestamp": "2026-03-14T18:52:38.194Z",
+        "totals": {
+          "pass": 13,
+          "fail": 0,
+          "warn": 0,
+          "skip": 0
+        }
+      }
+    },
+    {
+      "id": "cutover_www_route",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/bursluluk-2026",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "latency_ms": 244,
+        "error": null
+      }
+    },
+    {
+      "id": "cutover_exam_health",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://exam-api.teachera.com.tr/api/health",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "latency_ms": 1180,
+        "error": null
+      }
+    },
+    {
+      "id": "cutover_panel_me_unauth",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/auth/me",
+        "status": 401,
+        "expected": [
+          401,
+          403
+        ],
+        "latency_ms": 428,
+        "error": null
+      }
+    },
+    {
+      "id": "cutover_ops_health",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://ops-api.teachera.com.tr/api/health",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "latency_ms": 1107,
+        "error": null
+      }
+    },
+    {
+      "id": "cutover_exam_start_flow",
+      "status": "PASS",
+      "detail": "exam session start succeeded.",
+      "evidence": {
+        "http_status": 200,
+        "error": null,
+        "code": ""
+      }
+    },
+    {
+      "id": "cutover_exam_answer_flow",
+      "status": "PASS",
+      "detail": "answer accepted.",
+      "evidence": {
+        "http_status": 200,
+        "error": null,
+        "code": ""
+      }
+    },
+    {
+      "id": "cutover_exam_submit_flow",
+      "status": "PASS",
+      "detail": "submit accepted.",
+      "evidence": {
+        "http_status": 200,
+        "error": null,
+        "code": ""
+      }
+    },
+    {
+      "id": "cutover_exam_results_flow",
+      "status": "PASS",
+      "detail": "results fetched successfully.",
+      "evidence": {
+        "http_status": 200,
+        "error": null,
+        "code": ""
+      }
+    },
+    {
+      "id": "cutover_panel_login_dashboard",
+      "status": "PASS",
+      "detail": "Panel login -> auth/me -> dashboard -> logout flow succeeded.",
+      "evidence": {
+        "login_status": 200,
+        "me_status": 200,
+        "dashboard_status": 200,
+        "logout_status": 200
+      }
+    },
+    {
+      "id": "cutover_worker_auth_guard",
+      "status": "PASS",
+      "detail": "Worker rejects invalid secret (401).",
+      "evidence": {
+        "http_status": 401,
+        "code": "invalid_worker_secret"
+      }
+    },
+    {
+      "id": "cutover_worker_valid_secret",
+      "status": "PASS",
+      "detail": "Worker accepts valid secret (200).",
+      "evidence": {
+        "http_status": 200,
+        "code": ""
+      }
+    },
+    {
+      "id": "cutover_webhook_signature_guard",
+      "status": "PASS",
+      "detail": "Webhook rejects missing signature (401).",
+      "evidence": {
+        "http_status": 401,
+        "code": "missing_webhook_signature"
+      }
+    },
+    {
+      "id": "cutover_webhook_valid_signature",
+      "status": "PASS",
+      "detail": "Webhook accepted signed callback (202).",
+      "evidence": {
+        "http_status": 202,
+        "code": ""
+      }
+    },
+    {
+      "id": "hypercare_http_window",
+      "status": "PASS",
+      "detail": "Hypercare drill window clean (6 samples, 2m).",
+      "evidence": {
+        "sample_count": 6,
+        "window_minutes": 2,
+        "incidents": []
+      }
+    },
+    {
+      "id": "hypercare_alarm_state",
+      "status": "PASS",
+      "detail": "No critical alarms in ALARM state for prefix teachera-p0-10 (missing-data alarms: 38).",
+      "evidence": {
+        "region": "eu-north-1",
+        "alarm_prefix": "teachera-p0-10",
+        "alarm_total": 38,
+        "alarm_state_alarm_count": 38,
+        "alarm_state_alarm_names": [
+          "teachera-p0-10-db-health",
+          "teachera-p0-10-exam-exam_api-error-rate",
+          "teachera-p0-10-exam-exam_api-latency-p95",
+          "teachera-p0-10-exam-exam_api-latency-p99",
+          "teachera-p0-10-exam_api-error-rate",
+          "teachera-p0-10-exam_api-latency-p95",
+          "teachera-p0-10-exam_api-latency-p99",
+          "teachera-p0-10-ops-db-health",
+          "teachera-p0-10-ops-ops_api-error-rate",
+          "teachera-p0-10-ops-ops_api-latency-p95",
+          "teachera-p0-10-ops-ops_api-latency-p99",
+          "teachera-p0-10-ops-queue-depth",
+          "teachera-p0-10-ops-queue-lag",
+          "teachera-p0-10-ops-redis-health",
+          "teachera-p0-10-ops-sms-success-rate",
+          "teachera-p0-10-ops-wa-success-rate",
+          "teachera-p0-10-ops-worker-fail-rate",
+          "teachera-p0-10-ops_api-error-rate",
+          "teachera-p0-10-ops_api-latency-p95",
+          "teachera-p0-10-ops_api-latency-p99"
+        ],
+        "missing_data_alarm_count": 38,
+        "critical_alarm_count": 0,
+        "critical_alarm_names": []
+      }
+    },
+    {
+      "id": "rollback_candidate_selection",
+      "status": "PASS",
+      "detail": "Rollback candidates found for all services (dry-run only).",
+      "evidence": {
+        "www": {
+          "current_candidate": "https://teachera-nby0ip7m4-ahmet-fehim-uyars-projects.vercel.app",
+          "rollback_candidate": "https://teachera-2osrf92a7-ahmet-fehim-uyars-projects.vercel.app",
+          "candidate_count": 13
+        },
+        "exam-api": {
+          "current_candidate": "https://teachera-exam-2tik1r4u6-ahmet-fehim-uyars-projects.vercel.app",
+          "rollback_candidate": "https://teachera-exam-esq5li68o-ahmet-fehim-uyars-projects.vercel.app",
+          "candidate_count": 19
+        },
+        "panel-api": {
+          "current_candidate": "https://teachera-panel-bpjrmmdze-ahmet-fehim-uyars-projects.vercel.app",
+          "rollback_candidate": "https://teachera-panel-ejcjfp9ur-ahmet-fehim-uyars-projects.vercel.app",
+          "candidate_count": 13
+        },
+        "ops-api": {
+          "current_candidate": "https://teachera-ops-o20vw0pmk-ahmet-fehim-uyars-projects.vercel.app",
+          "rollback_candidate": "https://teachera-ops-1oluxg953-ahmet-fehim-uyars-projects.vercel.app",
+          "candidate_count": 20
+        }
+      }
+    },
+    {
+      "id": "rollback_candidate_health",
+      "status": "PASS",
+      "detail": "Rollback candidate health checks are acceptable (dry-run).",
+      "evidence": {
+        "www": {
+          "url": "https://teachera-2osrf92a7-ahmet-fehim-uyars-projects.vercel.app/",
+          "status": 401,
+          "expected": [
+            200,
+            301,
+            302,
+            308,
+            401,
+            403
+          ],
+          "latency_ms": 302,
+          "error": null
+        },
+        "exam-api": {
+          "url": "https://teachera-exam-esq5li68o-ahmet-fehim-uyars-projects.vercel.app/api/health",
+          "status": 401,
+          "expected": [
+            200,
+            401,
+            403
+          ],
+          "latency_ms": 464,
+          "error": null
+        },
+        "panel-api": {
+          "url": "https://teachera-panel-ejcjfp9ur-ahmet-fehim-uyars-projects.vercel.app/api/panel/auth/me",
+          "status": 401,
+          "expected": [
+            200,
+            401,
+            403
+          ],
+          "latency_ms": 324,
+          "error": null
+        },
+        "ops-api": {
+          "url": "https://teachera-ops-1oluxg953-ahmet-fehim-uyars-projects.vercel.app/api/health",
+          "status": 401,
+          "expected": [
+            200,
+            401,
+            403
+          ],
+          "latency_ms": 451,
+          "error": null
+        }
+      }
+    },
+    {
+      "id": "rollback_post_dry_run_stability",
+      "status": "PASS",
+      "detail": "Primary domains remained stable after rollback dry-run simulation.",
+      "evidence": {
+        "www_after_dry_run": {
+          "status": 200,
+          "expected": [
+            200,
+            301,
+            302,
+            308
+          ],
+          "latency_ms": 213,
+          "error": null
+        },
+        "exam_after_dry_run": {
+          "status": 200,
+          "expected": [
+            200
+          ],
+          "latency_ms": 700,
+          "error": null
+        },
+        "ops_after_dry_run": {
+          "status": 200,
+          "expected": [
+            200
+          ],
+          "latency_ms": 409,
+          "error": null
+        }
+      }
+    }
+  ],
+  "evidence": {
+    "panel_smoke": {
+      "temp_user_email": "cutover.smoke.1773521365920@teachera.com.tr",
+      "login_status": 200,
+      "me_status": 200,
+      "dashboard_status": 200,
+      "logout_status": 200
+    },
+    "hypercare_samples": [
+      {
+        "sample_index": 1,
+        "sampled_at_utc": "2026-03-14T20:49:38.310Z",
+        "endpoints": {
+          "www": {
+            "url": "https://teachera.com.tr/",
+            "status": 200,
+            "latency_ms": 303,
+            "expected": [
+              200,
+              301,
+              302,
+              308
+            ],
+            "error": null
+          },
+          "exam_health": {
+            "url": "https://exam-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 614,
+            "expected": [
+              200
+            ],
+            "error": null
+          },
+          "panel_me_unauth": {
+            "url": "https://panel-api.teachera.com.tr/api/panel/auth/me",
+            "status": 401,
+            "latency_ms": 442,
+            "expected": [
+              401,
+              403
+            ],
+            "error": null
+          },
+          "ops_health": {
+            "url": "https://ops-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 371,
+            "expected": [
+              200
+            ],
+            "error": null
+          }
+        }
+      },
+      {
+        "sample_index": 2,
+        "sampled_at_utc": "2026-03-14T20:50:00.046Z",
+        "endpoints": {
+          "www": {
+            "url": "https://teachera.com.tr/",
+            "status": 200,
+            "latency_ms": 231,
+            "expected": [
+              200,
+              301,
+              302,
+              308
+            ],
+            "error": null
+          },
+          "exam_health": {
+            "url": "https://exam-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 524,
+            "expected": [
+              200
+            ],
+            "error": null
+          },
+          "panel_me_unauth": {
+            "url": "https://panel-api.teachera.com.tr/api/panel/auth/me",
+            "status": 401,
+            "latency_ms": 498,
+            "expected": [
+              401,
+              403
+            ],
+            "error": null
+          },
+          "ops_health": {
+            "url": "https://ops-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 521,
+            "expected": [
+              200
+            ],
+            "error": null
+          }
+        }
+      },
+      {
+        "sample_index": 3,
+        "sampled_at_utc": "2026-03-14T20:50:21.845Z",
+        "endpoints": {
+          "www": {
+            "url": "https://teachera.com.tr/",
+            "status": 200,
+            "latency_ms": 237,
+            "expected": [
+              200,
+              301,
+              302,
+              308
+            ],
+            "error": null
+          },
+          "exam_health": {
+            "url": "https://exam-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 558,
+            "expected": [
+              200
+            ],
+            "error": null
+          },
+          "panel_me_unauth": {
+            "url": "https://panel-api.teachera.com.tr/api/panel/auth/me",
+            "status": 401,
+            "latency_ms": 560,
+            "expected": [
+              401,
+              403
+            ],
+            "error": null
+          },
+          "ops_health": {
+            "url": "https://ops-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 561,
+            "expected": [
+              200
+            ],
+            "error": null
+          }
+        }
+      },
+      {
+        "sample_index": 4,
+        "sampled_at_utc": "2026-03-14T20:50:43.770Z",
+        "endpoints": {
+          "www": {
+            "url": "https://teachera.com.tr/",
+            "status": 200,
+            "latency_ms": 230,
+            "expected": [
+              200,
+              301,
+              302,
+              308
+            ],
+            "error": null
+          },
+          "exam_health": {
+            "url": "https://exam-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 659,
+            "expected": [
+              200
+            ],
+            "error": null
+          },
+          "panel_me_unauth": {
+            "url": "https://panel-api.teachera.com.tr/api/panel/auth/me",
+            "status": 401,
+            "latency_ms": 431,
+            "expected": [
+              401,
+              403
+            ],
+            "error": null
+          },
+          "ops_health": {
+            "url": "https://ops-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 539,
+            "expected": [
+              200
+            ],
+            "error": null
+          }
+        }
+      },
+      {
+        "sample_index": 5,
+        "sampled_at_utc": "2026-03-14T20:51:05.641Z",
+        "endpoints": {
+          "www": {
+            "url": "https://teachera.com.tr/",
+            "status": 200,
+            "latency_ms": 262,
+            "expected": [
+              200,
+              301,
+              302,
+              308
+            ],
+            "error": null
+          },
+          "exam_health": {
+            "url": "https://exam-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 526,
+            "expected": [
+              200
+            ],
+            "error": null
+          },
+          "panel_me_unauth": {
+            "url": "https://panel-api.teachera.com.tr/api/panel/auth/me",
+            "status": 401,
+            "latency_ms": 469,
+            "expected": [
+              401,
+              403
+            ],
+            "error": null
+          },
+          "ops_health": {
+            "url": "https://ops-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 585,
+            "expected": [
+              200
+            ],
+            "error": null
+          }
+        }
+      },
+      {
+        "sample_index": 6,
+        "sampled_at_utc": "2026-03-14T20:51:27.503Z",
+        "endpoints": {
+          "www": {
+            "url": "https://teachera.com.tr/",
+            "status": 200,
+            "latency_ms": 221,
+            "expected": [
+              200,
+              301,
+              302,
+              308
+            ],
+            "error": null
+          },
+          "exam_health": {
+            "url": "https://exam-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 557,
+            "expected": [
+              200
+            ],
+            "error": null
+          },
+          "panel_me_unauth": {
+            "url": "https://panel-api.teachera.com.tr/api/panel/auth/me",
+            "status": 401,
+            "latency_ms": 451,
+            "expected": [
+              401,
+              403
+            ],
+            "error": null
+          },
+          "ops_health": {
+            "url": "https://ops-api.teachera.com.tr/api/health",
+            "status": 200,
+            "latency_ms": 570,
+            "expected": [
+              200
+            ],
+            "error": null
+          }
+        }
+      }
+    ],
+    "rollback_dry_run": {
+      "candidates": {
+        "www": {
+          "current_candidate": "https://teachera-nby0ip7m4-ahmet-fehim-uyars-projects.vercel.app",
+          "rollback_candidate": "https://teachera-2osrf92a7-ahmet-fehim-uyars-projects.vercel.app",
+          "candidate_count": 13
+        },
+        "exam-api": {
+          "current_candidate": "https://teachera-exam-2tik1r4u6-ahmet-fehim-uyars-projects.vercel.app",
+          "rollback_candidate": "https://teachera-exam-esq5li68o-ahmet-fehim-uyars-projects.vercel.app",
+          "candidate_count": 19
+        },
+        "panel-api": {
+          "current_candidate": "https://teachera-panel-bpjrmmdze-ahmet-fehim-uyars-projects.vercel.app",
+          "rollback_candidate": "https://teachera-panel-ejcjfp9ur-ahmet-fehim-uyars-projects.vercel.app",
+          "candidate_count": 13
+        },
+        "ops-api": {
+          "current_candidate": "https://teachera-ops-o20vw0pmk-ahmet-fehim-uyars-projects.vercel.app",
+          "rollback_candidate": "https://teachera-ops-1oluxg953-ahmet-fehim-uyars-projects.vercel.app",
+          "candidate_count": 20
+        }
+      },
+      "simulated_commands": [
+        "vercel alias set https://teachera-2osrf92a7-ahmet-fehim-uyars-projects.vercel.app teachera.com.tr",
+        "vercel alias set https://teachera-exam-esq5li68o-ahmet-fehim-uyars-projects.vercel.app exam-api.teachera.com.tr",
+        "vercel alias set https://teachera-panel-ejcjfp9ur-ahmet-fehim-uyars-projects.vercel.app panel-api.teachera.com.tr",
+        "vercel alias set https://teachera-ops-1oluxg953-ahmet-fehim-uyars-projects.vercel.app ops-api.teachera.com.tr"
+      ],
+      "candidate_health": {
+        "www": {
+          "url": "https://teachera-2osrf92a7-ahmet-fehim-uyars-projects.vercel.app/",
+          "status": 401,
+          "expected": [
+            200,
+            301,
+            302,
+            308,
+            401,
+            403
+          ],
+          "latency_ms": 302,
+          "error": null
+        },
+        "exam-api": {
+          "url": "https://teachera-exam-esq5li68o-ahmet-fehim-uyars-projects.vercel.app/api/health",
+          "status": 401,
+          "expected": [
+            200,
+            401,
+            403
+          ],
+          "latency_ms": 464,
+          "error": null
+        },
+        "panel-api": {
+          "url": "https://teachera-panel-ejcjfp9ur-ahmet-fehim-uyars-projects.vercel.app/api/panel/auth/me",
+          "status": 401,
+          "expected": [
+            200,
+            401,
+            403
+          ],
+          "latency_ms": 324,
+          "error": null
+        },
+        "ops-api": {
+          "url": "https://teachera-ops-1oluxg953-ahmet-fehim-uyars-projects.vercel.app/api/health",
+          "status": 401,
+          "expected": [
+            200,
+            401,
+            403
+          ],
+          "latency_ms": 451,
+          "error": null
+        }
+      }
+    }
+  },
+  "totals": {
+    "pass": 19,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "overall_ready_for_p0_12_cutover_hypercare_rollback": true
+}

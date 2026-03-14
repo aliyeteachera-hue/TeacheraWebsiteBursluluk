@@ -32,9 +32,19 @@ function readArg(name) {
   return '';
 }
 
+function readBoolArg(name, fallback) {
+  const raw = trim(readArg(name));
+  if (!raw) return fallback;
+  if (['1', 'true', 'yes', 'on'].includes(raw.toLowerCase())) return true;
+  if (['0', 'false', 'no', 'off'].includes(raw.toLowerCase())) return false;
+  return fallback;
+}
+
 function main() {
   const reportPath = resolve(trim(readArg('report') || 'guidelines/p0-11-load-resilience-report-latest.json'));
   const signingKey = trim(readArg('signing-key') || process.env.P0_11_REPORT_SIGNING_KEY || process.env.CRON_SECRET);
+  const requireReady = readBoolArg('require-ready', true);
+  const requireDirectPeakEvidence = readBoolArg('require-direct-peak-evidence', true);
   if (!signingKey) {
     throw new Error('Missing signing key. Set P0_11_REPORT_SIGNING_KEY or CRON_SECRET.');
   }
@@ -62,12 +72,22 @@ function main() {
 
   const shaOk = canonicalSha256 === trim(signatureBlock.canonical_sha256);
   const signatureOk = computedSignature === expectedSignature;
+  const overallReady = parsed?.overall_ready_for_p0_11 === true;
+  const directPeakEvidencePass = Array.isArray(parsed?.checks)
+    && parsed.checks.some((item) => item?.id === 'direct_peak_evidence' && item?.status === 'PASS');
 
   const result = {
-    ok: shaOk && signatureOk,
+    ok: shaOk
+      && signatureOk
+      && (!requireReady || overallReady)
+      && (!requireDirectPeakEvidence || directPeakEvidencePass),
     report_path: reportPath,
     sha_ok: shaOk,
     signature_ok: signatureOk,
+    overall_ready_for_p0_11: overallReady,
+    direct_peak_evidence_pass: directPeakEvidencePass,
+    require_ready: requireReady,
+    require_direct_peak_evidence: requireDirectPeakEvidence,
     signer: signatureBlock.signer || null,
   };
 

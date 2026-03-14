@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "node -e \"const fs=require('fs');fs.mkdirSync('dist',{recursive:true});fs.writeFileSync('dist/.keep','ok');console.log('ops-api build ok')\"",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/notifications/worker?limit=100&reconcile_limit=100",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/ops/observability/collect?sample_size=5&timeout_ms=4500",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}

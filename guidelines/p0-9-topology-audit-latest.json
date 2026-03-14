@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-03-13T13:26:10.411Z",
+  "mode": {
+    "http": true,
+    "aws": true
+  },
+  "totals": {
+    "pass": 0,
+    "fail": 1,
+    "warn": 0,
+    "skip": 0
+  },
+  "overall_ready_for_p0_9": false,
+  "checks": [
+    {
+      "id": "preflight_required_env",
+      "status": "FAIL",
+      "detail": "Missing required env: EXAM_API_BASE_URL, PANEL_API_BASE_URL, OPS_API_BASE_URL, AWS_REGION, AURORA_CLUSTER_ID|RDS_INSTANCE_ID, ELASTICACHE_REPLICATION_GROUP_ID, SQS_QUEUE_URL, S3_BUCKET_NAME, CLOUDFRONT_DISTRIBUTION_ID",
+      "evidence": {
+        "missing": [
+          "EXAM_API_BASE_URL",
+          "PANEL_API_BASE_URL",
+          "OPS_API_BASE_URL",
+          "AWS_REGION",
+          "AURORA_CLUSTER_ID|RDS_INSTANCE_ID",
+          "ELASTICACHE_REPLICATION_GROUP_ID",
+          "SQS_QUEUE_URL",
+          "S3_BUCKET_NAME",
+          "CLOUDFRONT_DISTRIBUTION_ID"
+        ],
+        "mode": {
+          "http": true,
+          "aws": true
+        }
+      }
+    }
+  ]
+}

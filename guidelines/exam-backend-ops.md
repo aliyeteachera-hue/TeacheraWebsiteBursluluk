@@ -15,13 +15,19 @@ Bu doküman, `api/*` altında eklenen backend’in 10.000 aday hedefi için oper
 
 ## 2) Veritabanı
 - Migration: `db/migrations/20260306_0001_exam_backend.sql`
+- Versioned consent migration: `db/migrations/20260313_0008_kvkk_versioned_consent.sql`
 - Kritik view’lar:
   - `v_candidate_operations`
   - `v_notifications`
   - `v_unviewed_results`
 - Tüm panel endpoint’lerinde `page`/`per_page` zorunlu tutulur (`per_page <= 200`).
+- KVKK açık rıza kayıtları `consent_records` tablosunda sürüm bazlı tutulur (`consent_version`, `legal_text_version`, `consented_at`).
 
 ## 3) Bildirim retry / DLQ
+- Queue-first runtime contract:
+  - Otoritatif kuyruk: `notification_jobs` (PostgreSQL)
+  - Worker dequeue kaynağı: DB (`FOR UPDATE SKIP LOCKED`)
+  - `SQS_QUEUE_URL` varsa: yalnız infra/ops (alarm/entegrasyon) amacıyla, runtime source-of-truth değildir
 - İlk enqueue: `notification_jobs.status = QUEUED`
 - Worker başarısızlığı: `RETRYING` + `next_retry_at`
 - Backoff politikası: `1m -> 5m -> 15m -> 60m -> 6h`

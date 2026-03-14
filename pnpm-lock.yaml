@@ -85,6 +85,115 @@ importers:
         specifier: ^4.0.18
         version: 4.0.18(jiti@2.6.1)(lightningcss@1.30.1)
 
+  apps/exam-api:
+    dependencies:
+      '@aws-sdk/client-kms':
+        specifier: ^3.1006.0
+        version: 3.1006.0
+      '@teachera/shared-backend':
+        specifier: file:../../packages/shared/backend
+        version: link:../../packages/shared/backend
+      pg:
+        specifier: ^8.16.3
+        version: 8.20.0
+      redis:
+        specifier: ^4.7.1
+        version: 4.7.1
+
+  apps/ops-api:
+    dependencies:
+      '@aws-sdk/client-cloudwatch':
+        specifier: ^3.1007.0
+        version: 3.1007.0
+      '@aws-sdk/client-kms':
+        specifier: ^3.1006.0
+        version: 3.1006.0
+      '@teachera/shared-backend':
+        specifier: file:../../packages/shared/backend
+        version: link:../../packages/shared/backend
+      pg:
+        specifier: ^8.16.3
+        version: 8.20.0
+      redis:
+        specifier: ^4.7.1
+        version: 4.7.1
+
+  apps/panel-api:
+    dependencies:
+      '@aws-sdk/client-kms':
+        specifier: ^3.1006.0
+        version: 3.1006.0
+      '@teachera/shared-backend':
+        specifier: file:../../packages/shared/backend
+        version: link:../../packages/shared/backend
+      pg:
+        specifier: ^8.16.3
+        version: 8.20.0
+      redis:
+        specifier: ^4.7.1
+        version: 4.7.1
+
+  apps/www:
+    dependencies:
+      '@vercel/speed-insights':
+        specifier: ^1.3.1
+        version: 1.3.1(react@18.3.1)
+      clsx:
+        specifier: 2.1.1
+        version: 2.1.1
+      lucide-react:
+        specifier: 0.487.0
+        version: 0.487.0(react@18.3.1)
+      motion:
+        specifier: 12.23.24
+        version: 12.23.24(@emotion/is-prop-valid@1.4.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: 18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: 18.3.1
+        version: 18.3.1(react@18.3.1)
+      react-router:
+        specifier: 7.13.0
+        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      sonner:
+        specifier: 2.0.3
+        version: 2.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      tw-animate-css:
+        specifier: 1.3.8
+        version: 1.3.8
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: 4.1.12
+        version: 4.1.12(vite@6.3.5(jiti@2.6.1)(lightningcss@1.30.1))
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      '@vitejs/plugin-react':
+        specifier: 4.7.0
+        version: 4.7.0(vite@6.3.5(jiti@2.6.1)(lightningcss@1.30.1))
+      tailwindcss:
+        specifier: 4.1.12
+        version: 4.1.12
+      vite:
+        specifier: 6.3.5
+        version: 6.3.5(jiti@2.6.1)(lightningcss@1.30.1)
+
+  packages/shared/backend:
+    dependencies:
+      '@aws-sdk/client-kms':
+        specifier: ^3.1006.0
+        version: 3.1006.0
+      pg:
+        specifier: ^8.16.3
+        version: 8.20.0
+      redis:
+        specifier: ^4.7.1
+        version: 4.7.1
+
 packages:
 
   '@aws-crypto/sha256-browser@5.2.0':

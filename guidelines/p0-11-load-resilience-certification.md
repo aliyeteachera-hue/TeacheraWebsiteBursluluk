@@ -6,6 +6,7 @@ Bu kılavuz P0-11 DoD’yi tek akışta, zaman kazandıran şekilde kapatır:
 - Provider outage simülasyonu
 - Queue backlog recovery + DLQ replay
 - Signed report üretimi
+- Direct peak evidence gate (projection-only raporları tek başına yeterli saymaz)
 
 ## 1) Zorunlu env
 
@@ -27,7 +28,9 @@ npm run p0:load-resilience:certify -- \
   --worker_batch 140 \
   --scenario_window_minutes 180 \
   --scenario_min_users 10000 \
-  --scenario_max_users 15000
+  --scenario_max_users 15000 \
+  --direct_evidence_min_users 200 \
+  --direct_evidence_min_start_concurrency 20
 ```
 
 Not:
@@ -61,9 +64,14 @@ Minimum beklenenler:
 - `burst_results_success_rate = PASS`
 - `provider_outage_simulation = PASS`
 - `queue_backlog_recovery = PASS`
+- `direct_peak_evidence = PASS`
 - `scenario_10k_projection = PASS`
 - `scenario_15k_projection = PASS`
 - `signed_report = PASS`
+
+`direct_peak_evidence` PASS koşulu:
+- Ya doğrudan koşuda kullanıcı/concurrency eşiği sağlanır
+- Ya da bağımsız dış kanıt (örn. dağıtık load testi rapor URL/referansı) eklenir
 
 ## 5) Notlar
 

@@ -54,7 +54,8 @@ Mandatory backend module boundaries:
 Mandatory data platform:
 - PostgreSQL (production: HA, backup, PITR)
 - Redis (session, rate-limit, counters/timers, short-lived state)
-- Queue (canonical v1 provider: AWS SQS + DLQ)
+- Queue runtime (canonical v1): PostgreSQL `notification_jobs` + `dlq_jobs`
+- SQS (optional in v1): infra/ops integration layer, not runtime dequeue source-of-truth
 - Object Storage + CDN for media/static distribution
 
 Core tables required in canonical schema:
@@ -66,12 +67,13 @@ Core tables required in canonical schema:
 ### 2.5 Notification Pipeline (Queue-First)
 Canonical sequence:
 1. API writes job to `notification_jobs`.
-2. Worker consumes queued jobs.
+2. Worker consumes queued jobs directly from DB (`FOR UPDATE SKIP LOCKED` lease pattern).
 3. Provider send request.
 4. Callback/webhook processed and verified.
 5. `notification_events` and job status updated.
 6. Retry policy: `1m -> 5m -> 15m -> 60m -> 6h`.
 7. Max retry exhausted -> DLQ + panel manual action required.
+8. If SQS exists in environment, it is treated as infra-level signal/observability channel, not dequeue authority.
 
 ### 2.6 Security and Compliance Baseline
 Mandatory controls:
@@ -109,7 +111,8 @@ Mandatory go-live operations package:
 - Canonical v1 keeps UI on `teachera.com.tr` while enforcing API separation by subdomain.
 
 2. Queue technology ambiguity resolved:
-- Canonical v1 provider = AWS SQS (+ DLQ).
+- Canonical v1 runtime queue = PostgreSQL (`notification_jobs` / `dlq_jobs`).
+- AWS SQS remains optional infra integration in v1.
 - RabbitMQ/Kafka remain future alternatives, not v1 default.
 
 3. Generic vs AWS diagrams resolved:

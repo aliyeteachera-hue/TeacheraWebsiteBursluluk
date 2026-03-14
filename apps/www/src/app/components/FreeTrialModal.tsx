@@ -1,0 +1,579 @@
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import {
+  ChevronDown, Check, Send,
+  User, Phone, Mail, Globe, CalendarDays, Clock, Calendar, X, Sparkles, Info,
+} from 'lucide-react';
+import { useFreeTrial } from './FreeTrialContext';
+import { ageRanges, getLanguagesForAge } from './ageLanguageMap';
+import imgBg from "figma:asset/fc31d891571779da1d514055d08ebb51d4ccb03e.webp";
+import { openMailDraft } from './formMailto';
+import { isValidTrMobilePhone, normalizeTrMobileInput, TR_MOBILE_PATTERN, TR_MOBILE_TITLE } from './phoneUtils';
+import { notifyError, notifySuccess } from '../lib/notifications';
+import { FORM_UI_MESSAGES } from '../lib/formUiMessages';
+import { useFormSubmission } from '../lib/useFormSubmission';
+import { useCoarsePointer } from '../lib/useCoarsePointer';
+import { OverlayModal } from './overlay/OverlayPrimitives';
+import { DatePickerInput, formatDateTr } from './form/DatePickerInput';
+
+const LEGAL_KVKK_URL = '/hukuki/musteri-aydinlatma-metni';
+
+/* ─── DATA ──────────────────────────────────────────────────────────────── */
+const timeSlots = [
+  { id: '09-12', label: '09:00 – 12:00', icon: '🌅' },
+  { id: '12-15', label: '12:00 – 15:00', icon: '☀️' },
+  { id: '15-18', label: '15:00 – 18:00', icon: '🌤️' },
+  { id: '18-21', label: '18:00 – 21:00', icon: '🌙' },
+];
+
+const inputBase =
+  "w-full h-[44px] bg-white rounded-[30px] px-5 text-[14px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#00000B] placeholder:text-[#686767] outline-none border border-black/5 focus:border-[#324D47]/50 focus:ring-2 focus:ring-[#324D47]/15 transition-all";
+
+const inputDisabled =
+  "w-full h-[44px] bg-white/40 rounded-[30px] px-5 text-[14px] font-['Neutraface_2_Text:Demi',sans-serif] text-[#686767] outline-none border border-black/5 cursor-not-allowed transition-all";
+
+/* ─── MODAL ─────────────────────────────────────────────────────────────── */
+export default function FreeTrialModal() {
+  const { isOpen, close } = useFreeTrial();
+
+  const [formData, setFormData] = useState({
+    fullName: '', phone: '', email: '', age: '', language: '',
+  });
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState('');
+  const [langOpen, setLangOpen] = useState(false);
+  const [ageOpen, setAgeOpen] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [kvkkConsent, setKvkkConsent] = useState(false);
+  const [contactConsent, setContactConsent] = useState(false);
+  const {
+    isSubmitting,
+    fieldError,
+    submitError,
+    setFieldError,
+    clearErrors,
+    resetSubmissionState,
+    runSubmission,
+  } = useFormSubmission({ defaultSubmitErrorMessage: FORM_UI_MESSAGES.submitFailed });
+
+  const langRef = useRef<HTMLDivElement>(null);
+  const ageRef = useRef<HTMLDivElement>(null);
+
+  const availableLanguages = getLanguagesForAge(formData.age);
+  const selectedLang = availableLanguages.find((l) => l.id === formData.language);
+  const isPhoneValid = isValidTrMobilePhone(formData.phone);
+  const isCoarsePointer = useCoarsePointer();
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
+      if (ageRef.current && !ageRef.current.contains(e.target as Node)) setAgeOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      const t = setTimeout(() => {
+        setFormData({ fullName: '', phone: '', email: '', age: '', language: '' });
+        setSelectedDate(null);
+        setSelectedTime('');
+        setKvkkConsent(false);
+        setContactConsent(false);
+        setSubmitted(false);
+        setLangOpen(false);
+        setAgeOpen(false);
+        resetSubmissionState();
+      }, 400);
+      return () => clearTimeout(t);
+    }
+  }, [isOpen, resetSubmissionState]);
+
+  /* Yaş değişince dili sıfırla (yeni yaşta mevcut dil yoksa) */
+  const handleAgeChange = (age: string) => {
+    const langs = getLanguagesForAge(age);
+    const currentLangStillValid = langs.some((l) => l.id === formData.language);
+    setFormData({
+      ...formData,
+      age,
+      language: currentLangStillValid ? formData.language : '',
+    });
+    setAgeOpen(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    clearErrors();
+
+    if (!formData.fullName || !formData.age || !formData.language) {
+      setFieldError(FORM_UI_MESSAGES.required);
+      return;
+    }
+
+    if (!isPhoneValid) {
+      setFieldError(FORM_UI_MESSAGES.phone);
+      return;
+    }
+
+    if (!kvkkConsent) {
+      setFieldError(FORM_UI_MESSAGES.kvkk);
+      return;
+    }
+
+    const sent = await runSubmission(() =>
+      openMailDraft({
+        subject: 'Ucretsiz Deneme Seansi Talebi',
+        lines: [
+          `Ad Soyad: ${formData.fullName}`,
+          `Telefon: +90 ${formData.phone}`,
+          `E-posta: ${formData.email || '-'}`,
+          `Yas Araligi: ${ageRanges.find((age) => age === formData.age) || formData.age}`,
+          `Dil: ${getLanguagesForAge(formData.age).find((language) => language.id === formData.language)?.name || formData.language}`,
+          `Seans Tarihi: ${selectedDate ? formatDateTr(selectedDate) : '-'}`,
+          `Saat Araligi: ${timeSlots.find((slot) => slot.id === selectedTime)?.label || selectedTime || '-'}`,
+          `Iletisim Izni: ${contactConsent ? 'Evet' : 'Hayir'}`,
+        ],
+      }),
+    );
+
+    if (!sent) {
+      notifyError('Talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      return;
+    }
+
+    notifySuccess('Ücretsiz deneme seansı talebiniz alındı.');
+    setSubmitted(true);
+  };
+
+  /* Phone mask: auto-format as 5XX XXX XX XX */
+  const handlePhoneChange = (value: string) => {
+    setFieldError(null);
+    setFormData({ ...formData, phone: normalizeTrMobileInput(value) });
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <OverlayModal
+          open={isOpen}
+          onClose={close}
+          owner="free-trial"
+          ariaLabel="Ücretsiz deneme seansı formu"
+          containerClassName="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#00000B]"
+        >
+          {({ panelProps }) => (
+            <>
+              {/* Background */}
+              <div className="fixed inset-0 pointer-events-none">
+                <img src={imgBg} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,11,0.5)] via-[rgba(50,77,71,0.35)] to-[rgba(0,0,11,0.65)]" />
+                <div className="absolute inset-0 bg-[#00000B]/18" />
+              </div>
+
+              {/* Close */}
+              <motion.button
+                initial={isCoarsePointer ? false : { opacity: 0, scale: 0.8 }}
+                animate={isCoarsePointer ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                onClick={close}
+                className="fixed top-4 right-4 md:top-8 md:right-8 z-[95] w-12 h-12 flex items-center justify-center rounded-full bg-[#324D47] hover:bg-[#3d5e56] text-white shadow-[0_0_20px_rgba(50,77,71,0.4)] transition-all duration-300"
+                aria-label="Kapat"
+              >
+                <X size={22} />
+              </motion.button>
+
+              {/* Card */}
+              <motion.div
+                {...panelProps}
+                initial={isCoarsePointer ? false : { opacity: 0, y: 40, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={isCoarsePointer ? { opacity: 0, y: 16 } : { opacity: 0, y: 30, scale: 0.96 }}
+                transition={{ duration: isCoarsePointer ? 0.28 : 0.45, ease: [0.25, 1, 0.5, 1] }}
+                className="relative z-[91] w-full max-w-[620px] mx-4 my-12 md:my-20"
+              >
+                <AnimatePresence mode="wait">
+                  {submitted ? (
+                    <SuccessState
+                      key="success"
+                      selectedDate={selectedDate}
+                      selectedTime={selectedTime}
+                      isCoarsePointer={isCoarsePointer}
+                      onReset={() => setSubmitted(false)}
+                      onClose={close}
+                    />
+                  ) : (
+                    <motion.form
+                      key="form"
+                      onSubmit={handleSubmit}
+                      initial={isCoarsePointer ? false : { opacity: 0, scale: 0.97 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.97 }}
+                      transition={{ duration: isCoarsePointer ? 0.24 : 0.35 }}
+                      className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
+                    >
+                      {/* Glass shine */}
+                      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+
+                  <div className="relative z-10 p-7 md:p-10">
+                    {/* Header */}
+                    <div className="flex flex-col items-center text-center mb-8">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-6 h-[1px] bg-white/40" />
+                        <span className="text-mobile-kicker md:text-[10px] text-white/70 font-['Neutraface_2_Text:Demi',sans-serif] tracking-[0.12em] md:tracking-[0.25em] uppercase">
+                          Hemen Deneyin
+                        </span>
+                        <div className="w-6 h-[1px] bg-white/40" />
+                      </div>
+                      <h2 className="font-['Neutraface_2_Text:Demi',sans-serif] text-[26px] md:text-[32px] text-white leading-tight mb-2">
+                        Ücretsiz Deneme Seansı
+                      </h2>
+                      <p className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[14px] text-white/70 max-w-[460px] leading-relaxed">
+                        Formu doldurun, eğitim danışmanlarımız sizinle iletişime geçerek deneme seansınızı planlasın.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-4">
+                      {/* Row: İsim + Telefon */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FieldWrap icon={<User size={14} />} label="Adınız Soyadınız">
+                          <input
+                            type="text"
+                            required
+                            placeholder="Adınız Soyadınız"
+                            value={formData.fullName}
+                            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                            className={inputBase}
+                          />
+                        </FieldWrap>
+
+                        <FieldWrap icon={<Phone size={14} />} label="Telefon Numaranız">
+                          <div className="flex gap-2">
+                            <div className="bg-white h-[44px] rounded-[30px] px-3.5 flex items-center gap-1.5 border border-black/5 shrink-0">
+                              <div className="w-[14px] h-[10px] rounded-[2px] overflow-hidden relative bg-[#E92434] flex items-center justify-center">
+                                <div className="w-[3px] h-[3px] rounded-full border border-white" />
+                              </div>
+                              <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] text-[#302d2d]">+90</span>
+                              <ChevronDown size={12} className="text-[#292D32]" />
+                            </div>
+                            <input
+                              type="tel"
+                              required
+                              placeholder="5XX XXX XX XX"
+                              value={formData.phone}
+                              onChange={(e) => handlePhoneChange(e.target.value)}
+                              inputMode="numeric"
+                              maxLength={13}
+                              pattern={TR_MOBILE_PATTERN}
+                              title={TR_MOBILE_TITLE}
+                              className={`${inputBase} flex-1`}
+                            />
+                          </div>
+                        </FieldWrap>
+                      </div>
+
+                      {/* E-posta */}
+                      <FieldWrap icon={<Mail size={14} />} label="E-posta Adresiniz">
+                        <input
+                          type="email"
+                          placeholder="ornek@email.com"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className={inputBase}
+                        />
+                      </FieldWrap>
+
+                      {/* Row: Yaş + Dil */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Yaş */}
+                        <FieldWrap icon={<Calendar size={14} />} label="Yaş Aralığınız">
+                          <div className="relative" ref={ageRef}>
+                            <button
+                              type="button"
+                              onClick={() => { setAgeOpen(!ageOpen); setLangOpen(false); }}
+                              className={`${inputBase} text-left flex items-center justify-between cursor-pointer`}
+                            >
+                              <span className={formData.age ? 'text-[#00000B]' : 'text-[#686767]'}>
+                                {formData.age ? `${formData.age} yaş` : 'Seçiniz'}
+                              </span>
+                              <ChevronDown size={15} className={`text-[#686767] transition-transform duration-200 ${ageOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            <AnimatePresence>
+                              {ageOpen && (
+                                <DropdownList
+                                  items={ageRanges.map((a) => ({ id: a, label: `${a} yaş` }))}
+                                  selected={formData.age}
+                                  onSelect={handleAgeChange}
+                                />
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        </FieldWrap>
+
+                        {/* Dil – yaş seçilmeden kilitli */}
+                        <FieldWrap icon={<Globe size={14} />} label="Dil Seçimi">
+                          <div className="relative" ref={langRef}>
+                            {formData.age ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => { setLangOpen(!langOpen); setAgeOpen(false); }}
+                                  className={`${inputBase} text-left flex items-center justify-between cursor-pointer`}
+                                >
+                                  <span className={formData.language ? 'text-[#00000B]' : 'text-[#686767]'}>
+                                    {selectedLang ? selectedLang.name : 'Dil Seçiniz'}
+                                  </span>
+                                  <ChevronDown size={15} className={`text-[#686767] transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                <AnimatePresence>
+                                  {langOpen && (
+                                    <DropdownList
+                                      items={availableLanguages.map((l) => ({ id: l.id, label: l.name }))}
+                                      selected={formData.language}
+                                      onSelect={(v) => { setFormData({ ...formData, language: v }); setLangOpen(false); }}
+                                    />
+                                  )}
+                                </AnimatePresence>
+                              </>
+                            ) : (
+                              <div className={inputDisabled}>
+                                <span className="flex items-center h-full text-[#686767]">Önce yaş seçiniz</span>
+                              </div>
+                            )}
+                          </div>
+                        </FieldWrap>
+                      </div>
+
+                      {/* Tarih seçimi */}
+                      <FieldWrap icon={<CalendarDays size={14} />} label="Tercih Ettiğiniz Tarih">
+                        <DatePickerInput
+                          value={selectedDate}
+                          onChange={setSelectedDate}
+                          placeholder="Tarih Seçiniz"
+                          disablePast
+                          inputClassName={`${inputBase} text-left flex items-center justify-between cursor-pointer`}
+                          panelClassName="absolute top-full left-0 right-0 mt-2 bg-white rounded-[20px] shadow-xl shadow-black/20 border border-black/5 overflow-hidden z-30 p-4"
+                          indicator="calendar"
+                          indicatorClassName="text-[#686767]"
+                        />
+                      </FieldWrap>
+
+                      {/* Saat Dilimi */}
+                      <FieldWrap icon={<Clock size={14} />} label="Tercih Ettiğiniz Saat Aralığı">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          {timeSlots.map((slot) => (
+                            <button
+                              key={slot.id}
+                              type="button"
+                              onClick={() => setSelectedTime(slot.id)}
+                              className={`h-[44px] rounded-[30px] flex items-center justify-center gap-1.5 text-mobile-meta md:text-[12px] font-['Neutraface_2_Text:Demi',sans-serif] border transition-all duration-200 cursor-pointer ${
+                                selectedTime === slot.id
+                                  ? 'bg-white text-[#324D47] border-white shadow-lg shadow-black/10'
+                                  : 'bg-white/10 text-white/80 border-white/15 hover:bg-white/20 hover:border-white/30'
+                              }`}
+                            >
+                              <span className="text-mobile-kicker md:text-[11px]">{slot.icon}</span>
+                              <span>{slot.label.split(' – ')[0]}–{slot.label.split(' – ')[1]}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </FieldWrap>
+
+                      {/* Disclaimer Note */}
+                      <div className="flex items-start gap-2.5 bg-white/8 rounded-[16px] px-4 py-3 border border-white/10">
+                        <Info size={14} className="text-[#F4EBD1] mt-0.5 shrink-0" />
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[12px] text-white/60 leading-relaxed">
+                          Seçtiğiniz tarih ve saat aralığı <span className="text-white/80">kesinleşmiş bir randevu değildir</span>; tercih bildiriminiz olarak değerlendirilecektir. Eğitim danışmanlarımız sizinle iletişime geçerek uygun tarih ve saati birlikte belirleyecektir.
+                        </p>
+                      </div>
+
+                      {/* Consent */}
+                      <div className="flex flex-col gap-3 mt-1">
+                        <ConsentRow checked={kvkkConsent} onChange={setKvkkConsent}>
+                          <a
+                            href={LEGAL_KVKK_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="font-['Neutraface_2_Text:Demi',sans-serif] underline decoration-[10%] cursor-pointer hover:text-[#F4EBD1] transition-colors"
+                          >
+                            KVKK Aydınlatma Metni
+                          </a>'ni okudum ve kabul ediyorum.
+                        </ConsentRow>
+                      </div>
+
+                      {fieldError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#F4EBD1]">
+                          {fieldError}
+                        </p>
+                      )}
+                      {submitError && (
+                        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[12px] text-[#FFD4D1]">
+                          {submitError}
+                        </p>
+                      )}
+
+                      {/* Submit */}
+                      <motion.button
+                        type="submit"
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.98 }}
+                        disabled={isSubmitting || !kvkkConsent || !isPhoneValid}
+                        className={`w-full h-[48px] rounded-[30px] flex items-center justify-center gap-2.5 transition-colors duration-300 mt-1 ${
+                          !isSubmitting && kvkkConsent && isPhoneValid
+                            ? 'bg-[#00000B] hover:bg-[#68232E] cursor-pointer'
+                            : 'bg-[#00000B]/40 cursor-not-allowed'
+                        }`}
+                      >
+                        <Send size={15} className="text-white" />
+                        <span className="font-['Neutraface_2_Text:Demi',sans-serif] text-[14px] text-white tracking-wide">
+                          {isSubmitting ? FORM_UI_MESSAGES.submitting : 'Deneme Seansı Talep Et'}
+                        </span>
+                      </motion.button>
+
+                      {/* Footer note */}
+                      <p className="text-center font-['Neutraface_2_Text:Book',sans-serif] text-mobile-kicker md:text-[11px] text-white/40 leading-relaxed">
+                        Bilgileriniz KVKK kapsamında korunmaktadır.
+                      </p>
+                    </div>
+                  </div>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </>
+          )}
+        </OverlayModal>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ─── FIELD WRAPPER ─────────────────────────────────────────────────────── */
+function FieldWrap({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="flex items-center gap-1.5 font-['Neutraface_2_Text:Book',sans-serif] text-[14px] text-white">
+        <span className="text-white/60">{icon}</span>
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+/* ─── CONSENT ROW ───────────────────────────────────────────────────────── */
+function ConsentRow({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) {
+  return (
+    <button type="button" onClick={() => onChange(!checked)} className="flex items-start gap-2.5 text-left group">
+      <div
+        className={`w-4 h-4 mt-[2px] rounded-[3px] border flex items-center justify-center transition-all duration-200 shrink-0 ${
+          checked ? 'bg-[#E70000] border-[#E70000]' : 'bg-white border-[#64748b] group-hover:border-white'
+        }`}
+      >
+        {checked && <Check size={10} className="text-white" strokeWidth={3} />}
+      </div>
+      <span className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] text-white/80 leading-relaxed">
+        {children}
+      </span>
+    </button>
+  );
+}
+
+/* ─── DROPDOWN LIST ─────────────────────────────────────────────────────── */
+function DropdownList({ items, selected, onSelect }: { items: { id: string; label: string }[]; selected: string; onSelect: (id: string) => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -6, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -6, scale: 0.97 }}
+      transition={{ duration: 0.2 }}
+      className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-[18px] shadow-xl shadow-black/20 border border-black/5 overflow-hidden z-30 max-h-[210px] overflow-y-auto"
+    >
+      {items.map((item) => (
+        <button
+          key={item.id}
+          type="button"
+          onClick={() => onSelect(item.id)}
+          className={`w-full px-5 py-2.5 text-left text-mobile-meta md:text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] transition-colors flex items-center justify-between ${
+            selected === item.id
+              ? 'bg-[#324D47]/10 text-[#324D47]'
+              : 'text-[#00000B] hover:bg-[#F4EBD1]/50'
+          }`}
+        >
+          <span>{item.label}</span>
+          {selected === item.id && <Check size={13} className="text-[#324D47]" />}
+        </button>
+      ))}
+    </motion.div>
+  );
+}
+
+/* ─── SUCCESS STATE ─────────────────────────────────────────────────────── */
+function SuccessState({
+  selectedDate, selectedTime, isCoarsePointer, onReset, onClose,
+}: {
+  selectedDate: Date | null; selectedTime: string;
+  isCoarsePointer: boolean;
+  onReset: () => void; onClose: () => void;
+}) {
+  const timeLabel = timeSlots.find(t => t.id === selectedTime)?.label;
+
+  return (
+    <motion.div
+      initial={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={isCoarsePointer ? { opacity: 0, y: 8 } : { opacity: 0, scale: 0.95 }}
+      transition={{ duration: isCoarsePointer ? 0.28 : 0.5, ease: [0.25, 1, 0.5, 1] }}
+      className="relative bg-[rgba(50,77,71,0.55)] backdrop-blur-none md:backdrop-blur-xl rounded-[30px] border border-white/20 shadow-2xl shadow-black/20 overflow-hidden"
+    >
+      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+
+      <div className="relative z-10 p-10 md:p-14 flex flex-col items-center text-center">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
+          className="w-16 h-16 rounded-full bg-white/15 border border-white/25 flex items-center justify-center mb-6"
+        >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+            <Sparkles size={28} className="text-[#F4EBD1]" />
+          </motion.div>
+        </motion.div>
+
+        <h3 className="font-['Neutraface_2_Text:Demi',sans-serif] text-[22px] md:text-[26px] text-white mb-2">
+          Talebiniz Alındı!
+        </h3>
+        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-[14px] text-white/70 max-w-[400px] leading-relaxed mb-2">
+          Ücretsiz deneme seansınız için başvurunuz başarıyla kaydedildi.
+          {selectedDate && timeLabel && (
+            <>
+              {' '}Tercih ettiğiniz tarih <span className="text-white">{formatDateTr(selectedDate)}</span>, saat aralığı <span className="text-white">{timeLabel}</span>.
+            </>
+          )}
+        </p>
+        <p className="font-['Neutraface_2_Text:Book',sans-serif] text-mobile-meta md:text-[13px] text-white/50 mb-8">
+          Eğitim danışmanlarımız en kısa sürede sizinle iletişime geçerek dersinizi kesinleştirecektir.
+        </p>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onReset}
+            className="px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-mobile-meta md:text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] rounded-[30px] transition-all"
+          >
+            Yeni Başvuru
+          </button>
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onClose}
+            className="px-5 py-2.5 bg-[#00000B] hover:bg-[#68232E] text-white text-mobile-meta md:text-[13px] font-['Neutraface_2_Text:Demi',sans-serif] rounded-[30px] flex items-center gap-2 transition-colors duration-300"
+          >
+            Kapat
+          </motion.button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}

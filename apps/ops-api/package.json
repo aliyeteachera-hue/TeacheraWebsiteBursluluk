@@ -1,0 +1,16 @@
+{
+  "name": "@teachera/ops-api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "node -e \"console.log('ops-api runtime ready')\""
+  },
+  "dependencies": {
+    "@teachera/shared-backend": "file:../../packages/shared/backend",
+    "@aws-sdk/client-cloudwatch": "^3.1007.0",
+    "@aws-sdk/client-kms": "^3.1006.0",
+    "pg": "^8.16.3",
+    "redis": "^4.7.1"
+  }
+}

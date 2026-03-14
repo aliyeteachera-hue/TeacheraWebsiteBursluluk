@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-03-13T05:28:13.812Z",
+  "timestamp": "2026-03-14T18:52:38.194Z",
   "mode": {
     "http": true,
-    "aws": false
+    "aws": true
   },
   "totals": {
-    "pass": 10,
+    "pass": 13,
     "fail": 0,
     "warn": 0,
-    "skip": 1
+    "skip": 0
   },
   "overall_ready_for_p0_12": true,
   "checks": [
@@ -117,10 +117,29 @@
       }
     },
     {
-      "id": "aws_checks",
-      "status": "SKIP",
-      "detail": "AWS checks disabled (use --aws).",
+      "id": "aws_identity",
+      "status": "PASS",
+      "detail": "AWS credentials are valid.",
       "evidence": {}
+    },
+    {
+      "id": "sns_topic_discovery",
+      "status": "PASS",
+      "detail": "SNS topic ARN resolved.",
+      "evidence": {
+        "topic_arn": "arn:aws:sns:eu-north-1:572337278519:teachera-p0-10-alarms",
+        "source": "env:OBSERVABILITY_ALARM_SNS_TOPIC_ARN"
+      }
+    },
+    {
+      "id": "sns_subscription_confirmed",
+      "status": "PASS",
+      "detail": "Confirmed subscriptions: 1",
+      "evidence": {
+        "topic_arn": "arn:aws:sns:eu-north-1:572337278519:teachera-p0-10-alarms",
+        "discovery_source": "env:OBSERVABILITY_ALARM_SNS_TOPIC_ARN",
+        "confirmed_count": 1
+      }
     }
   ]
 }
