@@ -159,6 +159,105 @@ const STATIC_ROUTE_META: Record<string, SeoMeta> = {
     description: 'Teachera öğrenci portalına güvenli giriş yapın.',
     keywords: ['teachera öğrenci girişi', 'teachera portal'],
   },
+  '/bursluluk-2026': {
+    title: 'Bursluluk Sınavı Başvuru | Teachera',
+    description:
+      'Teachera bursluluk sınavı başvuru formunu doldurun, sınav süreci bilgilendirmelerine ve aday giriş akışına geçin.',
+    keywords: [...CORE_KEYWORDS, 'bursluluk sınavı', 'bursluluk başvuru formu', 'online bursluluk sınavı'],
+  },
+  '/bursluluk': {
+    title: 'Bursluluk Sınavı | Teachera',
+    description:
+      'Teachera bursluluk sınavı duyuru, başvuru, aday giriş, sınav ve sonuç süreçlerine bu sayfadan ulaşın.',
+    keywords: [...CORE_KEYWORDS, 'bursluluk sınavı', 'bursluluk aday girişi'],
+  },
+  '/bursluluk/onay': {
+    title: 'Bursluluk Başvuru Onayı | Teachera',
+    description:
+      'Bursluluk başvurunuz alındı. Sınava katılım yöntemi ve teknik gereksinim bilgilendirmelerini bu ekrandan takip edin.',
+    keywords: [...CORE_KEYWORDS, 'bursluluk başvuru onayı', 'sınav bilgilendirme'],
+  },
+  '/bursluluk/giris': {
+    title: 'Bursluluk Aday Girişi | Teachera',
+    description:
+      'Bursluluk sınavına katılım için kullanıcı adı ve şifre ile aday girişinizi güvenli şekilde tamamlayın.',
+    keywords: [...CORE_KEYWORDS, 'bursluluk giriş', 'aday girişi', 'sınav kullanıcı adı şifre'],
+  },
+  '/bursluluk/bekleme': {
+    title: 'Bursluluk Sınav Bekleme Ekranı | Teachera',
+    description:
+      'Sınav başlamadan önce sayaç ve teknik kontrol ekranını takip edin. Sınav açıldığında otomatik yönlendirme sağlanır.',
+    keywords: [...CORE_KEYWORDS, 'sınav bekleme ekranı', 'sayaç', 'teknik kontrol'],
+  },
+  '/bursluluk/sinav': {
+    title: 'Bursluluk Sınavı | Teachera',
+    description:
+      'Teachera bursluluk sınavını güvenli oturumla tamamlayın. Sorular autosave ile kaydedilir ve süre yönetimi panelden takip edilir.',
+    keywords: [...CORE_KEYWORDS, 'bursluluk sınav ekranı', 'online sınav', 'autosave sınav'],
+  },
+  '/bursluluk/sınav': {
+    title: 'Bursluluk Sınavı | Teachera',
+    description:
+      'Teachera bursluluk sınavını güvenli oturumla tamamlayın. Sorular autosave ile kaydedilir ve süre yönetimi panelden takip edilir.',
+    keywords: [...CORE_KEYWORDS, 'bursluluk sınav ekranı', 'online sınav', 'autosave sınav'],
+  },
+  '/bursluluk/sonuc': {
+    title: 'Bursluluk Sınav Sonuç | Teachera',
+    description:
+      'Bursluluk sınav sonucunu kullanıcı adı ve şifre ile görüntüleyin. Sonuç görüntüleme ve bildirim durumları operasyon panelinde izlenir.',
+    keywords: [...CORE_KEYWORDS, 'bursluluk sonuç', 'sınav sonucu görüntüleme'],
+  },
+  '/bursluluk/sonuç': {
+    title: 'Bursluluk Sınav Sonuç | Teachera',
+    description:
+      'Bursluluk sınav sonucunu kullanıcı adı ve şifre ile görüntüleyin. Sonuç görüntüleme ve bildirim durumları operasyon panelinde izlenir.',
+    keywords: [...CORE_KEYWORDS, 'bursluluk sonuç', 'sınav sonucu görüntüleme'],
+  },
+  '/panel/login': {
+    title: 'Panel Giriş | Teachera',
+    description: 'Teachera operasyon paneline güvenli giriş yapın.',
+    keywords: ['teachera panel', 'panel giriş', 'admin panel login'],
+  },
+  '/panel/dashboard': {
+    title: 'Panel Dashboard | Teachera',
+    description: 'Teachera operasyon dashboard ekranı: başvurular, bildirimler, görevler ve KPI takibi.',
+    keywords: ['teachera dashboard', 'bursluluk operasyon paneli', 'panel kpi'],
+  },
+  '/panel/inbox': {
+    title: 'Panel Inbox | Teachera',
+    description: 'CRM ve operasyon inbox kayıtlarını panel üzerinden yönetin.',
+    keywords: ['panel inbox', 'crm inbox', 'operasyon mesajları'],
+  },
+  '/panel/operations': {
+    title: 'Panel Operasyon | Teachera',
+    description: 'Bursluluk operasyon süreçlerini tek panelde izleyin ve yönetin.',
+    keywords: ['operasyon paneli', 'bursluluk operasyonu'],
+  },
+  '/panel/candidates': {
+    title: 'Panel Adaylar | Teachera',
+    description: 'Aday listesi, giriş/sınav/sonuç durumlarını panelden görüntüleyin.',
+    keywords: ['aday paneli', 'bursluluk aday takibi'],
+  },
+  '/panel/notifications': {
+    title: 'Panel Bildirimler | Teachera',
+    description: 'SMS ve WhatsApp bildirim kuyruğu, başarı ve hata durumlarını izleyin.',
+    keywords: ['sms panel', 'whatsapp panel', 'bildirim takibi'],
+  },
+  '/panel/dlq': {
+    title: 'Panel DLQ | Teachera',
+    description: 'Başarısız bildirimleri (DLQ) görüntüleyin ve tekrar işleme alın.',
+    keywords: ['dlq', 'retry queue', 'failed notification'],
+  },
+  '/panel/unviewed-results': {
+    title: 'Panel Sonuç Görmeyenler | Teachera',
+    description: 'Sonuç ekranını açmayan adayları filtreleyin ve operasyon aksiyonlarını yönetin.',
+    keywords: ['unviewed results', 'sonuç görmeyen adaylar', 'operasyon aksiyonu'],
+  },
+  '/panel/password-reset': {
+    title: 'Panel Şifre Yenileme | Teachera',
+    description: 'Panel kullanıcı şifresini güvenli şekilde yenileyin.',
+    keywords: ['panel password reset', 'şifre yenileme', 'mfa panel'],
+  },
 };
 
 const NOT_FOUND_META: SeoMeta = {
@@ -277,7 +376,10 @@ export default function SeoManager() {
   const location = useLocation();
 
   useEffect(() => {
-    const { pathname } = location;
+    const rawPathname = location.pathname || "/";
+    const pathname = rawPathname !== "/"
+      ? (rawPathname.replace(/\/+$/, "") || "/" )
+      : "/";
 
     // Article pages already maintain richer article-level SEO in their own component.
     if (/^\/academy\/[^/]+$/.test(pathname)) {
