@@ -67,7 +67,8 @@
     "env:secret-scope:cleanup:dry": "node scripts/vercel-env-secret-scope-cleanup.mjs --environment=production",
     "env:secret-scope:cleanup": "node scripts/vercel-env-secret-scope-cleanup.mjs --environment=production --apply",
     "env:secret:smoke": "node scripts/vercel-env-secret-prod-smoke.mjs",
-    "env:secret:gate": "node scripts/vercel-env-secret-gate.mjs --environment=production"
+    "env:secret:gate": "node scripts/vercel-env-secret-gate.mjs --environment=production",
+    "frontend:uat:rc": "node scripts/frontend-uat-bugfix-freeze-rc.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.1007.0",

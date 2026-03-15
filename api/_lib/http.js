@@ -130,7 +130,7 @@ function normalizeRequestPath(req) {
 function inferRuntimeFromPath(pathname) {
   if (pathname.startsWith('/api/panel/')) return 'panel-api';
   if (pathname.startsWith('/api/notifications/') || pathname.startsWith('/api/ops/')) return 'ops-api';
-  if (pathname.startsWith('/api/exam/') || pathname === '/api/forms') return 'exam-api';
+  if (pathname.startsWith('/api/exam/') || pathname.startsWith('/api/schools/') || pathname === '/api/forms') return 'exam-api';
   return '';
 }
 
@@ -165,7 +165,7 @@ function inferRuntimeFromHost(req) {
 
 function allowedPathPrefixesForRuntime(runtime) {
   if (runtime === 'exam-api') {
-    return ['/api/exam/', '/api/forms', '/api/health'];
+    return ['/api/exam/', '/api/schools/', '/api/forms', '/api/health'];
   }
   if (runtime === 'panel-api') {
     return ['/api/panel/', '/api/health'];
@@ -219,7 +219,10 @@ function resolveAllowedCorsOrigins(runtime, allowOriginsOverride = null) {
   }
 
   if (safeTrim(process.env.NODE_ENV).toLowerCase() !== 'production') {
-    candidates.push('http://localhost:5173', 'http://127.0.0.1:5173');
+    const devPorts = [3000, 4173, 5173, 5174, 5175, 5176, 5177, 5178, 5179, 5180];
+    for (const port of devPorts) {
+      candidates.push(`http://localhost:${port}`, `http://127.0.0.1:${port}`);
+    }
   }
 
   return normalizeOriginList(candidates);

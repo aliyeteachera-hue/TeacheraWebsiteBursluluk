@@ -39,6 +39,69 @@ export interface StartExamSessionResponse {
   };
 }
 
+export interface SchoolSearchItem {
+  id: string | null;
+  name: string;
+  district: string | null;
+  city: string | null;
+  source: 'db' | 'fallback';
+}
+
+export interface SchoolSearchResponse {
+  query: string;
+  items: SchoolSearchItem[];
+}
+
+export interface CandidateLoginPayload {
+  username: string;
+  password: string;
+  campaignCode?: string;
+}
+
+export interface CandidateLoginResponse {
+  session: {
+    applicationNo: string;
+    attemptId: string;
+    candidateId: string;
+    sessionToken: string;
+    expiresAt: string;
+    examStatus: string;
+    examLanguage?: string;
+    examAgeRange?: string;
+    questionCount?: number;
+  };
+  candidate: {
+    studentFullName?: string | null;
+    parentFullName?: string | null;
+    grade?: number | null;
+  };
+  gate: {
+    exam_open: boolean;
+    exam_open_at: string | null;
+    server_time_utc: string;
+    remaining_seconds: number;
+    source?: string;
+  };
+}
+
+export interface ExamSessionStatusResponse {
+  session: {
+    attemptId: string;
+    applicationNo: string;
+    candidateId: string;
+    campaignCode: string;
+    examStatus: string;
+    expiresAt: string;
+  };
+  gate: {
+    exam_open: boolean;
+    exam_open_at: string | null;
+    server_time_utc: string;
+    remaining_seconds: number;
+    source?: string;
+  };
+}
+
 export interface SubmitExamPayload {
   attemptId: string;
   completionStatus: 'completed' | 'time_limit_reached' | 'left_exam';
@@ -78,8 +141,17 @@ export interface SubmitExamResponse {
   notifications_enqueued: boolean;
 }
 
+function isTruthyEnv(value: unknown) {
+  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
+}
+
 export function resolveExamApiBase() {
   const base = (import.meta.env.VITE_EXAM_API_BASE || '').trim();
+  const directApiInDev = isTruthyEnv(import.meta.env.VITE_DEV_DIRECT_API);
+
+  if (import.meta.env.DEV && !directApiInDev && typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
   if (base) return base;
   if (import.meta.env.DEV && typeof window !== 'undefined' && window.location?.origin) {
     return window.location.origin;
@@ -114,6 +186,49 @@ export async function startExamSession(payload: StartExamSessionPayload): Promis
   });
 
   return parseApiResponse<StartExamSessionResponse>(response);
+}
+
+export async function searchSchools(queryText: string, limit = 8): Promise<SchoolSearchResponse> {
+  const endpoint = new URL(resolveExamEndpoint('/api/schools/search'));
+  endpoint.searchParams.set('q', String(queryText || '').trim());
+  endpoint.searchParams.set('limit', String(Math.max(1, Math.min(50, Math.trunc(limit)))));
+
+  const response = await fetch(endpoint.toString(), {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+
+  return parseApiResponse<SchoolSearchResponse>(response);
+}
+
+export async function candidateLogin(payload: CandidateLoginPayload): Promise<CandidateLoginResponse> {
+  const response = await fetch(resolveExamEndpoint('/api/exam/candidate/login'), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return parseApiResponse<CandidateLoginResponse>(response);
+}
+
+export async function getExamSessionStatus(sessionToken: string, attemptId: string): Promise<ExamSessionStatusResponse> {
+  const endpoint = new URL(resolveExamEndpoint('/api/exam/session/status'));
+  endpoint.searchParams.set('attemptId', String(attemptId || '').trim());
+
+  const response = await fetch(endpoint.toString(), {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'x-exam-session-token': sessionToken,
+    },
+  });
+
+  return parseApiResponse<ExamSessionStatusResponse>(response);
 }
 
 export async function submitExam(sessionToken: string, payload: SubmitExamPayload): Promise<SubmitExamResponse> {

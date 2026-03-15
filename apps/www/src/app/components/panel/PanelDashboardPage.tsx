@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router';
 import { panelApiHref, panelFetch } from '../../api/panelApi';
 
 type PanelView = 'inbox' | 'operations' | 'tasks' | 'settings';
-type PanelOpsFocus = 'candidates' | 'notifications' | 'dlq' | null;
+type PanelOpsFocus = 'candidates' | 'notifications' | 'dlq' | 'unviewed' | null;
 
 type PanelIdentity = {
   user_id: string;
@@ -35,6 +35,27 @@ type SettingsPayload = {
     key: string;
     value: unknown;
   }>;
+};
+
+type UnviewedResultItem = {
+  candidate_id: string;
+  student_full_name: string;
+  school_name: string;
+  grade: number | null;
+  result_published_at: string | null;
+  last_login_at: string | null;
+  wa_result_status: string;
+  wa_last_sent_at: string | null;
+};
+
+type UnviewedResultsPayload = {
+  items?: UnviewedResultItem[];
+  total?: number;
+  summary?: {
+    total_unviewed?: number;
+    wa_problematic?: number;
+    wa_reached?: number;
+  };
 };
 
 const VIEW_ITEMS: Array<{ id: PanelView; title: string; subtitle: string }> = [
@@ -84,7 +105,7 @@ function readView(raw: string | null): PanelView {
 
 function readOpsFocus(raw: string | null): PanelOpsFocus {
   const normalized = String(raw || '').toLowerCase();
-  if (normalized === 'candidates' || normalized === 'notifications' || normalized === 'dlq') {
+  if (normalized === 'candidates' || normalized === 'notifications' || normalized === 'dlq' || normalized === 'unviewed') {
     return normalized;
   }
   return null;
@@ -120,6 +141,11 @@ export default function PanelDashboardPage() {
   const [identity, setIdentity] = useState<PanelIdentity | null>(null);
   const [dashboard, setDashboard] = useState<DashboardPayload | null>(null);
   const [settingsCount, setSettingsCount] = useState(0);
+  const [unviewedResults, setUnviewedResults] = useState<UnviewedResultsPayload | null>(null);
+  const [unviewedLoading, setUnviewedLoading] = useState(false);
+  const [selectedUnviewedCandidateIds, setSelectedUnviewedCandidateIds] = useState<string[]>([]);
+  const [isUnviewedActionRunning, setIsUnviewedActionRunning] = useState(false);
+  const [opsMessage, setOpsMessage] = useState('');
   const activeOpsFocus = useMemo(() => readOpsFocus(searchParams.get('focus')), [searchParams]);
 
   useEffect(() => {
@@ -186,6 +212,44 @@ export default function PanelDashboardPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (activeView !== 'operations' || activeOpsFocus !== 'unviewed') return;
+
+    let cancelled = false;
+    const loadUnviewedResults = async () => {
+      setUnviewedLoading(true);
+      setOpsMessage('');
+
+      try {
+        const response = await panelFetch('/api/panel/unviewed-results?per_page=20', {
+          method: 'GET',
+        });
+        const payload = await readJsonSafe<UnviewedResultsPayload>(response);
+        if (!response.ok || !payload) {
+          throw new Error('Sonuç görmeyen aday listesi alınamadı.');
+        }
+        if (cancelled) return;
+        const items = Array.isArray(payload.items) ? payload.items : [];
+        setUnviewedResults(payload);
+        setSelectedUnviewedCandidateIds(items.map((item) => item.candidate_id).filter(Boolean));
+      } catch {
+        if (cancelled) return;
+        setUnviewedResults(null);
+        setSelectedUnviewedCandidateIds([]);
+        setOpsMessage('Sonuç görmeyen aday listesi şu anda yüklenemiyor.');
+      } finally {
+        if (!cancelled) {
+          setUnviewedLoading(false);
+        }
+      }
+    };
+
+    void loadUnviewedResults();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeOpsFocus, activeView]);
+
   const viewMeta = useMemo(
     () => VIEW_ITEMS.find((item) => item.id === activeView) || VIEW_ITEMS[0],
     [activeView],
@@ -200,6 +264,47 @@ export default function PanelDashboardPage() {
       });
     } finally {
       window.location.assign('/panel/login');
+    }
+  };
+
+  const handleSendUnviewedWhatsapp = async () => {
+    if (isUnviewedActionRunning || selectedUnviewedCandidateIds.length === 0) return;
+    setIsUnviewedActionRunning(true);
+    setOpsMessage('');
+
+    try {
+      const response = await panelFetch('/api/panel/unviewed-results/actions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'send_whatsapp',
+          candidate_ids: selectedUnviewedCandidateIds,
+          template_code: 'WA_RESULT',
+        }),
+      });
+
+      const payload = await readJsonSafe<{ enqueued?: number; requested?: number; message?: string }>(response);
+      if (!response.ok) {
+        throw new Error(payload?.message || 'WhatsApp kuyruğu tetiklenemedi.');
+      }
+
+      setOpsMessage(
+        `WhatsApp kuyruğu tetiklendi. Enqueued: ${formatNumber(payload?.enqueued)} / Requested: ${formatNumber(payload?.requested)}`,
+      );
+
+      const reload = await panelFetch('/api/panel/unviewed-results?per_page=20', { method: 'GET' });
+      const reloadPayload = await readJsonSafe<UnviewedResultsPayload>(reload);
+      if (reload.ok && reloadPayload) {
+        const items = Array.isArray(reloadPayload.items) ? reloadPayload.items : [];
+        setUnviewedResults(reloadPayload);
+        setSelectedUnviewedCandidateIds(items.map((item) => item.candidate_id).filter(Boolean));
+      }
+    } catch (error) {
+      setOpsMessage(error instanceof Error ? error.message : 'WhatsApp işlemi başarısız.');
+    } finally {
+      setIsUnviewedActionRunning(false);
     }
   };
 
@@ -330,9 +435,11 @@ export default function PanelDashboardPage() {
                 <Link className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" to="/panel/candidates">Adaylar</Link>
                 <Link className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" to="/panel/notifications">Bildirimler</Link>
                 <Link className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" to="/panel/dlq">DLQ</Link>
+                <Link className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" to="/panel/unviewed-results">Sonuç Görmeyenler</Link>
                 <a className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" href={panelApiHref('/api/panel/candidates')} target="_blank" rel="noreferrer">Aday API</a>
                 <a className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" href={panelApiHref('/api/panel/notifications')} target="_blank" rel="noreferrer">Bildirim API</a>
                 <a className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" href={panelApiHref('/api/panel/dlq')} target="_blank" rel="noreferrer">DLQ API</a>
+                <a className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" href={panelApiHref('/api/panel/unviewed-results')} target="_blank" rel="noreferrer">Unviewed API</a>
               </div>
             </section>
 
@@ -344,7 +451,9 @@ export default function PanelDashboardPage() {
                     ? 'Adaylar Ekranı'
                     : activeOpsFocus === 'notifications'
                       ? 'Bildirimler Ekranı'
-                      : 'DLQ Ekranı'}
+                      : activeOpsFocus === 'dlq'
+                        ? 'DLQ Ekranı'
+                        : 'Sonuç Görmeyenler Ekranı'}
                 </h3>
                 <p className="mt-2 text-[14px] leading-[1.7] text-white/64">
                   Bu route, operasyonu tek panel yüzeyinde ilgili alt başlığa odaklayacak şekilde açar.
@@ -359,7 +468,69 @@ export default function PanelDashboardPage() {
                   {activeOpsFocus === 'dlq' ? (
                     <a className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" href={panelApiHref('/api/panel/dlq')} target="_blank" rel="noreferrer">DLQ verisini aç</a>
                   ) : null}
+                  {activeOpsFocus === 'unviewed' ? (
+                    <a className="rounded-full border border-[#1A273A] bg-[#071021]/82 px-3 py-2 text-white/72 hover:border-[#2D4363]" href={panelApiHref('/api/panel/unviewed-results')} target="_blank" rel="noreferrer">Sonuç görmeyen adayları aç</a>
+                  ) : null}
                 </div>
+
+                {activeOpsFocus === 'unviewed' ? (
+                  <div className="mt-5 rounded-2xl border border-[#1A273A] bg-[#071021]/82 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[13px] text-white/55">
+                          Toplam: <span className="font-semibold text-white">{formatNumber(unviewedResults?.summary?.total_unviewed)}</span>
+                          {' '}• WA sorunlu: <span className="font-semibold text-white">{formatNumber(unviewedResults?.summary?.wa_problematic)}</span>
+                          {' '}• WA ulaştı: <span className="font-semibold text-white">{formatNumber(unviewedResults?.summary?.wa_reached)}</span>
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSendUnviewedWhatsapp}
+                        disabled={isUnviewedActionRunning || selectedUnviewedCandidateIds.length === 0}
+                        className="rounded-xl bg-[#D92E27] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.11em] text-white transition hover:bg-[#bf251f] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isUnviewedActionRunning ? 'Gönderiliyor...' : `WhatsApp Gönder (${selectedUnviewedCandidateIds.length})`}
+                      </button>
+                    </div>
+
+                    {opsMessage ? (
+                      <p className="mt-3 rounded-lg border border-[#254163] bg-[#0a1728] px-3 py-2 text-[12px] text-white/75">{opsMessage}</p>
+                    ) : null}
+
+                    {unviewedLoading ? (
+                      <p className="mt-3 text-[13px] text-white/60">Sonuç görmeyen adaylar yükleniyor...</p>
+                    ) : null}
+
+                    {!unviewedLoading && Array.isArray(unviewedResults?.items) && unviewedResults.items.length > 0 ? (
+                      <div className="mt-3 overflow-x-auto">
+                        <table className="min-w-full text-left text-[12px] text-white/78">
+                          <thead>
+                            <tr className="border-b border-white/12 text-white/55">
+                              <th className="px-2 py-2">#</th>
+                              <th className="px-2 py-2">Aday</th>
+                              <th className="px-2 py-2">Okul</th>
+                              <th className="px-2 py-2">Sınıf</th>
+                              <th className="px-2 py-2">WA Durumu</th>
+                              <th className="px-2 py-2">Yayın</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {unviewedResults.items.map((item) => (
+                              <tr key={item.candidate_id} className="border-b border-white/6">
+                                <td className="px-2 py-2">{item.candidate_id.slice(0, 8)}</td>
+                                <td className="px-2 py-2">{item.student_full_name || '-'}</td>
+                                <td className="px-2 py-2">{item.school_name || '-'}</td>
+                                <td className="px-2 py-2">{item.grade ? `${item.grade}` : '-'}</td>
+                                <td className="px-2 py-2">{item.wa_result_status || '-'}</td>
+                                <td className="px-2 py-2">{item.result_published_at ? new Date(item.result_published_at).toLocaleString('tr-TR') : '-'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
               </section>
             ) : null}
           </div>

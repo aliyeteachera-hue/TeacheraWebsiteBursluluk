@@ -44,7 +44,7 @@ export default function Bursluluk2026Page() {
 
           <div className="mt-8">
             <Link
-              to="/seviye-tespit-sinavi"
+              to="/bursluluk/giris"
               className="inline-flex items-center gap-2 rounded-full bg-[#D92E27] px-8 py-4 text-[12px] font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-[#bf251f]"
             >
               Hemen Başvur

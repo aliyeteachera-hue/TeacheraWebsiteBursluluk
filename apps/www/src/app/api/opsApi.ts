@@ -6,8 +6,17 @@ function trim(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function isTruthyEnv(value: unknown) {
+  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
+}
+
 export function resolveOpsApiBase() {
   const base = trim(import.meta.env.VITE_OPS_API_BASE);
+  const directApiInDev = isTruthyEnv(import.meta.env.VITE_DEV_DIRECT_API);
+
+  if (import.meta.env.DEV && !directApiInDev && typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
   if (base) return base;
   if (import.meta.env.DEV && typeof window !== 'undefined' && window.location?.origin) {
     return window.location.origin;
