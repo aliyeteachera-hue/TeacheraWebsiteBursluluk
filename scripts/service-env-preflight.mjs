@@ -1,5 +1,10 @@
 function trim(value) {
-  return String(value || '').trim();
+  return String(value || '')
+    .replace(/\\r/g, '')
+    .replace(/\\n/g, '')
+    .replace(/\r/g, '')
+    .replace(/\n/g, '')
+    .trim();
 }
 
 function readAnyEnv(names) {

@@ -245,15 +245,19 @@ function main() {
   const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const steps = [];
 
+  steps.push(runStep('ci-path-filter-selftest', npmCmd, ['run', 'ci:path-filter:selftest']));
+
   const observabilityArgs = ['run', 'p0:observability:audit', '--', '--http'];
   if (enableAws) observabilityArgs.push('--aws');
-  steps.push(runStep('p0-10-observability-audit', npmCmd, observabilityArgs));
-
   if (steps[0].ok) {
-    steps.push(runStep('p0-11-verify-signature', npmCmd, ['run', 'p0:load-resilience:verify-signature']));
+    steps.push(runStep('p0-10-observability-audit', npmCmd, observabilityArgs));
   }
 
   if (steps[0].ok && steps[1]?.ok) {
+    steps.push(runStep('p0-11-verify-signature', npmCmd, ['run', 'p0:load-resilience:verify-signature']));
+  }
+
+  if (steps[0].ok && steps[1]?.ok && steps[2]?.ok) {
     const auditArgs = ['run', 'p0:go-live:package:audit', '--', '--http'];
     if (enableAws) auditArgs.push('--aws');
     steps.push(runStep('p0-12-go-live-package-audit', npmCmd, auditArgs));
@@ -266,6 +270,7 @@ function main() {
       http: true,
       aws: enableAws,
       observability_included: true,
+      ci_path_filter_selftest_included: true,
     },
     env: {
       production_env_file_loaded: envMeta.loaded,

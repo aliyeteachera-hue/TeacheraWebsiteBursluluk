@@ -27,6 +27,12 @@ export function safeTrim(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function normalizeEnvToken(value) {
+  const raw = safeTrim(value);
+  if (!raw) return '';
+  return raw.replace(/\\r/g, '').replace(/\\n/g, '').replace(/\r/g, '').replace(/\n/g, '').trim();
+}
+
 export function clampInt(value, min, max, fallback) {
   const num = Number.parseInt(String(value), 10);
   if (!Number.isFinite(num)) return fallback;
@@ -47,19 +53,19 @@ export function parseJsonSafe(raw) {
 function splitCsv(raw) {
   return String(raw || '')
     .split(',')
-    .map((item) => safeTrim(item).toLowerCase())
+    .map((item) => normalizeEnvToken(item).toLowerCase())
     .filter(Boolean);
 }
 
 function splitCsvPreserveCase(raw) {
   return String(raw || '')
     .split(',')
-    .map((item) => safeTrim(item))
+    .map((item) => normalizeEnvToken(item))
     .filter(Boolean);
 }
 
 function normalizeHost(rawHost) {
-  const candidate = safeTrim(String(rawHost || '').split(',')[0]);
+  const candidate = normalizeEnvToken(String(rawHost || '').split(',')[0]);
   if (!candidate) return '';
   return candidate.toLowerCase().replace(/:\d+$/, '');
 }
@@ -75,7 +81,7 @@ function normalizeOrigin(rawOrigin) {
 }
 
 function parseBoolean(rawValue, fallback = false) {
-  const value = safeTrim(rawValue).toLowerCase();
+  const value = normalizeEnvToken(rawValue).toLowerCase();
   if (!value) return fallback;
   if (['1', 'true', 'yes', 'on'].includes(value)) return true;
   if (['0', 'false', 'no', 'off'].includes(value)) return false;
@@ -83,7 +89,7 @@ function parseBoolean(rawValue, fallback = false) {
 }
 
 function readServiceGuardMode() {
-  const mode = safeTrim(process.env.SERVICE_HOST_GUARD_MODE).toLowerCase();
+  const mode = normalizeEnvToken(process.env.SERVICE_HOST_GUARD_MODE).toLowerCase();
   if (mode === 'off' || mode === 'warn' || mode === 'enforce') {
     return mode;
   }
@@ -91,7 +97,7 @@ function readServiceGuardMode() {
 }
 
 function readServiceRouteGuardMode() {
-  const mode = safeTrim(process.env.SERVICE_ROUTE_GUARD_MODE).toLowerCase();
+  const mode = normalizeEnvToken(process.env.SERVICE_ROUTE_GUARD_MODE).toLowerCase();
   if (mode === 'off' || mode === 'warn' || mode === 'enforce') {
     return mode;
   }
@@ -99,7 +105,7 @@ function readServiceRouteGuardMode() {
 }
 
 function readCorsGuardMode() {
-  const mode = safeTrim(process.env.CORS_GUARD_MODE).toLowerCase();
+  const mode = normalizeEnvToken(process.env.CORS_GUARD_MODE).toLowerCase();
   if (mode === 'off' || mode === 'warn' || mode === 'enforce') {
     return mode;
   }
@@ -107,7 +113,7 @@ function readCorsGuardMode() {
 }
 
 function readServiceRuntime() {
-  const value = safeTrim(process.env.SERVICE_RUNTIME).toLowerCase();
+  const value = normalizeEnvToken(process.env.SERVICE_RUNTIME).toLowerCase();
   if (value === 'exam-api' || value === 'panel-api' || value === 'ops-api') {
     return value;
   }

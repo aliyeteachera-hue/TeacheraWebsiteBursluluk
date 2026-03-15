@@ -53,6 +53,7 @@
     "p0:cutover:hypercare:drill": "node scripts/p0-12-cutover-hypercare-rollback-drill.mjs",
     "p0:go-live:checklist:set": "node scripts/p0-12-go-live-checklist-set.mjs",
     "p0:evidence:gate": "node scripts/p0-evidence-gate.mjs",
+    "ci:path-filter:selftest": "node scripts/ci-path-filter-selftest.mjs",
     "runtime-boundaries:audit": "node scripts/runtime-boundaries-audit.mjs",
     "runtime-boundaries:show": "cat config/runtime-boundaries.json",
     "cron:worker:ownership:audit": "node scripts/cron-worker-ownership-audit.mjs",

@@ -1,0 +1,342 @@
+{
+  "timestamp": "2026-03-15T00:26:01.247Z",
+  "workflow_path": ".github/workflows/ci.yml",
+  "overall_ok": true,
+  "totals": {
+    "pass": 19,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "id": "filter_www_declared",
+      "status": "PASS",
+      "detail": "Filter \"www\" contains 6 pattern(s).",
+      "evidence": {}
+    },
+    {
+      "id": "filter_exam_api_declared",
+      "status": "PASS",
+      "detail": "Filter \"exam_api\" contains 6 pattern(s).",
+      "evidence": {}
+    },
+    {
+      "id": "filter_panel_api_declared",
+      "status": "PASS",
+      "detail": "Filter \"panel_api\" contains 4 pattern(s).",
+      "evidence": {}
+    },
+    {
+      "id": "filter_ops_api_declared",
+      "status": "PASS",
+      "detail": "Filter \"ops_api\" contains 5 pattern(s).",
+      "evidence": {}
+    },
+    {
+      "id": "filter_force_all_declared",
+      "status": "PASS",
+      "detail": "Filter \"force_all\" contains 10 pattern(s).",
+      "evidence": {}
+    },
+    {
+      "id": "www_only_change_matches",
+      "status": "PASS",
+      "detail": "Path filter outputs match expected values.",
+      "evidence": {
+        "paths": [
+          "apps/www/src/app/main.tsx"
+        ],
+        "expected": {
+          "www": true,
+          "exam_api": false,
+          "panel_api": false,
+          "ops_api": false,
+          "force_all": false
+        },
+        "actual": {
+          "www": true,
+          "exam_api": false,
+          "panel_api": false,
+          "ops_api": false,
+          "force_all": false
+        }
+      }
+    },
+    {
+      "id": "www_only_change_deploy",
+      "status": "PASS",
+      "detail": "Deploy decisions match expected values.",
+      "evidence": {
+        "expected": {
+          "deploy_www": true,
+          "deploy_exam_api": false,
+          "deploy_panel_api": false,
+          "deploy_ops_api": false
+        },
+        "actual": {
+          "deploy_www": true,
+          "deploy_exam_api": false,
+          "deploy_panel_api": false,
+          "deploy_ops_api": false
+        }
+      }
+    },
+    {
+      "id": "exam_only_change_matches",
+      "status": "PASS",
+      "detail": "Path filter outputs match expected values.",
+      "evidence": {
+        "paths": [
+          "apps/exam-api/api/exam/session/start.js"
+        ],
+        "expected": {
+          "www": false,
+          "exam_api": true,
+          "panel_api": false,
+          "ops_api": false,
+          "force_all": false
+        },
+        "actual": {
+          "www": false,
+          "exam_api": true,
+          "panel_api": false,
+          "ops_api": false,
+          "force_all": false
+        }
+      }
+    },
+    {
+      "id": "exam_only_change_deploy",
+      "status": "PASS",
+      "detail": "Deploy decisions match expected values.",
+      "evidence": {
+        "expected": {
+          "deploy_www": false,
+          "deploy_exam_api": true,
+          "deploy_panel_api": false,
+          "deploy_ops_api": false
+        },
+        "actual": {
+          "deploy_www": false,
+          "deploy_exam_api": true,
+          "deploy_panel_api": false,
+          "deploy_ops_api": false
+        }
+      }
+    },
+    {
+      "id": "panel_only_change_matches",
+      "status": "PASS",
+      "detail": "Path filter outputs match expected values.",
+      "evidence": {
+        "paths": [
+          "apps/panel-api/api/panel/dashboard.js"
+        ],
+        "expected": {
+          "www": false,
+          "exam_api": false,
+          "panel_api": true,
+          "ops_api": false,
+          "force_all": false
+        },
+        "actual": {
+          "www": false,
+          "exam_api": false,
+          "panel_api": true,
+          "ops_api": false,
+          "force_all": false
+        }
+      }
+    },
+    {
+      "id": "panel_only_change_deploy",
+      "status": "PASS",
+      "detail": "Deploy decisions match expected values.",
+      "evidence": {
+        "expected": {
+          "deploy_www": false,
+          "deploy_exam_api": false,
+          "deploy_panel_api": true,
+          "deploy_ops_api": false
+        },
+        "actual": {
+          "deploy_www": false,
+          "deploy_exam_api": false,
+          "deploy_panel_api": true,
+          "deploy_ops_api": false
+        }
+      }
+    },
+    {
+      "id": "ops_only_change_matches",
+      "status": "PASS",
+      "detail": "Path filter outputs match expected values.",
+      "evidence": {
+        "paths": [
+          "apps/ops-api/api/notifications/worker.js"
+        ],
+        "expected": {
+          "www": false,
+          "exam_api": false,
+          "panel_api": false,
+          "ops_api": true,
+          "force_all": false
+        },
+        "actual": {
+          "www": false,
+          "exam_api": false,
+          "panel_api": false,
+          "ops_api": true,
+          "force_all": false
+        }
+      }
+    },
+    {
+      "id": "ops_only_change_deploy",
+      "status": "PASS",
+      "detail": "Deploy decisions match expected values.",
+      "evidence": {
+        "expected": {
+          "deploy_www": false,
+          "deploy_exam_api": false,
+          "deploy_panel_api": false,
+          "deploy_ops_api": true
+        },
+        "actual": {
+          "deploy_www": false,
+          "deploy_exam_api": false,
+          "deploy_panel_api": false,
+          "deploy_ops_api": true
+        }
+      }
+    },
+    {
+      "id": "shared_backend_change_matches",
+      "status": "PASS",
+      "detail": "Path filter outputs match expected values.",
+      "evidence": {
+        "paths": [
+          "packages/shared/backend/http.js"
+        ],
+        "expected": {
+          "www": false,
+          "exam_api": true,
+          "panel_api": true,
+          "ops_api": true,
+          "force_all": true
+        },
+        "actual": {
+          "www": false,
+          "exam_api": true,
+          "panel_api": true,
+          "ops_api": true,
+          "force_all": true
+        }
+      }
+    },
+    {
+      "id": "shared_backend_change_deploy",
+      "status": "PASS",
+      "detail": "Deploy decisions match expected values.",
+      "evidence": {
+        "expected": {
+          "deploy_www": true,
+          "deploy_exam_api": true,
+          "deploy_panel_api": true,
+          "deploy_ops_api": true
+        },
+        "actual": {
+          "deploy_www": true,
+          "deploy_exam_api": true,
+          "deploy_panel_api": true,
+          "deploy_ops_api": true
+        }
+      }
+    },
+    {
+      "id": "scripts_change_force_all_matches",
+      "status": "PASS",
+      "detail": "Path filter outputs match expected values.",
+      "evidence": {
+        "paths": [
+          "scripts/p0-evidence-gate.mjs"
+        ],
+        "expected": {
+          "www": false,
+          "exam_api": false,
+          "panel_api": false,
+          "ops_api": false,
+          "force_all": true
+        },
+        "actual": {
+          "www": false,
+          "exam_api": false,
+          "panel_api": false,
+          "ops_api": false,
+          "force_all": true
+        }
+      }
+    },
+    {
+      "id": "scripts_change_force_all_deploy",
+      "status": "PASS",
+      "detail": "Deploy decisions match expected values.",
+      "evidence": {
+        "expected": {
+          "deploy_www": true,
+          "deploy_exam_api": true,
+          "deploy_panel_api": true,
+          "deploy_ops_api": true
+        },
+        "actual": {
+          "deploy_www": true,
+          "deploy_exam_api": true,
+          "deploy_panel_api": true,
+          "deploy_ops_api": true
+        }
+      }
+    },
+    {
+      "id": "docs_only_no_deploy_matches",
+      "status": "PASS",
+      "detail": "Path filter outputs match expected values.",
+      "evidence": {
+        "paths": [
+          "guidelines/architecture-notes.md"
+        ],
+        "expected": {
+          "www": false,
+          "exam_api": false,
+          "panel_api": false,
+          "ops_api": false,
+          "force_all": false
+        },
+        "actual": {
+          "www": false,
+          "exam_api": false,
+          "panel_api": false,
+          "ops_api": false,
+          "force_all": false
+        }
+      }
+    },
+    {
+      "id": "docs_only_no_deploy_deploy",
+      "status": "PASS",
+      "detail": "Deploy decisions match expected values.",
+      "evidence": {
+        "expected": {
+          "deploy_www": false,
+          "deploy_exam_api": false,
+          "deploy_panel_api": false,
+          "deploy_ops_api": false
+        },
+        "actual": {
+          "deploy_www": false,
+          "deploy_exam_api": false,
+          "deploy_panel_api": false,
+          "deploy_ops_api": false
+        }
+      }
+    }
+  ]
+}
