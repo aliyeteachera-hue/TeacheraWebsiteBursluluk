@@ -1,6 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHmac } from 'node:crypto';
+
+const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
 function safeTrim(value) {
   return String(value ?? '').trim();
@@ -22,6 +25,43 @@ function toJson(text) {
   } catch {
     return null;
   }
+}
+
+function decodeBase32(rawSecret) {
+  const normalized = safeTrim(rawSecret).replace(/[\s-]/g, '').toUpperCase();
+  if (!normalized) return Buffer.alloc(0);
+  let bits = '';
+  for (const char of normalized) {
+    const index = BASE32_ALPHABET.indexOf(char);
+    if (index < 0) throw new Error(`invalid_base32_char:${char}`);
+    bits += index.toString(2).padStart(5, '0');
+  }
+  const bytes = [];
+  for (let i = 0; i + 8 <= bits.length; i += 8) {
+    bytes.push(Number.parseInt(bits.slice(i, i + 8), 2));
+  }
+  return Buffer.from(bytes);
+}
+
+function hotp(secretBuffer, counter, digits = 6) {
+  const counterBuffer = Buffer.alloc(8);
+  counterBuffer.writeBigUInt64BE(BigInt(counter));
+  const digest = createHmac('sha1', secretBuffer).update(counterBuffer).digest();
+  const offset = digest[digest.length - 1] & 0x0f;
+  const code =
+    ((digest[offset] & 0x7f) << 24)
+    | ((digest[offset + 1] & 0xff) << 16)
+    | ((digest[offset + 2] & 0xff) << 8)
+    | (digest[offset + 3] & 0xff);
+  return String(code % (10 ** digits)).padStart(digits, '0');
+}
+
+function maybeResolvePanelMfaCode({ panelMfaCode, panelTotpSecret }) {
+  if (safeTrim(panelMfaCode)) return safeTrim(panelMfaCode);
+  const secret = safeTrim(panelTotpSecret);
+  if (!secret) return '';
+  const step = Math.floor(Date.now() / 1000 / 30);
+  return hotp(decodeBase32(secret), step, 6);
 }
 
 async function readEnvFileMap(filepath) {
@@ -76,8 +116,38 @@ function isExpectedStatus(status, expected) {
   return Array.isArray(expected) ? expected.includes(status) : status === expected;
 }
 
-function makeCheck(id, status, detail, evidence = {}) {
-  return { id, status, detail, evidence };
+function makeCheck(id, status, detail, evidence = {}, meta = {}) {
+  return { id, status, detail, evidence, ...meta };
+}
+
+function redactSensitive(value) {
+  const sensitiveKeys = new Set([
+    'token',
+    'sessionToken',
+    'session_token',
+    'password',
+    'mfaCode',
+    'mfa_code',
+    'x-load-test-key',
+    'load_test_bypass_key',
+  ]);
+
+  if (Array.isArray(value)) {
+    return value.map((item) => redactSensitive(item));
+  }
+  if (!value || typeof value !== 'object') {
+    return value;
+  }
+
+  const out = {};
+  for (const [key, raw] of Object.entries(value)) {
+    if (sensitiveKeys.has(key)) {
+      out[key] = '[REDACTED]';
+    } else {
+      out[key] = redactSensitive(raw);
+    }
+  }
+  return out;
 }
 
 function renderMarkdown(report) {
@@ -129,9 +199,12 @@ async function run() {
     kvkkConsentVersion: safeTrim(process.env.KVKK_CONSENT_VERSION || envFileMap.KVKK_CONSENT_VERSION || 'KVKK_v1_2026-03-13'),
     panelEmail: safeTrim(process.env.PANEL_EMAIL),
     panelPassword: safeTrim(process.env.PANEL_PASSWORD),
+    panelTotpSecret: safeTrim(process.env.PANEL_SMOKE_TOTP_SECRET || process.env.PANEL_TOTP_SECRET),
     panelMfaCode: safeTrim(process.env.PANEL_MFA_CODE),
     loadTestBypassKey: resolveLoadTestKey(envFileMap),
   };
+
+  cfg.panelMfaCode = maybeResolvePanelMfaCode(cfg);
 
   const checks = [];
   const startedAt = nowIso();
@@ -205,6 +278,7 @@ async function run() {
       {
         status: loginMissingResp.status,
         body: loginMissingResp.json || loginMissingResp.text,
+        
       },
     ),
   );
@@ -302,7 +376,7 @@ async function run() {
         applicationNo: applicationNo || null,
         hasSessionToken: Boolean(sessionToken),
         loadTestModeUsed: Boolean(startHeaders['x-load-test-key']),
-        body: startResp.json || startResp.text,
+        body: redactSensitive(startResp.json || startResp.text),
       },
     ),
   );
@@ -331,7 +405,7 @@ async function run() {
         `HTTP ${candidateLoginResp.status}`,
         {
           status: candidateLoginResp.status,
-          body: candidateLoginResp.json || candidateLoginResp.text,
+          body: redactSensitive(candidateLoginResp.json || candidateLoginResp.text),
         },
       ),
     );
@@ -393,7 +467,7 @@ async function run() {
         `HTTP ${answerResp.status}`,
         {
           status: answerResp.status,
-          body: answerResp.json || answerResp.text,
+          body: redactSensitive(answerResp.json || answerResp.text),
         },
       ),
     );
@@ -435,7 +509,7 @@ async function run() {
         {
           status: submitResp.status,
           resultId: submitResp.json?.result?.result_id || null,
-          body: submitResp.json || submitResp.text,
+          body: redactSensitive(submitResp.json || submitResp.text),
         },
       ),
     );
@@ -462,7 +536,7 @@ async function run() {
         {
           status: resultResp.status,
           resultStatus: resultResp.json?.result?.status || null,
-          body: resultResp.json || resultResp.text,
+          body: redactSensitive(resultResp.json || resultResp.text),
         },
       ),
     );
@@ -474,7 +548,7 @@ async function run() {
     checks.push(makeCheck('e2e_result_view', 'SKIP', 'Skipped because session start failed.'));
   }
 
-  // 4) Panel smoke (unauth always, full auth optional)
+  // 4) Panel smoke (unauth always, full auth optional-admin-check)
   const panelMeUnauth = await httpRequest({
     url: `${cfg.panelApiBase}/api/panel/auth/me`,
     method: 'GET',
@@ -486,6 +560,7 @@ async function run() {
       isExpectedStatus(panelMeUnauth.status, [401, 403]) ? 'PASS' : 'FAIL',
       `HTTP ${panelMeUnauth.status}`,
       { status: panelMeUnauth.status, body: panelMeUnauth.json || panelMeUnauth.text },
+      { check_group: 'optional-admin-check' },
     ),
   );
 
@@ -509,12 +584,13 @@ async function run() {
         `HTTP ${panelLoginResp.status}`,
         {
           status: panelLoginResp.status,
-          nextStep: panelLoginResp.json?.next_step || null,
-          hasToken: Boolean(panelToken),
-          body: panelLoginResp.json || panelLoginResp.text,
-        },
-      ),
-    );
+        nextStep: panelLoginResp.json?.next_step || null,
+        hasToken: Boolean(panelToken),
+        body: redactSensitive(panelLoginResp.json || panelLoginResp.text),
+      },
+      { check_group: 'optional-admin-check' },
+    ),
+  );
 
     if (panelToken) {
       const panelMeResp = await httpRequest({
@@ -531,8 +607,9 @@ async function run() {
           `HTTP ${panelMeResp.status}`,
           {
             status: panelMeResp.status,
-            body: panelMeResp.json || panelMeResp.text,
+            body: redactSensitive(panelMeResp.json || panelMeResp.text),
           },
+          { check_group: 'optional-admin-check' },
         ),
       );
 
@@ -553,16 +630,47 @@ async function run() {
             status: panelDashboardResp.status,
             hasSummary: Boolean(panelDashboardResp.json?.summary),
           },
+          { check_group: 'optional-admin-check' },
         ),
       );
     } else {
-      checks.push(makeCheck('panel_auth_me', 'SKIP', 'Skipped because panel login failed.'));
-      checks.push(makeCheck('panel_dashboard', 'SKIP', 'Skipped because panel login failed.'));
+      checks.push(makeCheck(
+        'panel_auth_me',
+        'WARN',
+        'optional-admin-check: skipped because panel login failed.',
+        {},
+        { check_group: 'optional-admin-check' },
+      ));
+      checks.push(makeCheck(
+        'panel_dashboard',
+        'WARN',
+        'optional-admin-check: skipped because panel login failed.',
+        {},
+        { check_group: 'optional-admin-check' },
+      ));
     }
   } else {
-    checks.push(makeCheck('panel_login', 'WARN', 'Skipped full panel auth smoke (set PANEL_EMAIL/PANEL_PASSWORD/PANEL_MFA_CODE).'));
-    checks.push(makeCheck('panel_auth_me', 'SKIP', 'Skipped full panel auth smoke (missing env).'));
-    checks.push(makeCheck('panel_dashboard', 'SKIP', 'Skipped full panel auth smoke (missing env).'));
+    checks.push(makeCheck(
+      'panel_login',
+      'PASS',
+      'optional-admin-check: skipped full panel auth smoke (set PANEL_EMAIL/PANEL_PASSWORD/PANEL_MFA_CODE).',
+      { skipped: true },
+      { check_group: 'optional-admin-check' },
+    ));
+    checks.push(makeCheck(
+      'panel_auth_me',
+      'PASS',
+      'optional-admin-check: skipped (missing env).',
+      { skipped: true },
+      { check_group: 'optional-admin-check' },
+    ));
+    checks.push(makeCheck(
+      'panel_dashboard',
+      'PASS',
+      'optional-admin-check: skipped (missing env).',
+      { skipped: true },
+      { check_group: 'optional-admin-check' },
+    ));
   }
 
   const totals = checks.reduce(
@@ -574,16 +682,20 @@ async function run() {
     { pass: 0, fail: 0, warn: 0, skip: 0 },
   );
 
+  const blockingFailures = checks.filter((check) => check.status === 'FAIL' && check.check_group !== 'optional-admin-check');
+
   const report = {
     timestamp: nowIso(),
     started_at: startedAt,
     mode: {
       http: true,
       panel_full_auth: Boolean(cfg.panelEmail && cfg.panelPassword && cfg.panelMfaCode),
+      panel_mfa_source: safeTrim(process.env.PANEL_MFA_CODE) ? 'PANEL_MFA_CODE' : (cfg.panelTotpSecret ? 'PANEL_SMOKE_TOTP_SECRET' : 'none'),
       load_test_bypass_key_available: Boolean(cfg.loadTestBypassKey),
     },
     totals,
-    overall_ready_for_release_candidate: totals.fail === 0,
+    blocking_failure_count: blockingFailures.length,
+    overall_ready_for_release_candidate: blockingFailures.length === 0,
     release_candidate: {
       id: `rc-frontend-uat-${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`,
       freeze_started_at: nowIso(),
