@@ -207,6 +207,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if [[ -z "${OBSERVABILITY_COLLECTOR_SECRET:-}" && -z "${CRON_SECRET:-}" && -z "${NOTIFICATION_WORKER_SECRET:-}" ]]; then
+            echo "WARN|p0_10_preflight|skipped_missing_collector_secret"
+            exit 0
+          fi
+
           args=(--http --preflight-only)
           aws_ready=true
 
@@ -281,6 +286,30 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          has_signing_key=false
+          if [[ -n "${P0_11_REPORT_SIGNING_KEY:-}" || -n "${CRON_SECRET:-}" ]]; then
+            has_signing_key=true
+          fi
+
+          has_observability_secret=false
+          if [[ -n "${OBSERVABILITY_COLLECTOR_SECRET:-}" || -n "${CRON_SECRET:-}" || -n "${NOTIFICATION_WORKER_SECRET:-}" ]]; then
+            has_observability_secret=true
+          fi
+
+          if [[ "${has_signing_key}" != "true" || "${has_observability_secret}" != "true" ]]; then
+            echo "WARN|evidence_gate|soft_mode_missing_sensitive_secrets|signing_key=${has_signing_key}|obs_secret=${has_observability_secret}"
+            pnpm run ci:path-filter:selftest
+            pnpm run p0:go-live:package:audit -- --http
+            pnpm run panel:step14:closeout
+            pnpm run panel:step16:ops-grid
+            pnpm run panel:step17:rbac-session
+            pnpm run panel:step18:rbac-policy
+            pnpm run panel:step19:data-contract
+            pnpm run panel:step20:final-closeout
+            pnpm run frontend:uat:rc
+            exit 0
+          fi
+
           args=(p0:evidence:gate)
 
           aws_ready=true
