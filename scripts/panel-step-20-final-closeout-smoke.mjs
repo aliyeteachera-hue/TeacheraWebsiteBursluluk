@@ -90,7 +90,7 @@ async function run() {
 
   for (const [id, fileName, readyKey] of artifactChecks) {
     const fullPath = path.join(guidelinesDir, fileName);
-    let payload = null;
+    let payload;
     try {
       payload = readJson(await fs.readFile(fullPath, 'utf8'));
     } catch {

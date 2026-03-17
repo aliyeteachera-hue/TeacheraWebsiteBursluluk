@@ -92,8 +92,8 @@ export async function openMailDraft({ to = 'data@teachera.com.tr', subject, line
   if (typeof window === 'undefined') return false;
 
   const fields = buildFields(lines);
-  let proxyEndpoint = '';
-  let endpointDomain = 'invalid_proxy_endpoint';
+  let proxyEndpoint: string;
+  let endpointDomain: string;
   const fieldCount = lines.filter(Boolean).length;
   const subjectKey = toSubjectKey(subject);
   const captchaEnabled = isCaptchaEnabled();
@@ -216,8 +216,8 @@ export function openMailDraftOnUnload({ to = 'data@teachera.com.tr', subject, li
     return false;
   }
 
-  let endpoint = '';
-  let endpointDomain = 'invalid_proxy_endpoint';
+  let endpoint: string;
+  let endpointDomain: string;
   const payload = {
     to,
     subject,

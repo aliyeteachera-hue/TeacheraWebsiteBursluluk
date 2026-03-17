@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   COOKIE_CONSENT_KEY,
@@ -39,6 +38,7 @@ function bootstrapDom(search = '') {
     search,
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test harness mutates globalThis in isolated unit tests
   const globals = globalThis as any;
 
   globals.window = {
@@ -77,6 +77,7 @@ describe('analytics', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test harness mutates globalThis in isolated unit tests
     const globals = globalThis as any;
     delete globals.window;
     delete globals.document;
@@ -85,11 +86,13 @@ describe('analytics', () => {
   it('blocks analytics events when consent is missing', () => {
     const tracked = trackEvent('page_view', {});
     expect(tracked).toBe(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test harness mutates globalThis in isolated unit tests
     const globals = globalThis as any;
     expect(globals.window?.dataLayer || []).toHaveLength(0);
   });
 
   it('tracks lead score and attribution context when consent is granted', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test harness mutates globalThis in isolated unit tests
     const globals = globalThis as any;
     globals.window?.localStorage.setItem(
       COOKIE_CONSENT_KEY,

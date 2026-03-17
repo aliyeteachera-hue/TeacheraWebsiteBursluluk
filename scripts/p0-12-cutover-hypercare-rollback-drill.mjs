@@ -241,7 +241,7 @@ async function createTempPanelUser({ connectionString, runId }) {
   const totpSecret = generateTotpSecret();
 
   const client = await pool.connect();
-  let userId = '';
+  let userId;
 
   try {
     await client.query('BEGIN');

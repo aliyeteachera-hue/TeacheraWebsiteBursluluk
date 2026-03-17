@@ -48,9 +48,10 @@ export default function BurslulukWaitingPage() {
         if (!active) return;
         setError(requestError instanceof Error ? requestError.message : 'Sınav durumu alınamadı.');
       } finally {
-        if (!active) return;
-        setLoading(false);
-        if (markRefreshing) setRefreshing(false);
+        if (active) {
+          setLoading(false);
+          if (markRefreshing) setRefreshing(false);
+        }
       }
     };
 
