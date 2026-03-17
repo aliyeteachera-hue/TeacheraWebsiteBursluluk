@@ -22,7 +22,9 @@
     "build:ops-api": "npm --prefix apps/ops-api run build",
     "sync:shared-backend": "node scripts/sync-shared-backend.mjs",
     "check:shared-backend-sync": "node scripts/check-shared-backend-sync.mjs",
-    "runtime:verify": "npm run build:monorepo",
+    "sync:legacy-runtime": "node scripts/sync-legacy-runtime-entrypoints.mjs",
+    "check:legacy-runtime-sync": "node scripts/check-legacy-runtime-entrypoints-sync.mjs",
+    "runtime:verify": "npm run check:shared-backend-sync && npm run check:legacy-runtime-sync && npm run runtime-boundaries:audit && npm run build:monorepo",
     "deploy:www:prod": "npx --yes vercel --prod --cwd apps/www",
     "deploy:exam-api:prod": "npx --yes vercel --prod --cwd apps/exam-api",
     "deploy:panel-api:prod": "npx --yes vercel --prod --cwd apps/panel-api",
@@ -68,7 +70,13 @@
     "env:secret-scope:cleanup": "node scripts/vercel-env-secret-scope-cleanup.mjs --environment=production --apply",
     "env:secret:smoke": "node scripts/vercel-env-secret-prod-smoke.mjs",
     "env:secret:gate": "node scripts/vercel-env-secret-gate.mjs --environment=production",
-    "frontend:uat:rc": "node scripts/frontend-uat-bugfix-freeze-rc.mjs"
+    "frontend:uat:rc": "node scripts/frontend-uat-bugfix-freeze-rc.mjs",
+    "panel:step14:closeout": "node scripts/panel-step-14-closeout-smoke.mjs",
+    "panel:step16:ops-grid": "node scripts/panel-step-16-ops-grid-smoke.mjs",
+    "panel:step17:rbac-session": "node scripts/panel-step-17-rbac-session-smoke.mjs",
+    "panel:step18:rbac-policy": "node scripts/panel-step-18-rbac-policy-smoke.mjs",
+    "panel:step19:data-contract": "node scripts/panel-step-19-data-contract-smoke.mjs",
+    "panel:step20:final-closeout": "node scripts/panel-step-20-final-closeout-smoke.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.1007.0",

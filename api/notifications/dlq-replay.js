@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { withTransaction } from '../_lib/db.js';
 import { HttpError } from '../_lib/errors.js';
 import { handleRequest, methodGuard, ok, parseBody, safeTrim } from '../_lib/http.js';

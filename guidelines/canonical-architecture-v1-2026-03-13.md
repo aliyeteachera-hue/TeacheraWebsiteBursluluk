@@ -1,6 +1,6 @@
 # Canonical Architecture v1
 Date: March 13, 2026
-Status: Draft for Approval
+Status: As-Built Baseline (Domains Approved)
 
 ## 1. Purpose and Scope
 This document is the single canonical technical baseline for the Teachera Online Bursluluk / Seviye Tespit system targeting 10,000-15,000 candidates.
@@ -19,7 +19,7 @@ It consolidates and resolves differences across:
 - Panel APIs: `https://panel-api.teachera.com.tr`
 - Operations APIs (health/observability/ops): `https://ops-api.teachera.com.tr`
 - Panel UI canonical route: `https://teachera.com.tr/panel/*`
-- Optional host alias allowed: `panel.teachera.com.tr` (must resolve to same panel UI behavior).
+- `panel.teachera.com.tr` host alias is not canonical in v1; if used, it must redirect to `https://teachera.com.tr/panel/*`.
 
 ### 2.2 Mandatory Frontend Flows
 Candidate flow routes must exist and be operational:
@@ -126,7 +126,7 @@ Status legend: `OPEN`, `IN_PROGRESS`, `APPROVED`
 
 | ID | Decision to Finalize | Owner | Deadline | Status |
 |---|---|---|---|---|
-| D-01 | Final public panel host policy (`teachera.com.tr/panel/*` only vs dual-host with `panel.teachera.com.tr`) | Solution Architect | March 15, 2026 | OPEN |
+| D-01 | Final public panel host policy (`teachera.com.tr/panel/*` canonical, alias optional redirect-only) | Solution Architect | March 15, 2026 | APPROVED |
 | D-02 | `credentials` table migration and rollout plan (dual-write + backfill + cutover) | Backend Lead | March 17, 2026 | OPEN |
 | D-03 | KVKK consent schema (`consent_version`, timestamp, legal text version) final contract | Legal/KVKK Owner + Backend Lead | March 18, 2026 | OPEN |
 | D-04 | Candidate dedupe policy (phone vs national ID vs school+name fallback) | Product Owner + Data Lead | March 16, 2026 | OPEN |

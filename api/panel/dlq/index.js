@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { requireRole } from '../../_lib/auth.js';
 import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { NOTIFICATION_CHANNELS, ROLES } from '../../_lib/constants.js';

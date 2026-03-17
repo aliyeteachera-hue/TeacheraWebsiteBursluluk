@@ -1,0 +1,375 @@
+{
+  "timestamp": "2026-03-17T07:29:24.780Z",
+  "mode": {
+    "http": true
+  },
+  "totals": {
+    "pass": 46,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "overall_ready_for_step_16": true,
+  "checks": [
+    {
+      "id": "public_route_/panel/dashboard?view=operations&focus=candidates",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/panel/dashboard?view=operations&focus=candidates",
+        "status": 200,
+        "expected": [
+          200
+        ]
+      }
+    },
+    {
+      "id": "public_route_/panel/candidates",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/panel/candidates",
+        "status": 200,
+        "expected": [
+          200
+        ]
+      }
+    },
+    {
+      "id": "public_route_/panel/notifications",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/panel/notifications",
+        "status": 200,
+        "expected": [
+          200
+        ]
+      }
+    },
+    {
+      "id": "public_route_/panel/dlq",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/panel/dlq",
+        "status": 200,
+        "expected": [
+          200
+        ]
+      }
+    },
+    {
+      "id": "public_route_/panel/unviewed-results",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/panel/unviewed-results",
+        "status": 200,
+        "expected": [
+          200
+        ]
+      }
+    },
+    {
+      "id": "unauth_get_/api/panel/candidates",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_get_/api/panel/candidates/export?format=csv",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates/export?format=csv",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_get_/api/panel/notifications",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/notifications",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_get_/api/panel/dlq",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/dlq",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_get_/api/panel/unviewed-results",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/unviewed-results",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_post_/api/panel/candidates/actions",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates/actions",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_post_/api/panel/notifications/actions",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/notifications/actions",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_post_/api/panel/dlq/actions",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/dlq/actions",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_post_/api/panel/unviewed-results/actions",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/unviewed-results/actions",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "bundle_index_path",
+      "status": "PASS",
+      "detail": "Found /assets/index-DCW-KWgh.js",
+      "evidence": {}
+    },
+    {
+      "id": "bundle_dashboard_chunk",
+      "status": "PASS",
+      "detail": "Found assets/PanelDashboardPage-DVfUl_fC.js",
+      "evidence": {}
+    },
+    {
+      "id": "marker_focus_candidates_route",
+      "status": "PASS",
+      "detail": "Marker found: /panel/candidates",
+      "evidence": {}
+    },
+    {
+      "id": "marker_candidates_api",
+      "status": "PASS",
+      "detail": "Marker found: /api/panel/candidates",
+      "evidence": {}
+    },
+    {
+      "id": "marker_notifications_api",
+      "status": "PASS",
+      "detail": "Marker found: /api/panel/notifications",
+      "evidence": {}
+    },
+    {
+      "id": "marker_dlq_api",
+      "status": "PASS",
+      "detail": "Marker found: /api/panel/dlq",
+      "evidence": {}
+    },
+    {
+      "id": "marker_unviewed_api",
+      "status": "PASS",
+      "detail": "Marker found: /api/panel/unviewed-results",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_application",
+      "status": "PASS",
+      "detail": "Marker found: Başvuru Alındı",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_credentials_sms",
+      "status": "PASS",
+      "detail": "Marker found: Credentials SMS Gönderildi",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_sms_delivery",
+      "status": "PASS",
+      "detail": "Marker found: SMS Teslim",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_login",
+      "status": "PASS",
+      "detail": "Marker found: Login",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_exam_started",
+      "status": "PASS",
+      "detail": "Marker found: Sınava Başladı",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_exam_completed",
+      "status": "PASS",
+      "detail": "Marker found: Sınavı Tamamladı",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_result_published",
+      "status": "PASS",
+      "detail": "Marker found: Sonuç Yayınlandı",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_result_viewed",
+      "status": "PASS",
+      "detail": "Marker found: Sonuç Görüntülendi",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_wa_sent",
+      "status": "PASS",
+      "detail": "Marker found: WA Sonucu Gönderildi",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_wa_delivery_read",
+      "status": "PASS",
+      "detail": "Marker found: WA Delivery/Read",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_last_error_code",
+      "status": "PASS",
+      "detail": "Marker found: Son Hata Kodu",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_last_operation_time",
+      "status": "PASS",
+      "detail": "Marker found: Son İşlem Zamanı",
+      "evidence": {}
+    },
+    {
+      "id": "marker_col_operator_note",
+      "status": "PASS",
+      "detail": "Marker found: Operatör Notu",
+      "evidence": {}
+    },
+    {
+      "id": "marker_filter_school",
+      "status": "PASS",
+      "detail": "Marker found: Okul filtresi",
+      "evidence": {}
+    },
+    {
+      "id": "marker_filter_grade",
+      "status": "PASS",
+      "detail": "Marker found: Sınıf (tümü)",
+      "evidence": {}
+    },
+    {
+      "id": "marker_filter_sms",
+      "status": "PASS",
+      "detail": "Marker found: SMS durumu (tümü)",
+      "evidence": {}
+    },
+    {
+      "id": "marker_filter_login",
+      "status": "PASS",
+      "detail": "Marker found: Login durumu (tümü)",
+      "evidence": {}
+    },
+    {
+      "id": "marker_filter_exam",
+      "status": "PASS",
+      "detail": "Marker found: Sınav durumu (tümü)",
+      "evidence": {}
+    },
+    {
+      "id": "marker_filter_result_viewed",
+      "status": "PASS",
+      "detail": "Marker found: Sonuç görüntüleme (tümü)",
+      "evidence": {}
+    },
+    {
+      "id": "marker_filter_wa",
+      "status": "PASS",
+      "detail": "Marker found: WhatsApp durumu (tümü)",
+      "evidence": {}
+    },
+    {
+      "id": "marker_action_sms_resend",
+      "status": "PASS",
+      "detail": "Marker found: Manual SMS Resend",
+      "evidence": {}
+    },
+    {
+      "id": "marker_action_wa_single",
+      "status": "PASS",
+      "detail": "Marker found: Tekil WA",
+      "evidence": {}
+    },
+    {
+      "id": "marker_action_wa_bulk",
+      "status": "PASS",
+      "detail": "Marker found: Toplu WhatsApp Gönder",
+      "evidence": {}
+    },
+    {
+      "id": "marker_action_csv_export",
+      "status": "PASS",
+      "detail": "Marker found: CSV Export",
+      "evidence": {}
+    },
+    {
+      "id": "marker_action_xls_export",
+      "status": "PASS",
+      "detail": "Marker found: XLS Export",
+      "evidence": {}
+    }
+  ]
+}

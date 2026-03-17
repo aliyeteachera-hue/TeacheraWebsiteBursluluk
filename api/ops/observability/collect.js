@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { CloudWatchClient, PutMetricDataCommand } from '@aws-sdk/client-cloudwatch';
 import { query } from '../../_lib/db.js';
 import { HttpError } from '../../_lib/errors.js';

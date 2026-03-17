@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import {
   assertNotBruteForceLocked,
   clearBruteForceState,

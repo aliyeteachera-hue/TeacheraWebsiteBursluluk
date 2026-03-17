@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { withTransaction } from '../../_lib/db.js';
 import { HttpError } from '../../_lib/errors.js';
 import { normalizeSubmissionStatus, optionalString } from '../../_lib/exam.js';
@@ -179,9 +180,7 @@ async function enqueueResultNotifications({
   placementLabel,
 }) {
   if (!parentPhoneE164) return [];
-  const jobs = [];
-
-  jobs.push(
+  return Promise.all([
     enqueueNotification({
       campaignCode,
       candidateId,
@@ -196,26 +195,7 @@ async function enqueueResultNotifications({
         placementLabel,
       },
     }),
-  );
-
-  jobs.push(
-    enqueueNotification({
-      campaignCode,
-      candidateId,
-      attemptId,
-      resultId,
-      channel: 'WHATSAPP',
-      templateCode: 'WA_RESULT',
-      recipient: parentPhoneE164,
-      payload: {
-        score,
-        percentage,
-        placementLabel,
-      },
-    }),
-  );
-
-  return Promise.all(jobs);
+  ]);
 }
 
 export default async function handler(req, res) {

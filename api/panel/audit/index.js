@@ -1,20 +1,40 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { requireRole } from '../../_lib/auth.js';
 import { ROLES } from '../../_lib/constants.js';
 import { query } from '../../_lib/db.js';
+import { buildListResponse } from '../../_lib/listResponse.js';
 import {
-  clampInt,
   handleRequest,
   methodGuard,
+  parseListQuery,
   ok,
   parseDateRange,
   parseFiltersFromQuery,
   safeTrim,
 } from '../../_lib/http.js';
+import { buildWhereClause, toSqlOrder } from '../../_lib/sql.js';
 
-function buildFilters(req) {
-  const filters = parseFiltersFromQuery(req.query?.filters);
+const AUDIT_SORT_COLUMNS = ['seq', 'created_at', 'actor_type', 'action', 'target_type'];
+const AUDIT_SORT_COLUMN_MAP = {
+  seq: 'seq',
+  created_at: 'created_at',
+  actor_type: 'actor_type',
+  action: 'action',
+  target_type: 'target_type',
+};
+
+function buildFilters(listQuery) {
+  const filters = parseFiltersFromQuery(listQuery.filters);
   const params = [];
   const clauses = [];
+  const q = safeTrim(listQuery.q).toLowerCase();
+
+  if (q) {
+    params.push(`%${q}%`);
+    clauses.push(
+      `(LOWER(COALESCE(actor_id, '')) LIKE $${params.length} OR LOWER(action) LIKE $${params.length} OR LOWER(COALESCE(target_type, '')) LIKE $${params.length} OR LOWER(COALESCE(target_id, '')) LIKE $${params.length} OR LOWER(COALESCE(request_id, '')) LIKE $${params.length})`,
+    );
+  }
 
   const actorId = safeTrim(filters.actor_id || filters.actorId);
   if (actorId) {
@@ -51,7 +71,7 @@ function buildFilters(req) {
   }
 
   return {
-    whereClause: clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '',
+    whereClause: buildWhereClause(clauses),
     params,
   };
 }
@@ -59,12 +79,12 @@ function buildFilters(req) {
 export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['GET']);
-    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS]);
+    await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
 
-    const page = clampInt(req.query?.page, 1, 100000, 1);
-    const perPage = clampInt(req.query?.per_page, 1, 200, 50);
-    const offset = (page - 1) * perPage;
-    const { whereClause, params } = buildFilters(req);
+    const listQuery = parseListQuery(req, AUDIT_SORT_COLUMNS, 'seq', 'desc');
+    const { whereClause, params } = buildFilters(listQuery);
+    const sortColumn = AUDIT_SORT_COLUMN_MAP[listQuery.sortBy] || AUDIT_SORT_COLUMN_MAP.seq;
+    const sortOrder = toSqlOrder(listQuery.sortOrder);
 
     const rowsPromise = query(
       `
@@ -86,16 +106,28 @@ export default async function handler(req, res) {
           created_at
         FROM audit_log_entries
         ${whereClause}
-        ORDER BY seq DESC
+        ORDER BY ${sortColumn} ${sortOrder} NULLS LAST
         LIMIT $${params.length + 1}
         OFFSET $${params.length + 2}
       `,
-      [...params, perPage, offset],
+      [...params, listQuery.perPage, listQuery.offset],
     );
 
     const countPromise = query(
       `
         SELECT COUNT(*)::int AS total
+        FROM audit_log_entries
+        ${whereClause}
+      `,
+      params,
+    );
+
+    const summaryPromise = query(
+      `
+        SELECT
+          COUNT(*)::int AS total_entries,
+          COUNT(*) FILTER (WHERE actor_type = 'ADMIN_USER')::int AS admin_events,
+          COUNT(*) FILTER (WHERE action LIKE 'PANEL_%')::int AS panel_actions
         FROM audit_log_entries
         ${whereClause}
       `,
@@ -110,21 +142,31 @@ export default async function handler(req, res) {
       `,
     );
 
-    const [rowsResult, countResult, headResult] = await Promise.all([
+    const [rowsResult, countResult, summaryResult, headResult] = await Promise.all([
       rowsPromise,
       countPromise,
+      summaryPromise,
       headPromise,
     ]);
 
-    ok(res, {
+    const payload = buildListResponse({
       items: rowsResult.rows,
-      page,
-      per_page: perPage,
+      page: listQuery.page,
+      perPage: listQuery.perPage,
       total: Number(countResult.rows[0]?.total || 0),
-      chain_head: {
-        last_hash: headResult.rows[0]?.last_hash || null,
-        updated_at: headResult.rows[0]?.updated_at || null,
+      summary: {
+        ...(summaryResult.rows[0] || {}),
+        chain_last_hash: headResult.rows[0]?.last_hash || null,
+        chain_updated_at: headResult.rows[0]?.updated_at || null,
       },
     });
+
+    // Backward-compatible duplicate field for existing clients.
+    payload.chain_head = {
+      last_hash: headResult.rows[0]?.last_hash || null,
+      updated_at: headResult.rows[0]?.updated_at || null,
+    };
+
+    ok(res, payload);
   });
 }

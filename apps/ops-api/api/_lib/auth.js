@@ -12,11 +12,20 @@ import {
 
 function hasAllowedRole(role, allowed) {
   if (!role) return false;
-  return allowed.includes(role);
+  const normalizedRole = normalizeRoleCode(role);
+  return allowed.map((item) => normalizeRoleCode(item)).includes(normalizedRole);
 }
 
 function isKnownRole(role) {
-  return Object.values(ROLES).includes(role);
+  return Object.values(ROLES).includes(normalizeRoleCode(role));
+}
+
+function normalizeRoleCode(role) {
+  const normalized = safeTrim(role).toUpperCase();
+  if (normalized === 'ADMIN' || normalized === 'EDUCATION_ADVISOR') {
+    return ROLES.OPERATIONS;
+  }
+  return normalized;
 }
 
 function unauthenticatedIdentity() {
@@ -30,6 +39,7 @@ function unauthenticatedIdentity() {
     fullName: null,
     sessionId: null,
     mfaVerified: false,
+    passwordResetRequired: false,
   };
 }
 
@@ -47,7 +57,8 @@ async function readActiveSessionFromDb(claims, tokenHash) {
         s.mfa_verified_at,
         u.email,
         u.full_name,
-        u.status AS user_status
+        u.status AS user_status,
+        COALESCE((to_jsonb(u)->>'password_reset_required')::boolean, FALSE) AS password_reset_required
       FROM admin_sessions s
       JOIN admin_users u ON u.id = s.admin_user_id
       WHERE s.id = $1::uuid
@@ -73,10 +84,11 @@ function isSessionValid(row, claims) {
   if (safeTrim(row.user_status).toUpperCase() !== 'ACTIVE') return false;
   if (row.revoked_at) return false;
   if (!row.mfa_verified_at) return false;
-  if (!isKnownRole(safeTrim(row.role_code).toUpperCase())) return false;
+  if (!isKnownRole(row.role_code)) return false;
 
-  const rowRole = safeTrim(row.role_code).toUpperCase();
-  if (rowRole !== claims.role) return false;
+  const rowRole = normalizeRoleCode(row.role_code);
+  const claimsRole = normalizeRoleCode(claims.role);
+  if (rowRole !== claimsRole) return false;
   if (safeTrim(row.admin_user_id) !== claims.userId) return false;
   if (safeTrim(row.session_id) !== claims.sessionId) return false;
 
@@ -138,14 +150,15 @@ export async function getPanelIdentity(req) {
 
   return {
     authenticated: true,
-    role: claims.role,
-    roles: [claims.role],
+    role: normalizeRoleCode(claims.role),
+    roles: [normalizeRoleCode(claims.role)],
     keyId: `usr_${claims.userId.slice(0, 8)}`,
     userId: claims.userId,
     email: safeTrim(row.email).toLowerCase(),
     fullName: safeTrim(row.full_name),
     sessionId: claims.sessionId,
     mfaVerified: true,
+    passwordResetRequired: Boolean(row.password_reset_required),
   };
 }
 
@@ -156,6 +169,9 @@ export async function requireRole(req, allowedRoles) {
   }
   if (!identity.mfaVerified) {
     throw new HttpError(403, 'MFA verification is required.', 'panel_mfa_required');
+  }
+  if (identity.passwordResetRequired) {
+    throw new HttpError(403, 'Password reset is required before accessing panel resources.', 'panel_password_reset_required');
   }
   if (!hasAllowedRole(identity.role, allowedRoles)) {
     throw new HttpError(403, 'You are not authorized for this action.', 'forbidden');

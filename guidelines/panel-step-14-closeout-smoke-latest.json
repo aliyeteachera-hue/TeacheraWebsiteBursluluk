@@ -1,0 +1,213 @@
+{
+  "timestamp": "2026-03-17T07:29:21.302Z",
+  "mode": {
+    "http": true
+  },
+  "totals": {
+    "pass": 21,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "overall_ready_for_step_14": true,
+  "checks": [
+    {
+      "id": "public_route_/panel/login",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/panel/login",
+        "status": 200,
+        "expected": [
+          200
+        ]
+      }
+    },
+    {
+      "id": "public_route_/panel/dashboard",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/panel/dashboard",
+        "status": 200,
+        "expected": [
+          200
+        ]
+      }
+    },
+    {
+      "id": "public_route_/panel/audit",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/panel/audit",
+        "status": 200,
+        "expected": [
+          200
+        ]
+      }
+    },
+    {
+      "id": "unauth_/api/panel/auth/me",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/auth/me",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_/api/panel/dashboard",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/dashboard",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_/api/panel/candidates",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_/api/panel/notifications",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/notifications",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_/api/panel/dlq",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/dlq",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_/api/panel/unviewed-results",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/unviewed-results",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_/api/panel/settings",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/settings",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_/api/panel/audit",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/audit",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_/api/panel/audit/export?format=csv",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/audit/export?format=csv",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "bundle_index_path",
+      "status": "PASS",
+      "detail": "Found /assets/index-DCW-KWgh.js",
+      "evidence": {}
+    },
+    {
+      "id": "bundle_dashboard_chunk",
+      "status": "PASS",
+      "detail": "Found assets/PanelDashboardPage-DVfUl_fC.js",
+      "evidence": {}
+    },
+    {
+      "id": "marker_audit_view",
+      "status": "PASS",
+      "detail": "Marker found: Audit & Uyum",
+      "evidence": {}
+    },
+    {
+      "id": "marker_audit_route",
+      "status": "PASS",
+      "detail": "Marker found: /panel/audit",
+      "evidence": {}
+    },
+    {
+      "id": "marker_audit_api",
+      "status": "PASS",
+      "detail": "Marker found: /api/panel/audit",
+      "evidence": {}
+    },
+    {
+      "id": "marker_audit_export_api",
+      "status": "PASS",
+      "detail": "Marker found: audit/export",
+      "evidence": {}
+    },
+    {
+      "id": "marker_csv_export_button",
+      "status": "PASS",
+      "detail": "Marker found: CSV Export",
+      "evidence": {}
+    },
+    {
+      "id": "marker_xls_export_button",
+      "status": "PASS",
+      "detail": "Marker found: XLS Export",
+      "evidence": {}
+    },
+    {
+      "id": "marker_read_only_lock",
+      "status": "PASS",
+      "detail": "Marker found: READ_ONLY modu",
+      "evidence": {}
+    }
+  ]
+}

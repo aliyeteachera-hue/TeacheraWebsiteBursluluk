@@ -1,0 +1,293 @@
+{
+  "timestamp": "2026-03-17T07:29:28.768Z",
+  "mode": {
+    "http": true,
+    "static": true
+  },
+  "totals": {
+    "pass": 11,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "overall_ready_for_step_19": true,
+  "checks": [
+    {
+      "id": "contract_frontend_filter_payload_markers",
+      "status": "PASS",
+      "detail": "Found 6/6 frontend filter payload marker(s).",
+      "evidence": {
+        "expected": [
+          "school_query",
+          "credentials_sms_status",
+          "login_status",
+          "exam_status",
+          "result_viewed_status",
+          "wa_result_status"
+        ],
+        "found": [
+          "school_query",
+          "credentials_sms_status",
+          "login_status",
+          "exam_status",
+          "result_viewed_status",
+          "wa_result_status"
+        ]
+      }
+    },
+    {
+      "id": "contract_backend_index_filter_markers",
+      "status": "PASS",
+      "detail": "Found 6/6 backend index filter marker(s).",
+      "evidence": {
+        "expected": [
+          "school_query",
+          "credentials_sms_status",
+          "login_status",
+          "exam_status",
+          "result_viewed_status",
+          "wa_result_status"
+        ],
+        "found": [
+          "school_query",
+          "credentials_sms_status",
+          "login_status",
+          "exam_status",
+          "result_viewed_status",
+          "wa_result_status"
+        ]
+      }
+    },
+    {
+      "id": "contract_backend_export_filter_markers",
+      "status": "PASS",
+      "detail": "Found 6/6 backend export filter marker(s).",
+      "evidence": {
+        "expected": [
+          "school_query",
+          "credentials_sms_status",
+          "login_status",
+          "exam_status",
+          "result_viewed_status",
+          "wa_result_status"
+        ],
+        "found": [
+          "school_query",
+          "credentials_sms_status",
+          "login_status",
+          "exam_status",
+          "result_viewed_status",
+          "wa_result_status"
+        ]
+      }
+    },
+    {
+      "id": "contract_frontend_action_markers",
+      "status": "PASS",
+      "detail": "Found 3/3 frontend action marker(s).",
+      "evidence": {
+        "expected": [
+          "sms_retry",
+          "wa_send",
+          "add_note"
+        ],
+        "found": [
+          "sms_retry",
+          "wa_send",
+          "add_note"
+        ]
+      }
+    },
+    {
+      "id": "contract_backend_action_markers",
+      "status": "PASS",
+      "detail": "Found 3/3 backend action marker(s).",
+      "evidence": {
+        "expected": [
+          "sms_retry",
+          "wa_send",
+          "add_note"
+        ],
+        "found": [
+          "sms_retry",
+          "wa_send",
+          "add_note"
+        ]
+      }
+    },
+    {
+      "id": "contract_frontend_grid_field_markers",
+      "status": "PASS",
+      "detail": "Found 17/17 frontend grid field marker(s).",
+      "evidence": {
+        "expected": [
+          "candidate_id",
+          "application_no",
+          "student_full_name",
+          "grade",
+          "school_name",
+          "application_status",
+          "credentials_sms_status",
+          "first_login_at",
+          "exam_status",
+          "exam_started_at",
+          "exam_submitted_at",
+          "result_status",
+          "result_viewed_at",
+          "wa_result_status",
+          "last_error_code",
+          "operator_note",
+          "updated_at"
+        ],
+        "found": [
+          "candidate_id",
+          "application_no",
+          "student_full_name",
+          "grade",
+          "school_name",
+          "application_status",
+          "credentials_sms_status",
+          "first_login_at",
+          "exam_status",
+          "exam_started_at",
+          "exam_submitted_at",
+          "result_status",
+          "result_viewed_at",
+          "wa_result_status",
+          "last_error_code",
+          "operator_note",
+          "updated_at"
+        ]
+      }
+    },
+    {
+      "id": "contract_backend_index_field_markers",
+      "status": "PASS",
+      "detail": "Found 17/17 backend index field marker(s).",
+      "evidence": {
+        "expected": [
+          "candidate_id",
+          "application_no",
+          "student_full_name",
+          "grade",
+          "school_name",
+          "application_status",
+          "credentials_sms_status",
+          "first_login_at",
+          "exam_status",
+          "exam_started_at",
+          "exam_submitted_at",
+          "result_status",
+          "result_viewed_at",
+          "wa_result_status",
+          "last_error_code",
+          "operator_note",
+          "updated_at"
+        ],
+        "found": [
+          "candidate_id",
+          "application_no",
+          "student_full_name",
+          "grade",
+          "school_name",
+          "application_status",
+          "credentials_sms_status",
+          "first_login_at",
+          "exam_status",
+          "exam_started_at",
+          "exam_submitted_at",
+          "result_status",
+          "result_viewed_at",
+          "wa_result_status",
+          "last_error_code",
+          "operator_note",
+          "updated_at"
+        ]
+      }
+    },
+    {
+      "id": "contract_backend_export_field_markers",
+      "status": "PASS",
+      "detail": "Found 17/17 backend export field marker(s).",
+      "evidence": {
+        "expected": [
+          "candidate_id",
+          "application_no",
+          "student_full_name",
+          "grade",
+          "school_name",
+          "application_status",
+          "credentials_sms_status",
+          "first_login_at",
+          "exam_status",
+          "exam_started_at",
+          "exam_submitted_at",
+          "result_status",
+          "result_viewed_at",
+          "wa_result_status",
+          "last_error_code",
+          "operator_note",
+          "updated_at"
+        ],
+        "found": [
+          "candidate_id",
+          "application_no",
+          "student_full_name",
+          "grade",
+          "school_name",
+          "application_status",
+          "credentials_sms_status",
+          "first_login_at",
+          "exam_status",
+          "exam_started_at",
+          "exam_submitted_at",
+          "result_status",
+          "result_viewed_at",
+          "wa_result_status",
+          "last_error_code",
+          "operator_note",
+          "updated_at"
+        ]
+      }
+    },
+    {
+      "id": "unauth_GET_/api/panel/candidates",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates",
+        "method": "GET",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_GET_/api/panel/candidates/export?format=csv",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates/export?format=csv",
+        "method": "GET",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_POST_/api/panel/candidates/actions",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates/actions",
+        "method": "POST",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    }
+  ]
+}

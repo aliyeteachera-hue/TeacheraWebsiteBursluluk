@@ -98,9 +98,16 @@ npm run sync:shared-backend
 npm run check:shared-backend-sync
 ```
 
+Legacy root runtime mirror (read-only/deprecated) doğrulaması:
+```bash
+npm run sync:legacy-runtime
+npm run check:legacy-runtime-sync
+```
+
 Not:
 - `packages/shared/backend` canonical kaynaktır.
 - `api/_lib` ve `apps/*/api/_lib` içerikleri otomatik üretilir; manuel düzenleme yapılmaz.
+- `api/**` (entrypoint) dosyaları legacy/local compatibility mirror olarak `apps/*/api` kaynaklarından üretilir; manuel düzenleme yapılmaz.
 
 App bazlı deploy komutları:
 ```bash
@@ -219,6 +226,8 @@ npm run service-env:preflight:www
 
 ### Worker / Cron
 - `api/notifications/worker` artık `GET` ve `POST` kabul eder.
+- `api/ops/exam-open-broadcast` ops scheduler uç noktasıdır; sınav açıldığında toplu `EXAM_OPEN_SMS` kuyruğa alınır.
+- `api/ops/unviewed-results/auto-whatsapp` ops scheduler uç noktasıdır; sonucu görüntülemeyen adaylara gecikmeli WA kuyruğu üretir.
 - Vercel cron her dakika worker’ı çağıracak şekilde `vercel.json` içinde tanımlıdır.
 - Worker doğrudan DB queue (`notification_jobs`) tüketir; SQS yokluğu worker doğruluğunu bozmaz.
 - Worker ownership `ops-api` runtime’a sabitlenmiştir (`SERVICE_RUNTIME=ops-api`, `NOTIFICATION_WORKER_RUNTIME=ops-api`).
@@ -227,7 +236,9 @@ npm run service-env:preflight:www
 - Provider webhook endpoint’i HMAC-SHA256 signature doğrular (`NOTIFICATION_PROVIDER_WEBHOOK_SIGNING_SECRET`).
 - Manuel tetikleme örneği:
 ```bash
-curl -X POST "https://teachera.com.tr/api/notifications/worker?limit=100&reconcile_limit=100&worker_secret=YOUR_SECRET"
+curl -X POST "https://ops-api.teachera.com.tr/api/notifications/worker?limit=100&reconcile_limit=100&worker_secret=YOUR_SECRET"
+curl -X POST "https://ops-api.teachera.com.tr/api/ops/exam-open-broadcast?limit=500&worker_secret=YOUR_SECRET"
+curl -X POST "https://ops-api.teachera.com.tr/api/ops/unviewed-results/auto-whatsapp?limit=250&delay_minutes=30&worker_secret=YOUR_SECRET"
 ```
 
 ### Panel Auth (P0-6 Hardened)

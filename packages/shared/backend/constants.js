@@ -67,6 +67,7 @@ export const CANDIDATE_GRID_COLUMNS = [
   'result_viewed_at',
   'wa_result_status',
   'last_error_code',
+  'operator_note_at',
   'updated_at',
 ];
 
@@ -107,4 +108,3 @@ export const JOB_STATUS = [
   'DLQ',
   'CANCELLED',
 ];
-

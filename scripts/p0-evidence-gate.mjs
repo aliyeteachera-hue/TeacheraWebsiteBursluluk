@@ -263,6 +263,30 @@ function main() {
     steps.push(runStep('p0-12-go-live-package-audit', npmCmd, auditArgs));
   }
 
+  if (steps[0].ok && steps[1]?.ok && steps[2]?.ok && steps[3]?.ok) {
+    steps.push(runStep('panel-step-14-closeout', npmCmd, ['run', 'panel:step14:closeout']));
+  }
+
+  if (steps[0].ok && steps[1]?.ok && steps[2]?.ok && steps[3]?.ok && steps[4]?.ok) {
+    steps.push(runStep('panel-step-16-ops-grid', npmCmd, ['run', 'panel:step16:ops-grid']));
+  }
+
+  if (steps[0].ok && steps[1]?.ok && steps[2]?.ok && steps[3]?.ok && steps[4]?.ok && steps[5]?.ok) {
+    steps.push(runStep('panel-step-17-rbac-session', npmCmd, ['run', 'panel:step17:rbac-session']));
+  }
+
+  if (steps[0].ok && steps[1]?.ok && steps[2]?.ok && steps[3]?.ok && steps[4]?.ok && steps[5]?.ok && steps[6]?.ok) {
+    steps.push(runStep('panel-step-18-rbac-policy', npmCmd, ['run', 'panel:step18:rbac-policy']));
+  }
+
+  if (steps[0].ok && steps[1]?.ok && steps[2]?.ok && steps[3]?.ok && steps[4]?.ok && steps[5]?.ok && steps[6]?.ok && steps[7]?.ok) {
+    steps.push(runStep('panel-step-19-data-contract', npmCmd, ['run', 'panel:step19:data-contract']));
+  }
+
+  if (steps[0].ok && steps[1]?.ok && steps[2]?.ok && steps[3]?.ok && steps[4]?.ok && steps[5]?.ok && steps[6]?.ok && steps[7]?.ok && steps[8]?.ok) {
+    steps.push(runStep('panel-step-20-final-closeout', npmCmd, ['run', 'panel:step20:final-closeout']));
+  }
+
   const summary = {
     timestamp: new Date().toISOString(),
     ok: steps.every((step) => step.ok),
@@ -271,6 +295,12 @@ function main() {
       aws: enableAws,
       observability_included: true,
       ci_path_filter_selftest_included: true,
+      panel_step_14_closeout_included: true,
+      panel_step_16_ops_grid_included: true,
+      panel_step_17_rbac_session_included: true,
+      panel_step_18_rbac_policy_included: true,
+      panel_step_19_data_contract_included: true,
+      panel_step_20_final_closeout_included: true,
     },
     env: {
       production_env_file_loaded: envMeta.loaded,

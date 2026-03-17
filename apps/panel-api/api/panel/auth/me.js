@@ -37,6 +37,7 @@ export default async function handler(req, res) {
         role: identity.role,
         mfa_verified: identity.mfaVerified,
         session_id: identity.sessionId,
+        password_reset_required: Boolean(identity.passwordResetRequired),
       },
     });
   });

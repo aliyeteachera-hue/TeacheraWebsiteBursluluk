@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { getPanelIdentity } from '../../_lib/auth.js';
 import { HttpError } from '../../_lib/errors.js';
 import { handleRequest, methodGuard, ok } from '../../_lib/http.js';
@@ -37,6 +38,7 @@ export default async function handler(req, res) {
         role: identity.role,
         mfa_verified: identity.mfaVerified,
         session_id: identity.sessionId,
+        password_reset_required: Boolean(identity.passwordResetRequired),
       },
     });
   });

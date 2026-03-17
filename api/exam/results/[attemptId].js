@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { getPanelIdentity } from '../../_lib/auth.js';
 import { appendAuditLog, buildPanelActor, readRequestContext } from '../../_lib/auditLog.js';
 import { withTransaction } from '../../_lib/db.js';

@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { query, withTransaction } from '../../_lib/db.js';
 import { HttpError } from '../../_lib/errors.js';
 import { handleRequest, methodGuard, ok, parseBody, safeTrim } from '../../_lib/http.js';
@@ -109,6 +110,12 @@ export default async function handler(req, res) {
     const attemptId = safeTrim(body.attemptId);
     if (!attemptId) {
       throw new HttpError(400, 'attemptId is required.', 'missing_attempt_id');
+    }
+    if (!req.headers?.['x-exam-session-token'] && body.sessionToken) {
+      req.headers = {
+        ...req.headers,
+        'x-exam-session-token': safeTrim(body.sessionToken),
+      };
     }
     const loadTestMode = isAuthorizedLoadTestMode(req);
 

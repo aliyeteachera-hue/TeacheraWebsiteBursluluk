@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { HttpError } from '../_lib/errors.js';
 import { handleRequest, methodGuard, ok, safeTrim } from '../_lib/http.js';
 import {

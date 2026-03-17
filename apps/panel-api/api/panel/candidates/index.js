@@ -42,6 +42,7 @@ const SORT_COLUMN_MAP = {
   result_viewed_at: 'result_viewed_at',
   wa_result_status: 'wa_result_status',
   last_error_code: 'last_error_code',
+  operator_note_at: 'operator_note_at',
   updated_at: 'updated_at',
 };
 
@@ -83,6 +84,12 @@ function buildFilters(listQuery) {
   const schools = normalizeArrayFilter(filters.school_name || filters.school);
   appendInFilter(clauses, params, 'school_name', schools);
 
+  const schoolQuery = safeTrim(filters.school_query || filters.schoolQuery);
+  if (schoolQuery) {
+    params.push(`%${schoolQuery.toLowerCase()}%`);
+    clauses.push(`LOWER(school_name) LIKE $${params.length}`);
+  }
+
   const grades = normalizeArrayFilter(filters.grade || filters.grades).map((item) => Number.parseInt(item, 10)).filter(Number.isFinite);
   appendInFilter(clauses, params, 'grade', grades);
 
@@ -98,8 +105,20 @@ function buildFilters(listQuery) {
     'credentials_sms_status',
     normalizeArrayFilter(filters.credentials_sms_status, CREDENTIALS_SMS_STATUS),
   );
+
+  const loginStatus = normalizeArrayFilter(filters.login_status || filters.loginStatus, ['LOGGED_IN', 'NOT_LOGGED_IN']);
+  if (loginStatus.length === 1) {
+    clauses.push(loginStatus[0] === 'LOGGED_IN' ? 'first_login_at IS NOT NULL' : 'first_login_at IS NULL');
+  }
+
   appendInFilter(clauses, params, 'exam_status', normalizeArrayFilter(filters.exam_status, EXAM_STATUS));
   appendInFilter(clauses, params, 'result_status', normalizeArrayFilter(filters.result_status, RESULT_STATUS));
+
+  const resultViewedStatus = normalizeArrayFilter(filters.result_viewed_status || filters.resultViewedStatus, ['VIEWED', 'NOT_VIEWED']);
+  if (resultViewedStatus.length === 1) {
+    clauses.push(resultViewedStatus[0] === 'VIEWED' ? 'result_viewed_at IS NOT NULL' : 'result_viewed_at IS NULL');
+  }
+
   appendInFilter(clauses, params, 'wa_result_status', normalizeArrayFilter(filters.wa_result_status, WA_RESULT_STATUS));
 
   addDateRangeFilter(clauses, params, 'updated_at', parseDateRange(filters));
@@ -125,29 +144,41 @@ export default async function handler(req, res) {
     const dataResult = await query(
       `
         SELECT
-          candidate_id,
-          application_no,
-          student_full_name AS student_full_name_legacy,
-          student_full_name_enc,
-          grade,
-          school_name,
-          parent_full_name AS parent_full_name_legacy,
-          parent_full_name_enc,
-          parent_phone_e164 AS parent_phone_e164_legacy,
-          parent_phone_e164_enc,
-          application_status,
-          credentials_sms_status,
-          first_login_at,
-          exam_status,
-          exam_started_at,
-          exam_submitted_at,
-          result_status,
-          result_score,
-          result_viewed_at,
-          wa_result_status,
-          last_error_code,
-          updated_at
-        FROM v_candidate_operations
+          v.candidate_id,
+          v.application_no,
+          v.student_full_name AS student_full_name_legacy,
+          v.student_full_name_enc,
+          v.grade,
+          v.school_name,
+          v.parent_full_name AS parent_full_name_legacy,
+          v.parent_full_name_enc,
+          v.parent_phone_e164 AS parent_phone_e164_legacy,
+          v.parent_phone_e164_enc,
+          v.application_status,
+          v.credentials_sms_status,
+          v.first_login_at,
+          v.exam_status,
+          v.exam_started_at,
+          v.exam_submitted_at,
+          v.result_status,
+          v.result_score,
+          v.result_viewed_at,
+          v.wa_result_status,
+          v.last_error_code,
+          note.operator_note,
+          note.operator_note_at,
+          v.updated_at
+        FROM v_candidate_operations v
+        LEFT JOIN LATERAL (
+          SELECT
+            ev.event_payload ->> 'note' AS operator_note,
+            ev.occurred_at AS operator_note_at
+          FROM activity_events ev
+          WHERE ev.candidate_id = v.candidate_id
+            AND ev.event_type = 'OPERATOR_NOTE'
+          ORDER BY ev.occurred_at DESC
+          LIMIT 1
+        ) note ON TRUE
         ${whereClause}
         ORDER BY ${sortColumn} ${sortOrder} NULLS LAST
         LIMIT $${limitIndex}

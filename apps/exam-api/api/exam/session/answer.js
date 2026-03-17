@@ -110,6 +110,12 @@ export default async function handler(req, res) {
     if (!attemptId) {
       throw new HttpError(400, 'attemptId is required.', 'missing_attempt_id');
     }
+    if (!req.headers?.['x-exam-session-token'] && body.sessionToken) {
+      req.headers = {
+        ...req.headers,
+        'x-exam-session-token': safeTrim(body.sessionToken),
+      };
+    }
     const loadTestMode = isAuthorizedLoadTestMode(req);
 
     if (!loadTestMode) {

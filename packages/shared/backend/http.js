@@ -526,13 +526,21 @@ export function parseDateRange(filters = {}) {
   };
 }
 
-export function parseListQuery(req, allowedSortKeys, defaultSortBy, defaultSortOrder = 'desc') {
+export function parseListQuery(req, allowedSortKeys, defaultSortBy, defaultSortOrder = 'desc', options = {}) {
   const page = clampInt(req.query?.page, 1, 100000, 1);
   const perPage = clampInt(req.query?.per_page, 1, 200, 25);
   const q = safeTrim(req.query?.q);
   const sortByCandidate = safeTrim(req.query?.sort_by);
   const sortOrderCandidate = safeTrim(req.query?.sort_order).toLowerCase();
   const filters = parseFiltersFromQuery(req.query?.filters);
+
+  const strictSortBy = options.strictSortBy !== false;
+  if (sortByCandidate && !allowedSortKeys.includes(sortByCandidate) && strictSortBy) {
+    throw new HttpError(400, 'Invalid sort_by value.', 'invalid_sort_by', {
+      sort_by: sortByCandidate,
+      allowed_sort_by: allowedSortKeys,
+    });
+  }
 
   const sortBy = allowedSortKeys.includes(sortByCandidate) ? sortByCandidate : defaultSortBy;
   const sortOrder = sortOrderCandidate === 'asc' ? 'asc' : defaultSortOrder.toLowerCase() === 'asc' ? 'asc' : 'desc';

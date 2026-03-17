@@ -24,6 +24,7 @@ const ensuredCampaignCodes = new Set();
 const cachedSchoolIds = new Map();
 const DEFAULT_KVKK_CONSENT_VERSION = optionalString(process.env.KVKK_CONSENT_VERSION, 120) || 'KVKK_v1_2026-03-13';
 const DEFAULT_KVKK_LEGAL_TEXT_VERSION = optionalString(process.env.KVKK_LEGAL_TEXT_VERSION, 120) || DEFAULT_KVKK_CONSENT_VERSION;
+const DEFAULT_EXAM_LOGIN_URL = 'https://teachera.com.tr/bursluluk/giris';
 
 function buildRedactedPhoneToken(phoneHash) {
   return `pii:${String(phoneHash || '').slice(0, 28)}`;
@@ -756,6 +757,7 @@ export default async function handler(req, res) {
 
     if (!loadTestMode && !started.hasCredentialsSmsJob && started.parentPhoneE164) {
       try {
+        const loginUrl = optionalString(process.env.EXAM_LOGIN_URL, 500) || DEFAULT_EXAM_LOGIN_URL;
         const enqueued = await enqueueNotification({
           campaignCode,
           candidateId: started.candidateId,
@@ -765,6 +767,12 @@ export default async function handler(req, res) {
           recipient: started.parentPhoneE164,
           payload: {
             applicationNo: started.applicationNo,
+            loginUrl,
+            credential: {
+              username: started.applicationNo,
+              password: started.sessionToken,
+              expiresAt: started.expiresAt,
+            },
             trigger: 'session_start_auto_credentials',
           },
         });

@@ -20,6 +20,10 @@ import {
 import { enforceRateLimit, getRequestIp } from '../../_lib/redisRateLimit.js';
 
 const ROLE_PRIORITY = [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY];
+const LEGACY_ROLE_NORMALIZATION_MAP = {
+  ADMIN: ROLES.OPERATIONS,
+  EDUCATION_ADVISOR: ROLES.OPERATIONS,
+};
 
 function normalizeEmail(value) {
   return safeTrim(value).toLowerCase();
@@ -35,6 +39,7 @@ function normalizeRoleCodes(value) {
   if (!Array.isArray(value)) return [];
   return value
     .map((item) => safeTrim(item).toUpperCase())
+    .map((item) => LEGACY_ROLE_NORMALIZATION_MAP[item] || item)
     .filter((item) => ROLE_PRIORITY.includes(item));
 }
 

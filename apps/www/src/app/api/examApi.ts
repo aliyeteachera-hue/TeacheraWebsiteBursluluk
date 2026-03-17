@@ -126,6 +126,22 @@ export interface SubmitExamPayload {
   };
 }
 
+export interface SaveExamAnswersPayload {
+  attemptId: string;
+  answers: Array<{
+    questionId: string;
+    selectedOption: string | null;
+    isCorrect: boolean | null;
+    scoreDelta: number;
+    questionWeight: number;
+  }>;
+}
+
+export interface SaveExamAnswersResponse {
+  attempt_id: string;
+  answered_count: number;
+}
+
 export interface SubmitExamResponse {
   result: {
     attempt_id: string;
@@ -244,6 +260,41 @@ export async function submitExam(sessionToken: string, payload: SubmitExamPayloa
   });
 
   return parseApiResponse<SubmitExamResponse>(response);
+}
+
+export async function saveExamAnswers(
+  sessionToken: string,
+  payload: SaveExamAnswersPayload,
+): Promise<SaveExamAnswersResponse> {
+  const response = await fetch(resolveExamEndpoint('/api/exam/session/answer'), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'x-exam-session-token': sessionToken,
+    },
+    body: JSON.stringify(payload),
+    keepalive: true,
+  });
+
+  return parseApiResponse<SaveExamAnswersResponse>(response);
+}
+
+export function saveExamAnswersOnUnload(sessionToken: string, payload: SaveExamAnswersPayload): boolean {
+  if (typeof navigator === 'undefined' || typeof navigator.sendBeacon !== 'function') return false;
+
+  const endpoint = resolveExamEndpoint('/api/exam/session/answer');
+  const body = {
+    ...payload,
+    sessionToken,
+  };
+
+  try {
+    const blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
+    return navigator.sendBeacon(endpoint, blob);
+  } catch {
+    return false;
+  }
 }
 
 export function submitExamOnUnload(sessionToken: string, payload: SubmitExamPayload): boolean {

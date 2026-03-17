@@ -58,6 +58,7 @@ export const router = createBrowserRouter([
       { path: 'panel/operations', loader: () => redirect('/panel/dashboard?view=operations') },
       { path: 'panel/tasks', loader: () => redirect('/panel/dashboard?view=tasks') },
       { path: 'panel/settings', loader: () => redirect('/panel/dashboard?view=settings') },
+      { path: 'panel/audit', loader: () => redirect('/panel/dashboard?view=audit') },
       { path: 'panel/candidates', loader: () => redirect('/panel/dashboard?view=operations&focus=candidates') },
       {
         path: 'panel/notifications',

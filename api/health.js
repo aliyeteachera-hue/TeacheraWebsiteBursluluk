@@ -1,3 +1,4 @@
+// AUTO-GENERATED FROM apps/*/api (legacy root runtime mirror). DO NOT EDIT DIRECTLY.
 import { query } from './_lib/db.js';
 import { isRedisConfigured, isRedisUnavailableError, runRedisCommand } from './_lib/redis.js';
 import { handleRequest, methodGuard, ok } from './_lib/http.js';

@@ -14,6 +14,8 @@
       ],
       "api_patterns": [
         "api/exam/**/*.js",
+        "api/schools/*.js",
+        "api/schools/**/*.js",
         "api/forms.js",
         "api/health.js"
       ]

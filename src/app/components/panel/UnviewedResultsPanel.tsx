@@ -1,0 +1,476 @@
+import { useEffect, useMemo, useState } from 'react';
+import { panelFetch } from '../../api/panelApi';
+
+type UnviewedRow = {
+  candidate_id: string;
+  student_full_name: string | null;
+  school_name: string | null;
+  grade: number | null;
+  result_published_at: string | null;
+  last_login_at: string | null;
+  wa_result_status: string | null;
+  wa_last_sent_at: string | null;
+};
+
+type UnviewedSummary = {
+  total_unviewed?: number;
+  wa_problematic?: number;
+  wa_reached?: number;
+};
+
+type UnviewedListResponse = {
+  items?: UnviewedRow[];
+  total?: number;
+  page?: number;
+  per_page?: number;
+  summary?: UnviewedSummary;
+  message?: string;
+  error?: string;
+};
+
+type UnviewedActionResponse = {
+  requested?: number;
+  enqueued?: number;
+  skipped?: number;
+  message?: string;
+  error?: string;
+};
+
+type UnviewedFilters = {
+  campaignCode: string;
+  grade: string;
+  waStatus: string;
+  publishedFrom: string;
+  publishedTo: string;
+};
+
+const defaultFilters: UnviewedFilters = {
+  campaignCode: '',
+  grade: '',
+  waStatus: '',
+  publishedFrom: '',
+  publishedTo: '',
+};
+
+const WA_STATUS_OPTIONS = ['NOT_QUEUED', 'QUEUED', 'SENT', 'DELIVERED', 'READ', 'FAILED', 'RETRYING', 'DLQ'] as const;
+const GRADE_OPTIONS = Array.from({ length: 10 }, (_, index) => String(index + 2));
+const TEMPLATE_OPTIONS = ['WA_RESULT', 'WA_RESULT_REMINDER'] as const;
+
+function formatNumber(value: number | undefined) {
+  if (!Number.isFinite(value)) return '-';
+  return new Intl.NumberFormat('tr-TR').format(Number(value));
+}
+
+function formatDate(value: string | null | undefined) {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return '-';
+  return date.toLocaleString('tr-TR');
+}
+
+function normalizeMessage(payload: { message?: string; error?: string } | null, fallback: string) {
+  const message = String(payload?.message || '').trim();
+  if (message) return message;
+  const error = String(payload?.error || '').trim();
+  if (error) return error;
+  return fallback;
+}
+
+function buildFiltersPayload(filters: UnviewedFilters) {
+  const payload: Record<string, unknown> = {};
+  const campaignCode = filters.campaignCode.trim();
+  if (campaignCode) payload.campaign_code = campaignCode;
+  if (filters.grade) payload.grade = [filters.grade];
+  if (filters.waStatus) payload.wa_result_status = [filters.waStatus];
+  if (filters.publishedFrom) payload.from = `${filters.publishedFrom}T00:00:00.000Z`;
+  if (filters.publishedTo) payload.to = `${filters.publishedTo}T23:59:59.999Z`;
+  return payload;
+}
+
+function buildUnviewedPath(query: string, filters: UnviewedFilters, page: number, perPage: number) {
+  const params = new URLSearchParams();
+  params.set('page', String(page));
+  params.set('per_page', String(perPage));
+  params.set('sort_by', 'result_published_at');
+  params.set('sort_order', 'desc');
+
+  const normalizedQuery = query.trim();
+  if (normalizedQuery) {
+    params.set('q', normalizedQuery);
+  }
+
+  const filtersPayload = buildFiltersPayload(filters);
+  if (Object.keys(filtersPayload).length > 0) {
+    params.set('filters', JSON.stringify(filtersPayload));
+  }
+
+  return `/api/panel/unviewed-results?${params.toString()}`;
+}
+
+export default function UnviewedResultsPanel({ active }: { active: boolean }) {
+  const [query, setQuery] = useState('');
+  const [templateCode, setTemplateCode] = useState<(typeof TEMPLATE_OPTIONS)[number]>('WA_RESULT');
+  const [draftFilters, setDraftFilters] = useState<UnviewedFilters>(defaultFilters);
+  const [appliedQuery, setAppliedQuery] = useState('');
+  const [appliedFilters, setAppliedFilters] = useState<UnviewedFilters>(defaultFilters);
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(20);
+  const [items, setItems] = useState<UnviewedRow[]>([]);
+  const [total, setTotal] = useState(0);
+  const [summary, setSummary] = useState<UnviewedSummary>({});
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isActionRunning, setIsActionRunning] = useState(false);
+  const [message, setMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const pageCount = useMemo(() => {
+    const value = Math.ceil(total / perPage);
+    return value > 0 ? value : 1;
+  }, [perPage, total]);
+
+  const allSelectedOnPage = items.length > 0 && items.every((item) => selectedIds.includes(item.candidate_id));
+
+  useEffect(() => {
+    if (!active) return;
+
+    let cancelled = false;
+    const load = async () => {
+      setIsLoading(true);
+      setErrorMessage('');
+
+      try {
+        const response = await panelFetch(buildUnviewedPath(appliedQuery, appliedFilters, page, perPage), {
+          method: 'GET',
+        });
+        const payload = (await response.json()) as UnviewedListResponse;
+        if (!response.ok) {
+          throw new Error(normalizeMessage(payload, 'Sonuç görmeyen aday listesi alınamadı.'));
+        }
+
+        if (cancelled) return;
+        const nextItems = Array.isArray(payload.items) ? payload.items : [];
+        setItems(nextItems);
+        setTotal(Number(payload.total || 0));
+        setSummary(payload.summary || {});
+        setSelectedIds((prev) => prev.filter((id) => nextItems.some((item) => item.candidate_id === id)));
+      } catch (error) {
+        if (!cancelled) {
+          setItems([]);
+          setTotal(0);
+          setSummary({});
+          setSelectedIds([]);
+          setErrorMessage(error instanceof Error ? error.message : 'Sonuç görmeyen aday listesi alınamadı.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [active, appliedFilters, appliedQuery, page, perPage]);
+
+  const sendWhatsapp = async (candidateIds: string[]) => {
+    if (candidateIds.length === 0 || isActionRunning) return;
+
+    setIsActionRunning(true);
+    setMessage('');
+    setErrorMessage('');
+
+    try {
+      const response = await panelFetch('/api/panel/unviewed-results/actions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'send_whatsapp',
+          candidate_ids: candidateIds,
+          template_code: templateCode,
+        }),
+      });
+
+      const payload = (await response.json()) as UnviewedActionResponse;
+      if (!response.ok) {
+        throw new Error(normalizeMessage(payload, 'WhatsApp gönderimi başarısız.'));
+      }
+
+      setMessage(
+        `WhatsApp gönderimi tetiklendi. Requested: ${formatNumber(payload.requested)} • Enqueued: ${formatNumber(payload.enqueued)} • Skipped: ${formatNumber(payload.skipped)}`,
+      );
+
+      const refresh = await panelFetch(buildUnviewedPath(appliedQuery, appliedFilters, page, perPage), { method: 'GET' });
+      if (refresh.ok) {
+        const refreshedPayload = (await refresh.json()) as UnviewedListResponse;
+        const refreshedItems = Array.isArray(refreshedPayload.items) ? refreshedPayload.items : [];
+        setItems(refreshedItems);
+        setTotal(Number(refreshedPayload.total || 0));
+        setSummary(refreshedPayload.summary || {});
+        setSelectedIds((prev) => prev.filter((id) => refreshedItems.some((item) => item.candidate_id === id)));
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'WhatsApp gönderimi tamamlanamadı.');
+    } finally {
+      setIsActionRunning(false);
+    }
+  };
+
+  return (
+    <section className="rounded-[22px] border border-[#1A273A] bg-[#071021]/82 p-5 shadow-[0_14px_38px_rgba(0,0,0,0.28)] lg:col-span-2">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[13px] font-semibold uppercase tracking-[0.18em] text-white/54">Sonuç Görmeyenler</p>
+          <h3 className="mt-2 text-[22px] font-semibold text-white">Unviewed Results Operasyon Ekranı</h3>
+          <p className="mt-2 text-[13px] leading-[1.7] text-white/64">
+            Sonuç yayını yapılmış ancak görüntülenmemiş adayları filtreleyin, tekil veya toplu WhatsApp sonucu gönderin.
+          </p>
+        </div>
+
+        <div className="min-w-[220px]">
+          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.1em] text-white/58">WhatsApp Şablonu</label>
+          <select
+            value={templateCode}
+            onChange={(event) => setTemplateCode(event.target.value as (typeof TEMPLATE_OPTIONS)[number])}
+            className="h-[40px] w-full rounded-xl border border-[#1A273A] bg-[#030B18] px-3 text-[13px] text-white/90 outline-none focus:border-[#2D4363]"
+          >
+            {TEMPLATE_OPTIONS.map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="rounded-xl border border-[#1A273A] bg-[#071021]/92 p-3">
+          <p className="text-[12px] text-white/50">Toplam Unviewed</p>
+          <p className="mt-1 text-[22px] font-semibold text-white">{formatNumber(summary.total_unviewed ?? total)}</p>
+        </div>
+        <div className="rounded-xl border border-[#1A273A] bg-[#071021]/92 p-3">
+          <p className="text-[12px] text-white/50">WA Sorunlu</p>
+          <p className="mt-1 text-[22px] font-semibold text-white">{formatNumber(summary.wa_problematic)}</p>
+        </div>
+        <div className="rounded-xl border border-[#1A273A] bg-[#071021]/92 p-3">
+          <p className="text-[12px] text-white/50">WA Ulaştı</p>
+          <p className="mt-1 text-[22px] font-semibold text-white">{formatNumber(summary.wa_reached)}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Aday / okul ara"
+          className="h-[42px] rounded-xl border border-[#1A273A] bg-[#030B18] px-3 text-[13px] text-white/90 outline-none focus:border-[#2D4363]"
+        />
+        <input
+          value={draftFilters.campaignCode}
+          onChange={(event) => setDraftFilters((prev) => ({ ...prev, campaignCode: event.target.value }))}
+          placeholder="Campaign code"
+          className="h-[42px] rounded-xl border border-[#1A273A] bg-[#030B18] px-3 text-[13px] text-white/90 outline-none focus:border-[#2D4363]"
+        />
+        <select
+          value={draftFilters.grade}
+          onChange={(event) => setDraftFilters((prev) => ({ ...prev, grade: event.target.value }))}
+          className="h-[42px] rounded-xl border border-[#1A273A] bg-[#030B18] px-3 text-[13px] text-white/90 outline-none focus:border-[#2D4363]"
+        >
+          <option value="">Sınıf (tümü)</option>
+          {GRADE_OPTIONS.map((value) => (
+            <option key={value} value={value}>
+              {value}
+            </option>
+          ))}
+        </select>
+        <select
+          value={draftFilters.waStatus}
+          onChange={(event) => setDraftFilters((prev) => ({ ...prev, waStatus: event.target.value }))}
+          className="h-[42px] rounded-xl border border-[#1A273A] bg-[#030B18] px-3 text-[13px] text-white/90 outline-none focus:border-[#2D4363]"
+        >
+          <option value="">WA durum (tümü)</option>
+          {WA_STATUS_OPTIONS.map((value) => (
+            <option key={value} value={value}>
+              {value}
+            </option>
+          ))}
+        </select>
+        <label className="flex items-center gap-2 text-[12px] text-white/66">
+          <span>Yayın başlangıç</span>
+          <input
+            type="date"
+            value={draftFilters.publishedFrom}
+            onChange={(event) => setDraftFilters((prev) => ({ ...prev, publishedFrom: event.target.value }))}
+            className="h-[36px] rounded-lg border border-[#1A273A] bg-[#030B18] px-2 text-[12px] text-white/90 outline-none focus:border-[#2D4363]"
+          />
+        </label>
+        <label className="flex items-center gap-2 text-[12px] text-white/66">
+          <span>Yayın bitiş</span>
+          <input
+            type="date"
+            value={draftFilters.publishedTo}
+            onChange={(event) => setDraftFilters((prev) => ({ ...prev, publishedTo: event.target.value }))}
+            className="h-[36px] rounded-lg border border-[#1A273A] bg-[#030B18] px-2 text-[12px] text-white/90 outline-none focus:border-[#2D4363]"
+          />
+        </label>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setAppliedQuery(query.trim());
+            setAppliedFilters({ ...draftFilters });
+            setPage(1);
+            setMessage('');
+            setErrorMessage('');
+          }}
+          className="rounded-xl bg-[#D92E27] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.11em] text-white transition hover:bg-[#bf251f]"
+        >
+          Filtreleri Uygula
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setQuery('');
+            setDraftFilters(defaultFilters);
+            setAppliedQuery('');
+            setAppliedFilters(defaultFilters);
+            setPage(1);
+            setMessage('');
+            setErrorMessage('');
+          }}
+          className="rounded-xl border border-[#1A273A] bg-[#0A192B]/90 px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.11em] text-white/80 transition hover:border-[#2D4363]"
+        >
+          Filtreleri Temizle
+        </button>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => void sendWhatsapp(selectedIds)}
+          disabled={isActionRunning || selectedIds.length === 0}
+          className="rounded-xl border border-[#1A273A] bg-[#0A192B]/90 px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-white/78 transition hover:border-[#2D4363] disabled:cursor-not-allowed disabled:opacity-55"
+        >
+          Toplu WhatsApp Gönder ({selectedIds.length})
+        </button>
+      </div>
+
+      {message ? (
+        <p className="mt-3 rounded-lg border border-[#244B39] bg-[#0E261E] px-3 py-2 text-[12px] text-[#9FE4D0]">{message}</p>
+      ) : null}
+      {errorMessage ? (
+        <p className="mt-3 rounded-lg border border-[#6F2824] bg-[#2B1214]/80 px-3 py-2 text-[12px] text-[#FFB8B1]">{errorMessage}</p>
+      ) : null}
+
+      {isLoading ? <p className="mt-3 text-[13px] text-white/65">Sonuç görmeyen aday listesi yükleniyor...</p> : null}
+
+      {!isLoading ? (
+        <div className="mt-4 overflow-x-auto">
+          <table className="min-w-[1320px] text-left text-[12px] text-white/80">
+            <thead>
+              <tr className="border-b border-white/12 text-white/56">
+                <th className="px-2 py-2">
+                  <input
+                    type="checkbox"
+                    checked={allSelectedOnPage}
+                    onChange={(event) => {
+                      if (event.target.checked) {
+                        setSelectedIds((prev) => Array.from(new Set([...prev, ...items.map((item) => item.candidate_id)])));
+                      } else {
+                        const pageIds = new Set(items.map((item) => item.candidate_id));
+                        setSelectedIds((prev) => prev.filter((id) => !pageIds.has(id)));
+                      }
+                    }}
+                  />
+                </th>
+                <th className="px-2 py-2">Aday</th>
+                <th className="px-2 py-2">Okul</th>
+                <th className="px-2 py-2">Sınıf</th>
+                <th className="px-2 py-2">Son Giriş</th>
+                <th className="px-2 py-2">Sonuç Yayın</th>
+                <th className="px-2 py-2">WA Durum</th>
+                <th className="px-2 py-2">WA Son Gönderim</th>
+                <th className="px-2 py-2">İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="px-2 py-6 text-center text-white/55">
+                    Filtreye uygun sonuç görmeyen aday bulunamadı.
+                  </td>
+                </tr>
+              ) : null}
+
+              {items.map((item) => (
+                <tr key={item.candidate_id} className="border-b border-white/6 align-top">
+                  <td className="px-2 py-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(item.candidate_id)}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          setSelectedIds((prev) => Array.from(new Set([...prev, item.candidate_id])));
+                        } else {
+                          setSelectedIds((prev) => prev.filter((id) => id !== item.candidate_id));
+                        }
+                      }}
+                    />
+                  </td>
+                  <td className="px-2 py-2 font-semibold text-white">{item.student_full_name || '-'}</td>
+                  <td className="px-2 py-2">{item.school_name || '-'}</td>
+                  <td className="px-2 py-2">{item.grade ? String(item.grade) : '-'}</td>
+                  <td className="px-2 py-2">{formatDate(item.last_login_at)}</td>
+                  <td className="px-2 py-2">{formatDate(item.result_published_at)}</td>
+                  <td className="px-2 py-2">{item.wa_result_status || '-'}</td>
+                  <td className="px-2 py-2">{formatDate(item.wa_last_sent_at)}</td>
+                  <td className="px-2 py-2">
+                    <button
+                      type="button"
+                      onClick={() => void sendWhatsapp([item.candidate_id])}
+                      disabled={isActionRunning}
+                      className="rounded-lg border border-[#1A273A] bg-[#0A192B]/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/78 transition hover:border-[#2D4363] disabled:cursor-not-allowed disabled:opacity-55"
+                    >
+                      Tekil WA Gönder
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[12px] text-white/58">
+          Toplam {formatNumber(total)} kayıt • Sayfa {page} / {pageCount}
+        </p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+            disabled={page <= 1 || isLoading}
+            className="rounded-lg border border-[#1A273A] bg-[#0A192B]/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/78 transition hover:border-[#2D4363] disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            Önceki
+          </button>
+          <button
+            type="button"
+            onClick={() => setPage((prev) => Math.min(pageCount, prev + 1))}
+            disabled={page >= pageCount || isLoading}
+            className="rounded-lg border border-[#1A273A] bg-[#0A192B]/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/78 transition hover:border-[#2D4363] disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            Sonraki
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}

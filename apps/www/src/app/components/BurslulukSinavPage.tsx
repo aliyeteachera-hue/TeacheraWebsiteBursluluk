@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { getPlacementBandForScore, getPlacementBank, type PlacementExamBank } from './exam/placementExamData';
-import { getExamSessionStatus, submitExam } from '../api/examApi';
+import { getExamSessionStatus, saveExamAnswers, saveExamAnswersOnUnload, submitExam } from '../api/examApi';
 import { clearExamDraft, readCandidateSession, readExamDraft, saveExamDraft } from './bursluluk/burslulukFlowSession';
 
 type SubmissionStatus = 'completed' | 'time_limit_reached';
@@ -24,6 +24,7 @@ interface ScoreMetrics {
 }
 
 const DEFAULT_DURATION_SECONDS = Number(import.meta.env.VITE_BURSLULUK_EXAM_DURATION_SECONDS || 2400) || 2400;
+const DEFAULT_AUTOSAVE_INTERVAL_SECONDS = Number(import.meta.env.VITE_BURSLULUK_AUTOSAVE_SECONDS || 25) || 25;
 
 function formatDuration(totalSeconds: number) {
   const safeSeconds = Math.max(0, totalSeconds);
@@ -147,6 +148,8 @@ export default function BurslulukSinavPage() {
   const [isGateOpen, setIsGateOpen] = useState(false);
 
   const didRestoreDraftRef = useRef(false);
+  const isAnswerSyncingRef = useRef(false);
+  const lastSyncedAnswersSignatureRef = useRef('');
 
   const bankResult = useMemo(() => {
     if (!session) return null;
@@ -225,6 +228,7 @@ export default function BurslulukSinavPage() {
     setErrorMessage('');
 
     try {
+      await flushAnswersToBackend({ force: true });
       const payload = {
         attemptId: session.attemptId,
         completionStatus: status,
@@ -251,6 +255,72 @@ export default function BurslulukSinavPage() {
     if (!session || !questions.length || remainingSeconds > 0 || isSubmitting) return;
     void submit('time_limit_reached');
   }, [isSubmitting, questions.length, remainingSeconds, session]);
+
+  const buildAutosavePayload = useCallback(() => {
+    if (!session?.attemptId || questions.length === 0) return null;
+    return {
+      attemptId: session.attemptId,
+      answers: buildSubmissionAnswers(questions, answers),
+    };
+  }, [answers, questions, session?.attemptId]);
+
+  const flushAnswersToBackend = useCallback(
+    async ({ force = false, unload = false }: { force?: boolean; unload?: boolean } = {}) => {
+      if (!session?.sessionToken || !session?.attemptId || isSubmitting) return;
+
+      const payload = buildAutosavePayload();
+      if (!payload || payload.answers.length === 0) return;
+
+      const signature = JSON.stringify(
+        payload.answers.map((answer) => [answer.questionId, answer.selectedOption ?? null]),
+      );
+
+      if (!force && signature === lastSyncedAnswersSignatureRef.current) return;
+
+      if (unload) {
+        const sent = saveExamAnswersOnUnload(session.sessionToken, payload);
+        if (sent) {
+          lastSyncedAnswersSignatureRef.current = signature;
+        }
+        return;
+      }
+
+      if (isAnswerSyncingRef.current) return;
+      isAnswerSyncingRef.current = true;
+      try {
+        await saveExamAnswers(session.sessionToken, payload);
+        lastSyncedAnswersSignatureRef.current = signature;
+      } catch {
+        // Next interval tick retries automatically.
+      } finally {
+        isAnswerSyncingRef.current = false;
+      }
+    },
+    [buildAutosavePayload, isSubmitting, session?.attemptId, session?.sessionToken],
+  );
+
+  useEffect(() => {
+    if (!session?.attemptId || !session?.sessionToken || questions.length === 0 || isSubmitting) return;
+    const intervalMs = Math.max(20, Math.min(30, DEFAULT_AUTOSAVE_INTERVAL_SECONDS)) * 1000;
+    const timer = window.setInterval(() => {
+      void flushAnswersToBackend();
+    }, intervalMs);
+    return () => window.clearInterval(timer);
+  }, [flushAnswersToBackend, isSubmitting, questions.length, session?.attemptId, session?.sessionToken]);
+
+  useEffect(() => {
+    if (!session?.attemptId || !session?.sessionToken) return;
+    const handlePageExit = () => {
+      void flushAnswersToBackend({ force: true, unload: true });
+    };
+
+    window.addEventListener('pagehide', handlePageExit);
+    window.addEventListener('beforeunload', handlePageExit);
+    return () => {
+      window.removeEventListener('pagehide', handlePageExit);
+      window.removeEventListener('beforeunload', handlePageExit);
+    };
+  }, [flushAnswersToBackend, session?.attemptId, session?.sessionToken]);
 
   if (!session) {
     return (

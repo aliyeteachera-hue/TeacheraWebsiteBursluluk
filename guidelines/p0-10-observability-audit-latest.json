@@ -1,15 +1,15 @@
 {
-  "timestamp": "2026-03-15T00:26:16.005Z",
+  "timestamp": "2026-03-17T07:29:15.485Z",
   "mode": {
     "http": true,
-    "aws": true,
+    "aws": false,
     "service_scoped": true
   },
   "totals": {
-    "pass": 19,
+    "pass": 2,
     "fail": 0,
     "warn": 0,
-    "skip": 0
+    "skip": 1
   },
   "overall_ready_for_p0_10": true,
   "checks": [
@@ -21,7 +21,7 @@
         "missing": [],
         "mode": {
           "http": true,
-          "aws": true
+          "aws": false
         },
         "service_scoped": true,
         "require_alarm_actions": true
@@ -37,178 +37,10 @@
       }
     },
     {
-      "id": "aws_identity",
-      "status": "PASS",
-      "detail": "AWS credentials are valid for observability audit.",
+      "id": "aws_checks",
+      "status": "SKIP",
+      "detail": "AWS checks disabled (use --aws).",
       "evidence": {}
-    },
-    {
-      "id": "dashboard_exists_www",
-      "status": "PASS",
-      "detail": "CloudWatch dashboard found (www): teachera-p0-10-observability-www",
-      "evidence": {
-        "service": "www",
-        "dashboard_name": "teachera-p0-10-observability-www"
-      }
-    },
-    {
-      "id": "dashboard_metric_coverage_www",
-      "status": "PASS",
-      "detail": "Dashboard contains required metric families (www).",
-      "evidence": {
-        "service": "www",
-        "dashboard_name": "teachera-p0-10-observability-www",
-        "missing_metrics": []
-      }
-    },
-    {
-      "id": "alarm_set_coverage_www",
-      "status": "PASS",
-      "detail": "All required alarms exist (www, 3).",
-      "evidence": {
-        "service": "www",
-        "alarm_prefix": "teachera-p0-10-www",
-        "expected_count": 3,
-        "found_count": 6
-      }
-    },
-    {
-      "id": "alarm_actions_attached_www",
-      "status": "PASS",
-      "detail": "SNS alarm actions attached and scoped (www).",
-      "evidence": {
-        "service": "www",
-        "require_alarm_actions": true,
-        "expected_alarm_topic": "arn:aws:sns:eu-north-1:572337278519:teachera-p0-10-alarms",
-        "missing_actions_for": [],
-        "wrong_topic_for": []
-      }
-    },
-    {
-      "id": "dashboard_exists_exam",
-      "status": "PASS",
-      "detail": "CloudWatch dashboard found (exam): teachera-p0-10-observability-exam",
-      "evidence": {
-        "service": "exam",
-        "dashboard_name": "teachera-p0-10-observability-exam"
-      }
-    },
-    {
-      "id": "dashboard_metric_coverage_exam",
-      "status": "PASS",
-      "detail": "Dashboard contains required metric families (exam).",
-      "evidence": {
-        "service": "exam",
-        "dashboard_name": "teachera-p0-10-observability-exam",
-        "missing_metrics": []
-      }
-    },
-    {
-      "id": "alarm_set_coverage_exam",
-      "status": "PASS",
-      "detail": "All required alarms exist (exam, 3).",
-      "evidence": {
-        "service": "exam",
-        "alarm_prefix": "teachera-p0-10-exam",
-        "expected_count": 3,
-        "found_count": 6
-      }
-    },
-    {
-      "id": "alarm_actions_attached_exam",
-      "status": "PASS",
-      "detail": "SNS alarm actions attached and scoped (exam).",
-      "evidence": {
-        "service": "exam",
-        "require_alarm_actions": true,
-        "expected_alarm_topic": "arn:aws:sns:eu-north-1:572337278519:teachera-p0-10-alarms",
-        "missing_actions_for": [],
-        "wrong_topic_for": []
-      }
-    },
-    {
-      "id": "dashboard_exists_panel",
-      "status": "PASS",
-      "detail": "CloudWatch dashboard found (panel): teachera-p0-10-observability-panel",
-      "evidence": {
-        "service": "panel",
-        "dashboard_name": "teachera-p0-10-observability-panel"
-      }
-    },
-    {
-      "id": "dashboard_metric_coverage_panel",
-      "status": "PASS",
-      "detail": "Dashboard contains required metric families (panel).",
-      "evidence": {
-        "service": "panel",
-        "dashboard_name": "teachera-p0-10-observability-panel",
-        "missing_metrics": []
-      }
-    },
-    {
-      "id": "alarm_set_coverage_panel",
-      "status": "PASS",
-      "detail": "All required alarms exist (panel, 3).",
-      "evidence": {
-        "service": "panel",
-        "alarm_prefix": "teachera-p0-10-panel",
-        "expected_count": 3,
-        "found_count": 6
-      }
-    },
-    {
-      "id": "alarm_actions_attached_panel",
-      "status": "PASS",
-      "detail": "SNS alarm actions attached and scoped (panel).",
-      "evidence": {
-        "service": "panel",
-        "require_alarm_actions": true,
-        "expected_alarm_topic": "arn:aws:sns:eu-north-1:572337278519:teachera-p0-10-alarms",
-        "missing_actions_for": [],
-        "wrong_topic_for": []
-      }
-    },
-    {
-      "id": "dashboard_exists_ops",
-      "status": "PASS",
-      "detail": "CloudWatch dashboard found (ops): teachera-p0-10-observability-ops",
-      "evidence": {
-        "service": "ops",
-        "dashboard_name": "teachera-p0-10-observability-ops"
-      }
-    },
-    {
-      "id": "dashboard_metric_coverage_ops",
-      "status": "PASS",
-      "detail": "Dashboard contains required metric families (ops).",
-      "evidence": {
-        "service": "ops",
-        "dashboard_name": "teachera-p0-10-observability-ops",
-        "missing_metrics": []
-      }
-    },
-    {
-      "id": "alarm_set_coverage_ops",
-      "status": "PASS",
-      "detail": "All required alarms exist (ops, 10).",
-      "evidence": {
-        "service": "ops",
-        "alarm_prefix": "teachera-p0-10-ops",
-        "expected_count": 10,
-        "found_count": 13
-      }
-    },
-    {
-      "id": "alarm_actions_attached_ops",
-      "status": "PASS",
-      "detail": "SNS alarm actions attached and scoped (ops).",
-      "evidence": {
-        "service": "ops",
-        "require_alarm_actions": true,
-        "expected_alarm_topic": "arn:aws:sns:eu-north-1:572337278519:teachera-p0-10-alarms",
-        "missing_actions_for": [],
-        "wrong_topic_for": []
-      }
     }
   ]
 }

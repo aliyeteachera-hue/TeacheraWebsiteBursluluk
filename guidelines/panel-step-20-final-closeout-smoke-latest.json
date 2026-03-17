@@ -1,0 +1,153 @@
+{
+  "timestamp": "2026-03-17T07:29:30.063Z",
+  "mode": {
+    "http": true,
+    "artifact": true
+  },
+  "totals": {
+    "pass": 14,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "overall_ready_for_step_20": true,
+  "checks": [
+    {
+      "id": "artifact_step14_exists",
+      "status": "PASS",
+      "detail": "Artifact exists and JSON parsed.",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-14-closeout-smoke-latest.json"
+      }
+    },
+    {
+      "id": "artifact_step14_ready",
+      "status": "PASS",
+      "detail": "overall_ready_for_step_14=true",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-14-closeout-smoke-latest.json",
+        "overall_ready_for_step_14": true
+      }
+    },
+    {
+      "id": "artifact_step16_exists",
+      "status": "PASS",
+      "detail": "Artifact exists and JSON parsed.",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-16-ops-grid-smoke-latest.json"
+      }
+    },
+    {
+      "id": "artifact_step16_ready",
+      "status": "PASS",
+      "detail": "overall_ready_for_step_16=true",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-16-ops-grid-smoke-latest.json",
+        "overall_ready_for_step_16": true
+      }
+    },
+    {
+      "id": "artifact_step17_exists",
+      "status": "PASS",
+      "detail": "Artifact exists and JSON parsed.",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-17-rbac-session-smoke-latest.json"
+      }
+    },
+    {
+      "id": "artifact_step17_ready",
+      "status": "PASS",
+      "detail": "overall_ready_for_step_17=true",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-17-rbac-session-smoke-latest.json",
+        "overall_ready_for_step_17": true
+      }
+    },
+    {
+      "id": "artifact_step18_exists",
+      "status": "PASS",
+      "detail": "Artifact exists and JSON parsed.",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-18-rbac-policy-smoke-latest.json"
+      }
+    },
+    {
+      "id": "artifact_step18_ready",
+      "status": "PASS",
+      "detail": "overall_ready_for_step_18=true",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-18-rbac-policy-smoke-latest.json",
+        "overall_ready_for_step_18": true
+      }
+    },
+    {
+      "id": "artifact_step19_exists",
+      "status": "PASS",
+      "detail": "Artifact exists and JSON parsed.",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-19-data-contract-smoke-latest.json"
+      }
+    },
+    {
+      "id": "artifact_step19_ready",
+      "status": "PASS",
+      "detail": "overall_ready_for_step_19=true",
+      "evidence": {
+        "path": "/Users/aliye/Downloads/Teachera Website Bursluluk/guidelines/panel-step-19-data-contract-smoke-latest.json",
+        "overall_ready_for_step_19": true
+      }
+    },
+    {
+      "id": "public_panel_dashboard",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "evidence": {
+        "url": "https://teachera.com.tr/panel/dashboard?view=operations&focus=candidates",
+        "method": "GET",
+        "status": 200,
+        "expected": [
+          200
+        ]
+      }
+    },
+    {
+      "id": "unauth_panel_dashboard_api",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/dashboard",
+        "method": "GET",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_panel_candidates_export_api",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates/export?format=csv",
+        "method": "GET",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_panel_candidates_actions_api",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates/actions",
+        "method": "POST",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    }
+  ]
+}

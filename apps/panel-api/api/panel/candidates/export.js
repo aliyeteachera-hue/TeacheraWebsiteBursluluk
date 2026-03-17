@@ -27,6 +27,21 @@ function escapeCsvCell(value) {
   return `"${asString.replaceAll('"', '""')}"`;
 }
 
+function escapeHtmlCell(value) {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function readExportFormat(value) {
+  const normalized = safeTrim(value).toLowerCase();
+  return normalized === 'xls' ? 'xls' : 'csv';
+}
+
 function buildFilterState(req) {
   const filters = parseFiltersFromQuery(req.query?.filters);
   const q = safeTrim(req.query?.q);
@@ -52,6 +67,12 @@ function buildFilterState(req) {
     clauses.push(`school_name = ANY($${params.length})`);
   }
 
+  const schoolQuery = safeTrim(filters.school_query || filters.schoolQuery);
+  if (schoolQuery) {
+    params.push(`%${schoolQuery.toLowerCase()}%`);
+    clauses.push(`LOWER(school_name) LIKE $${params.length}`);
+  }
+
   const grades = normalizeArrayFilter(filters.grade || filters.grades).map((item) => Number.parseInt(item, 10)).filter(Number.isFinite);
   if (grades.length > 0) {
     params.push(grades);
@@ -70,6 +91,11 @@ function buildFilterState(req) {
     clauses.push(`credentials_sms_status = ANY($${params.length})`);
   }
 
+  const loginStatus = normalizeArrayFilter(filters.login_status || filters.loginStatus, ['LOGGED_IN', 'NOT_LOGGED_IN']);
+  if (loginStatus.length === 1) {
+    clauses.push(loginStatus[0] === 'LOGGED_IN' ? 'first_login_at IS NOT NULL' : 'first_login_at IS NULL');
+  }
+
   const examStatuses = normalizeArrayFilter(filters.exam_status, EXAM_STATUS);
   if (examStatuses.length > 0) {
     params.push(examStatuses);
@@ -80,6 +106,11 @@ function buildFilterState(req) {
   if (resultStatuses.length > 0) {
     params.push(resultStatuses);
     clauses.push(`result_status = ANY($${params.length})`);
+  }
+
+  const resultViewedStatus = normalizeArrayFilter(filters.result_viewed_status || filters.resultViewedStatus, ['VIEWED', 'NOT_VIEWED']);
+  if (resultViewedStatus.length === 1) {
+    clauses.push(resultViewedStatus[0] === 'VIEWED' ? 'result_viewed_at IS NOT NULL' : 'result_viewed_at IS NULL');
   }
 
   const waStatuses = normalizeArrayFilter(filters.wa_result_status, WA_RESULT_STATUS);
@@ -108,36 +139,49 @@ export default async function handler(req, res) {
   await handleRequest(req, res, async () => {
     methodGuard(req, ['GET']);
     const identity = await requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY]);
+    const exportFormat = readExportFormat(req.query?.format);
 
     const { whereClause, params } = buildFilterState(req);
     const result = await query(
       `
         SELECT
-          candidate_id,
-          application_no,
-          student_full_name AS student_full_name_legacy,
-          student_full_name_enc,
-          grade,
-          school_name,
-          parent_full_name AS parent_full_name_legacy,
-          parent_full_name_enc,
-          parent_phone_e164 AS parent_phone_e164_legacy,
-          parent_phone_e164_enc,
-          application_status,
-          credentials_sms_status,
-          first_login_at,
-          exam_status,
-          exam_started_at,
-          exam_submitted_at,
-          result_status,
-          result_score,
-          result_viewed_at,
-          wa_result_status,
-          last_error_code,
-          updated_at
-        FROM v_candidate_operations
+          v.candidate_id,
+          v.application_no,
+          v.student_full_name AS student_full_name_legacy,
+          v.student_full_name_enc,
+          v.grade,
+          v.school_name,
+          v.parent_full_name AS parent_full_name_legacy,
+          v.parent_full_name_enc,
+          v.parent_phone_e164 AS parent_phone_e164_legacy,
+          v.parent_phone_e164_enc,
+          v.application_status,
+          v.credentials_sms_status,
+          v.first_login_at,
+          v.exam_status,
+          v.exam_started_at,
+          v.exam_submitted_at,
+          v.result_status,
+          v.result_score,
+          v.result_viewed_at,
+          v.wa_result_status,
+          v.last_error_code,
+          note.operator_note,
+          note.operator_note_at,
+          v.updated_at
+        FROM v_candidate_operations v
+        LEFT JOIN LATERAL (
+          SELECT
+            ev.event_payload ->> 'note' AS operator_note,
+            ev.occurred_at AS operator_note_at
+          FROM activity_events ev
+          WHERE ev.candidate_id = v.candidate_id
+            AND ev.event_type = 'OPERATOR_NOTE'
+          ORDER BY ev.occurred_at DESC
+          LIMIT 1
+        ) note ON TRUE
         ${whereClause}
-        ORDER BY updated_at DESC
+        ORDER BY v.updated_at DESC
         LIMIT 100000
       `,
       params,
@@ -162,6 +206,8 @@ export default async function handler(req, res) {
       'result_viewed_at',
       'wa_result_status',
       'last_error_code',
+      'operator_note',
+      'operator_note_at',
       'updated_at',
     ];
 
@@ -182,16 +228,26 @@ export default async function handler(req, res) {
       }),
     );
 
-    const lines = [headers.join(',')];
-    for (const row of mappedRows) {
-      lines.push(headers.map((header) => escapeCsvCell(row[header])).join(','));
-    }
-
     const now = new Date().toISOString().slice(0, 19).replaceAll(':', '-');
     res.status(200);
-    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="candidate-operations-${now}.csv"`);
-    res.end(lines.join('\n'));
+    if (exportFormat === 'xls') {
+      const tableHead = `<tr>${headers.map((header) => `<th>${escapeHtmlCell(header)}</th>`).join('')}</tr>`;
+      const tableBody = mappedRows
+        .map((row) => `<tr>${headers.map((header) => `<td>${escapeHtmlCell(row[header])}</td>`).join('')}</tr>`)
+        .join('');
+      const html = `<!doctype html><html><head><meta charset="utf-8"></head><body><table border="1">${tableHead}${tableBody}</table></body></html>`;
+      res.setHeader('Content-Type', 'application/vnd.ms-excel; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="candidate-operations-${now}.xls"`);
+      res.end(html);
+    } else {
+      const lines = [headers.join(',')];
+      for (const row of mappedRows) {
+        lines.push(headers.map((header) => escapeCsvCell(row[header])).join(','));
+      }
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="candidate-operations-${now}.csv"`);
+      res.end(lines.join('\n'));
+    }
 
     const ctx = readRequestContext(req);
     await appendAuditLog({
@@ -205,6 +261,7 @@ export default async function handler(req, res) {
       metadata: {
         q: safeTrim(req.query?.q) || null,
         filters: parseFiltersFromQuery(req.query?.filters),
+        exportFormat,
         rowCount: mappedRows.length,
         piiScope: piiScopeFull ? 'FULL' : 'MASKED',
       },

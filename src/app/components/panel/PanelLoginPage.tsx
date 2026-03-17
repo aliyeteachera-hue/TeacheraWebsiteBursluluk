@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { panelFetch } from '../../api/panelApi';
 
 type ApiResponse = {
@@ -6,11 +6,16 @@ type ApiResponse = {
   error?: string;
   message?: string;
   next_step?: string;
+  identity?: {
+    role?: string;
+    password_reset_required?: boolean;
+  };
   session?: {
     password_reset_required?: boolean;
     force_password_reset?: boolean;
   };
   user?: {
+    role?: string;
     password_reset_required?: boolean;
     force_password_reset?: boolean;
   };
@@ -27,17 +32,28 @@ function normalizeMessage(payload: ApiResponse | null, fallback: string) {
 function readRequiresPasswordReset(payload: ApiResponse | null) {
   if (!payload) return false;
   if (String(payload.next_step || '').toLowerCase() === 'password_reset') return true;
+  if (payload.identity?.password_reset_required) return true;
   if (payload.session?.password_reset_required || payload.session?.force_password_reset) return true;
   if (payload.user?.password_reset_required || payload.user?.force_password_reset) return true;
   return false;
 }
 
-function resolveSafeNextPath() {
-  const params = new URLSearchParams(window.location.search);
-  const next = String(params.get('next') || '').trim();
-  if (!next) return '/panel/dashboard';
-  if (!next.startsWith('/panel/')) return '/panel/dashboard';
-  return next;
+const DASHBOARD_ALLOWED_ROLES = new Set([
+  'SUPER_ADMIN',
+  'ADMIN',
+  'EDUCATION_ADVISOR',
+  'OPERATIONS',
+  'READ_ONLY',
+]);
+
+function readRole(payload: ApiResponse | null) {
+  return String(payload?.user?.role || payload?.identity?.role || '')
+    .trim()
+    .toUpperCase();
+}
+
+function canRouteToDashboard(role: string) {
+  return role ? DASHBOARD_ALLOWED_ROLES.has(role) : false;
 }
 
 async function readJsonSafe(response: Response) {
@@ -54,11 +70,58 @@ const inputClassName =
 export default function PanelLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSessionCheckLoading, setIsSessionCheckLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const canSubmit = email.trim() && password && !isSubmitting;
+  const canSubmit = email.trim() && password && !isSubmitting && !isSessionCheckLoading;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const verifyExistingSession = async () => {
+      try {
+        const response = await panelFetch('/api/panel/auth/me', {
+          method: 'GET',
+        });
+
+        if (cancelled) return;
+        if (response.status === 401 || response.status === 403) {
+          setIsSessionCheckLoading(false);
+          return;
+        }
+
+        const payload = await readJsonSafe(response);
+        const requiresPasswordReset = readRequiresPasswordReset(payload);
+        if (requiresPasswordReset) {
+          window.location.assign('/panel/password-reset');
+          return;
+        }
+
+        const role = readRole(payload);
+        if (canRouteToDashboard(role)) {
+          window.location.assign('/panel/dashboard');
+          return;
+        }
+
+        setErrorMessage('Panel rolünüz doğrulanamadı. Lütfen destek ekibiyle iletişime geçin.');
+      } catch {
+        if (!cancelled) {
+          setIsSessionCheckLoading(false);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsSessionCheckLoading(false);
+        }
+      }
+    };
+
+    void verifyExistingSession();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -97,7 +160,13 @@ export default function PanelLoginPage() {
       }
 
       const requiresPasswordReset = readRequiresPasswordReset(loginPayload);
-      const targetPath = requiresPasswordReset ? '/panel/password-reset' : resolveSafeNextPath();
+      const role = readRole(loginPayload);
+      if (!requiresPasswordReset && !canRouteToDashboard(role)) {
+        setErrorMessage('Bu hesap panel dashboard erişimi için yetkilendirilmemiş.');
+        return;
+      }
+
+      const targetPath = requiresPasswordReset ? '/panel/password-reset' : '/panel/dashboard';
       setSuccessMessage(
         requiresPasswordReset
           ? 'Geçici şifre algılandı. Şifre yenileme ekranına yönlendiriliyorsunuz...'

@@ -1,0 +1,237 @@
+{
+  "timestamp": "2026-03-17T07:29:27.647Z",
+  "mode": {
+    "http": true,
+    "static": true
+  },
+  "totals": {
+    "pass": 21,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "overall_ready_for_step_18": true,
+  "checks": [
+    {
+      "id": "rbac_dashboard_read",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/dashboard.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY])"
+      }
+    },
+    {
+      "id": "rbac_candidates_read",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/candidates/index.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY])"
+      }
+    },
+    {
+      "id": "rbac_candidates_export_read",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/candidates/export.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY])"
+      }
+    },
+    {
+      "id": "rbac_notifications_read",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/notifications/index.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY])"
+      }
+    },
+    {
+      "id": "rbac_dlq_read",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/dlq/index.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY])"
+      }
+    },
+    {
+      "id": "rbac_unviewed_read",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/unviewed-results/index.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY])"
+      }
+    },
+    {
+      "id": "rbac_audit_read",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/audit/index.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY])"
+      }
+    },
+    {
+      "id": "rbac_audit_export_read",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/audit/export.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS, ROLES.READ_ONLY])"
+      }
+    },
+    {
+      "id": "rbac_candidates_actions_write",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/candidates/actions.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS])"
+      }
+    },
+    {
+      "id": "rbac_notifications_actions_write",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/notifications/actions.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS])"
+      }
+    },
+    {
+      "id": "rbac_dlq_actions_write",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/dlq/actions.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS])"
+      }
+    },
+    {
+      "id": "rbac_unviewed_actions_write",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/unviewed-results/actions.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN, ROLES.OPERATIONS])"
+      }
+    },
+    {
+      "id": "rbac_settings_write_super_admin",
+      "status": "PASS",
+      "detail": "RBAC marker found.",
+      "evidence": {
+        "file": "apps/panel-api/api/panel/settings/index.js",
+        "marker": "requireRole(req, [ROLES.SUPER_ADMIN])"
+      }
+    },
+    {
+      "id": "unauth_GET_/api/panel/candidates",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates",
+        "method": "GET",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_GET_/api/panel/notifications",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/notifications",
+        "method": "GET",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_GET_/api/panel/dlq",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/dlq",
+        "method": "GET",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_GET_/api/panel/unviewed-results",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/unviewed-results",
+        "method": "GET",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_POST_/api/panel/candidates/actions",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/candidates/actions",
+        "method": "POST",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_POST_/api/panel/notifications/actions",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/notifications/actions",
+        "method": "POST",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_POST_/api/panel/dlq/actions",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/dlq/actions",
+        "method": "POST",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    },
+    {
+      "id": "unauth_POST_/api/panel/unviewed-results/actions",
+      "status": "PASS",
+      "detail": "HTTP 401",
+      "evidence": {
+        "url": "https://panel-api.teachera.com.tr/api/panel/unviewed-results/actions",
+        "method": "POST",
+        "status": 401,
+        "expected": [
+          401
+        ]
+      }
+    }
+  ]
+}
