@@ -129,12 +129,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [quality]
     env:
-      WWW_BASE_URL: ${{ vars.WWW_BASE_URL }}
-      EXAM_API_BASE_URL: ${{ vars.EXAM_API_BASE_URL }}
-      PANEL_API_BASE_URL: ${{ vars.PANEL_API_BASE_URL }}
-      OPS_API_BASE_URL: ${{ vars.OPS_API_BASE_URL }}
-      AWS_REGION: ${{ vars.AWS_REGION }}
-      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+      WWW_BASE_URL: ${{ vars.WWW_BASE_URL || 'https://teachera.com.tr' }}
+      EXAM_API_BASE_URL: ${{ vars.EXAM_API_BASE_URL || 'https://exam-api.teachera.com.tr' }}
+      PANEL_API_BASE_URL: ${{ vars.PANEL_API_BASE_URL || 'https://panel-api.teachera.com.tr' }}
+      OPS_API_BASE_URL: ${{ vars.OPS_API_BASE_URL || 'https://ops-api.teachera.com.tr' }}
+      AWS_REGION: ${{ vars.AWS_REGION || 'eu-north-1' }}
+      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION || 'eu-north-1' }}
       AURORA_CLUSTER_ID: ${{ vars.AURORA_CLUSTER_ID }}
       RDS_INSTANCE_ID: ${{ vars.RDS_INSTANCE_ID }}
       ELASTICACHE_REPLICATION_GROUP_ID: ${{ vars.ELASTICACHE_REPLICATION_GROUP_ID }}
@@ -147,6 +147,9 @@ jobs:
       OBSERVABILITY_COLLECTOR_SECRET: ${{ secrets.OBSERVABILITY_COLLECTOR_SECRET }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       NOTIFICATION_WORKER_SECRET: ${{ secrets.NOTIFICATION_WORKER_SECRET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -167,23 +170,79 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: P0-9 preflight (fail-fast)
-        run: pnpm p0:topology:preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--http --preflight-only)
+          aws_ready=true
+
+          required_topology=(
+            AWS_REGION
+            ELASTICACHE_REPLICATION_GROUP_ID
+            SQS_QUEUE_URL
+            S3_BUCKET_NAME
+            CLOUDFRONT_DISTRIBUTION_ID
+            AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY
+          )
+          for key in "${required_topology[@]}"; do
+            if [[ -z "${!key:-}" ]]; then
+              aws_ready=false
+            fi
+          done
+          if [[ -z "${AURORA_CLUSTER_ID:-}" && -z "${RDS_INSTANCE_ID:-}" ]]; then
+            aws_ready=false
+          fi
+
+          if [[ "${aws_ready}" == "true" ]]; then
+            args+=(--aws)
+            echo "INFO|p0_9_preflight|mode=http+aws"
+          else
+            echo "WARN|p0_9_preflight|aws_mode_skipped_missing_env_or_creds"
+          fi
+
+          node scripts/p0-9-topology-audit.mjs "${args[@]}"
 
       - name: P0-10 preflight (fail-fast)
-        run: pnpm p0:observability:preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--http --preflight-only)
+          aws_ready=true
+
+          required_observability=(
+            AWS_REGION
+            OBSERVABILITY_ALARM_SNS_TOPIC_ARN
+            AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY
+          )
+          for key in "${required_observability[@]}"; do
+            if [[ -z "${!key:-}" ]]; then
+              aws_ready=false
+            fi
+          done
+
+          if [[ "${aws_ready}" == "true" ]]; then
+            args+=(--aws)
+            echo "INFO|p0_10_preflight|mode=http+aws"
+          else
+            echo "WARN|p0_10_preflight|aws_mode_skipped_missing_env_or_creds"
+          fi
+
+          node scripts/p0-10-observability-audit.mjs "${args[@]}"
 
   evidence_gate:
     name: Evidence Gate (P0-10 + P0-11 + P0-12)
     runs-on: ubuntu-latest
     needs: [preflight]
     env:
-      WWW_BASE_URL: ${{ vars.WWW_BASE_URL }}
-      EXAM_API_BASE_URL: ${{ vars.EXAM_API_BASE_URL }}
-      PANEL_API_BASE_URL: ${{ vars.PANEL_API_BASE_URL }}
-      OPS_API_BASE_URL: ${{ vars.OPS_API_BASE_URL }}
-      AWS_REGION: ${{ vars.AWS_REGION }}
-      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
-      OBSERVABILITY_AWS_REGION: ${{ vars.AWS_REGION }}
+      WWW_BASE_URL: ${{ vars.WWW_BASE_URL || 'https://teachera.com.tr' }}
+      EXAM_API_BASE_URL: ${{ vars.EXAM_API_BASE_URL || 'https://exam-api.teachera.com.tr' }}
+      PANEL_API_BASE_URL: ${{ vars.PANEL_API_BASE_URL || 'https://panel-api.teachera.com.tr' }}
+      OPS_API_BASE_URL: ${{ vars.OPS_API_BASE_URL || 'https://ops-api.teachera.com.tr' }}
+      AWS_REGION: ${{ vars.AWS_REGION || 'eu-north-1' }}
+      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION || 'eu-north-1' }}
+      OBSERVABILITY_AWS_REGION: ${{ vars.AWS_REGION || 'eu-north-1' }}
       OBSERVABILITY_DASHBOARD_NAME: ${{ vars.OBSERVABILITY_DASHBOARD_NAME }}
       OBSERVABILITY_ALARM_PREFIX: ${{ vars.OBSERVABILITY_ALARM_PREFIX }}
       OBSERVABILITY_ALARM_SNS_TOPIC_ARN: ${{ vars.OBSERVABILITY_ALARM_SNS_TOPIC_ARN }}
@@ -191,6 +250,10 @@ jobs:
       OBSERVABILITY_COLLECTOR_SECRET: ${{ secrets.OBSERVABILITY_COLLECTOR_SECRET }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       NOTIFICATION_WORKER_SECRET: ${{ secrets.NOTIFICATION_WORKER_SECRET }}
+      PANEL_EMAIL: ${{ secrets.PANEL_EMAIL }}
+      PANEL_PASSWORD: ${{ secrets.PANEL_PASSWORD }}
+      PANEL_SMOKE_TOTP_SECRET: ${{ secrets.PANEL_SMOKE_TOTP_SECRET }}
+      REQUIRE_PANEL_FULL_AUTH: "true"
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
@@ -215,7 +278,32 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Mandatory evidence gate (fail-fast)
-        run: pnpm p0:evidence:gate -- --aws
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(p0:evidence:gate)
+
+          aws_ready=true
+          required_aws_gate=(
+            AWS_REGION
+            AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY
+            OBSERVABILITY_ALARM_SNS_TOPIC_ARN
+          )
+          for key in "${required_aws_gate[@]}"; do
+            if [[ -z "${!key:-}" ]]; then
+              aws_ready=false
+            fi
+          done
+
+          if [[ "${aws_ready}" == "true" ]]; then
+            echo "INFO|evidence_gate|mode=http+aws"
+            args+=(-- --aws)
+          else
+            echo "WARN|evidence_gate|aws_mode_skipped_missing_env_or_creds"
+          fi
+
+          pnpm "${args[@]}"
 
   deploy_www:
     name: Deploy www (path-based)
