@@ -19,20 +19,21 @@ jobs:
     name: Detect Changed Areas
     runs-on: ubuntu-latest
     outputs:
-      www: ${{ steps.filter.outputs.www }}
-      exam_api: ${{ steps.filter.outputs.exam_api }}
-      panel_api: ${{ steps.filter.outputs.panel_api }}
-      ops_api: ${{ steps.filter.outputs.ops_api }}
-      force_all: ${{ steps.filter.outputs.force_all }}
+      www: ${{ steps.filter.outputs.www || steps.manual_filter.outputs.www || 'false' }}
+      exam_api: ${{ steps.filter.outputs.exam_api || steps.manual_filter.outputs.exam_api || 'false' }}
+      panel_api: ${{ steps.filter.outputs.panel_api || steps.manual_filter.outputs.panel_api || 'false' }}
+      ops_api: ${{ steps.filter.outputs.ops_api || steps.manual_filter.outputs.ops_api || 'false' }}
+      force_all: ${{ steps.filter.outputs.force_all || steps.manual_filter.outputs.force_all || 'false' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Path Filter
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         id: filter
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           filters: |
             www:
@@ -72,13 +73,25 @@ jobs:
               - 'eslint.config.mjs'
               - 'vercel.json'
 
+      - name: Path Filter (workflow_dispatch fallback)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: manual_filter
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "www=true" >> "$GITHUB_OUTPUT"
+          echo "exam_api=true" >> "$GITHUB_OUTPUT"
+          echo "panel_api=true" >> "$GITHUB_OUTPUT"
+          echo "ops_api=true" >> "$GITHUB_OUTPUT"
+          echo "force_all=true" >> "$GITHUB_OUTPUT"
+
       - name: Print Change Summary
         run: |
-          echo "www=${{ steps.filter.outputs.www }}"
-          echo "exam_api=${{ steps.filter.outputs.exam_api }}"
-          echo "panel_api=${{ steps.filter.outputs.panel_api }}"
-          echo "ops_api=${{ steps.filter.outputs.ops_api }}"
-          echo "force_all=${{ steps.filter.outputs.force_all }}"
+          echo "www=${{ steps.filter.outputs.www || steps.manual_filter.outputs.www || 'false' }}"
+          echo "exam_api=${{ steps.filter.outputs.exam_api || steps.manual_filter.outputs.exam_api || 'false' }}"
+          echo "panel_api=${{ steps.filter.outputs.panel_api || steps.manual_filter.outputs.panel_api || 'false' }}"
+          echo "ops_api=${{ steps.filter.outputs.ops_api || steps.manual_filter.outputs.ops_api || 'false' }}"
+          echo "force_all=${{ steps.filter.outputs.force_all || steps.manual_filter.outputs.force_all || 'false' }}"
 
   quality:
     name: Lint, Typecheck, Test, Build
@@ -86,7 +99,7 @@ jobs:
     needs: [changes]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -95,7 +108,7 @@ jobs:
           run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "pnpm"
@@ -152,7 +165,7 @@ jobs:
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -161,7 +174,7 @@ jobs:
           run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "pnpm"
@@ -265,7 +278,7 @@ jobs:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -274,7 +287,7 @@ jobs:
           run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "pnpm"
@@ -345,12 +358,12 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "pnpm"
@@ -368,12 +381,12 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "pnpm"
@@ -391,12 +404,12 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "pnpm"
@@ -414,12 +427,12 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "pnpm"
