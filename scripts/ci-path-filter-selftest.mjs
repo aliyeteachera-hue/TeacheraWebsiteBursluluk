@@ -2,13 +2,13 @@
 import { writeFileSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { minimatch } from 'minimatch';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const WORKFLOW_PATH = resolve(ROOT, '.github/workflows/ci.yml');
 const OUTPUT_PATH = resolve(ROOT, 'guidelines/ci-path-filter-selftest-latest.json');
 const REQUIRED_FILTERS = ['www', 'exam_api', 'panel_api', 'ops_api', 'force_all'];
+const REGEX_SPECIALS = /[|\\{}()[\]^$+?.]/g;
 
 function trim(value) {
   return String(value ?? '').trim();
@@ -54,11 +54,53 @@ function parseWorkflowFilters(raw) {
   return filters;
 }
 
+function normalizePath(value) {
+  return String(value ?? '').replace(/\\/g, '/');
+}
+
+function escapeRegexLiteral(value) {
+  return value.replace(REGEX_SPECIALS, '\\$&');
+}
+
+function globToRegExp(pattern) {
+  const normalized = normalizePath(pattern);
+  let regex = '^';
+
+  for (let i = 0; i < normalized.length; i += 1) {
+    const char = normalized[i];
+
+    if (char === '*') {
+      const next = normalized[i + 1];
+      if (next === '*') {
+        regex += '.*';
+        i += 1;
+      } else {
+        regex += '[^/]*';
+      }
+      continue;
+    }
+
+    if (char === '?') {
+      regex += '[^/]';
+      continue;
+    }
+
+    regex += escapeRegexLiteral(char);
+  }
+
+  regex += '$';
+  return new RegExp(regex);
+}
+
+function pathMatchesPattern(candidate, pattern) {
+  return globToRegExp(pattern).test(normalizePath(candidate));
+}
+
 function evaluateFilterMatches(filters, changedPaths) {
   const result = {};
   for (const [filterName, patterns] of Object.entries(filters)) {
     result[filterName] = patterns.some((pattern) =>
-      changedPaths.some((candidate) => minimatch(candidate, pattern, { dot: true })),
+      changedPaths.some((candidate) => pathMatchesPattern(candidate, pattern)),
     );
   }
   return result;
