@@ -60,6 +60,15 @@ type CandidateFilters = {
   waStatus: string;
 };
 
+type CandidateFilterPreset = {
+  id: string;
+  name: string;
+  query: string;
+  filters: CandidateFilters;
+  created_at: string;
+  updated_at: string;
+};
+
 const defaultFilters: CandidateFilters = {
   campaignCode: '',
   schoolQuery: '',
@@ -77,6 +86,20 @@ const WA_STATUS_OPTIONS = ['NOT_QUEUED', 'QUEUED', 'SENT', 'DELIVERED', 'READ', 
 const LOGIN_STATUS_OPTIONS = ['LOGGED_IN', 'NOT_LOGGED_IN'] as const;
 const RESULT_VIEWED_STATUS_OPTIONS = ['VIEWED', 'NOT_VIEWED'] as const;
 const GRADE_OPTIONS = Array.from({ length: 10 }, (_, index) => String(index + 2));
+const CANDIDATE_PRESET_STORAGE_KEY = 'teachera.panel.candidates.filter-presets.v1';
+
+const ERROR_CODE_DICTIONARY: Record<string, string> = {
+  missing_provider_endpoint_SMS: 'SMS sağlayıcı endpoint ayarı eksik. Ops > Settings tarafında endpoint kontrol edilmeli.',
+  missing_provider_endpoint_WHATSAPP: 'WhatsApp sağlayıcı endpoint ayarı eksik. Ops > Settings tarafında endpoint kontrol edilmeli.',
+  simulated_provider_outage: 'Test amaçlı provider outage simülasyonu tetiklenmiş. Gerçek sağlayıcı arızası değildir.',
+  invalid_worker_secret: 'Worker secret doğrulaması başarısız. Ops API secret senkronu kontrol edilmeli.',
+  provider_rejected: 'Sağlayıcı isteği reddetti. Payload/kimlik doğrulama bilgilerini kontrol edin.',
+  provider_timeout: 'Sağlayıcı zaman aşımı. Retry/backoff politikası devreye girecektir.',
+  webhook_signature_invalid: 'Webhook imza doğrulaması başarısız. Provider webhook secret değerini doğrulayın.',
+  captcha_failed: 'Turnstile doğrulaması başarısız. Kullanıcıya captcha yenilemesi önerin.',
+  rate_limited: 'İstek hız limiti aşıldı. Kısa süre bekleyip tekrar deneyin.',
+  db_unavailable: 'Veritabanı erişimi geçici olarak kesildi. Altyapı health metriklerini kontrol edin.',
+};
 
 function formatNumber(value: number | undefined) {
   if (!Number.isFinite(value)) return '-';
@@ -182,6 +205,47 @@ function readFileName(contentDisposition: string | null, fallback: string) {
   return match[1];
 }
 
+function loadCandidateFilterPresets(): CandidateFilterPreset[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(CANDIDATE_PRESET_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((item) => item && typeof item === 'object')
+      .map((item) => ({
+        id: String(item.id || ''),
+        name: String(item.name || '').trim(),
+        query: String(item.query || ''),
+        filters: {
+          ...defaultFilters,
+          ...(item.filters && typeof item.filters === 'object' ? item.filters : {}),
+        },
+        created_at: String(item.created_at || new Date().toISOString()),
+        updated_at: String(item.updated_at || new Date().toISOString()),
+      }))
+      .filter((item) => item.id && item.name);
+  } catch {
+    return [];
+  }
+}
+
+function saveCandidateFilterPresets(presets: CandidateFilterPreset[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(CANDIDATE_PRESET_STORAGE_KEY, JSON.stringify(presets));
+  } catch {
+    // ignore storage write errors
+  }
+}
+
+function resolveErrorCodeHelp(code: string | null | undefined) {
+  const normalized = String(code || '').trim();
+  if (!normalized) return '';
+  return ERROR_CODE_DICTIONARY[normalized] || 'Sözlükte tanım yok. Audit log ve provider response detayını kontrol edin.';
+}
+
 export default function CandidateOperationsPanel({
   active,
   seedQuery = '',
@@ -215,6 +279,8 @@ export default function CandidateOperationsPanel({
   const [isLoading, setIsLoading] = useState(false);
   const [isActionRunning, setIsActionRunning] = useState(false);
   const [isExportRunning, setIsExportRunning] = useState(false);
+  const [presets, setPresets] = useState<CandidateFilterPreset[]>([]);
+  const [selectedPresetId, setSelectedPresetId] = useState('');
   const [message, setMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const canOperate = canOperatePanelActions(role);
@@ -230,12 +296,81 @@ export default function CandidateOperationsPanel({
 
   useEffect(() => {
     if (!active) return;
+    const loaded = loadCandidateFilterPresets();
+    setPresets(loaded);
+    setSelectedPresetId((prev) => (prev && loaded.some((item) => item.id === prev) ? prev : ''));
     setQuery(normalizedSeedQuery);
     setAppliedQuery(normalizedSeedQuery);
     setDraftFilters((prev) => ({ ...prev, campaignCode: normalizedSeedCampaignCode }));
     setAppliedFilters((prev) => ({ ...prev, campaignCode: normalizedSeedCampaignCode }));
     setPage(1);
   }, [active, normalizedSeedCampaignCode, normalizedSeedQuery]);
+
+  const handleSavePreset = () => {
+    const suggested = `Preset ${new Date().toLocaleDateString('tr-TR')}`;
+    const rawName = window.prompt('Preset adı girin', suggested);
+    const name = String(rawName || '').trim();
+    if (!name) {
+      setErrorMessage('Preset kaydı iptal edildi: geçerli bir isim girilmedi.');
+      return;
+    }
+    const now = new Date().toISOString();
+    const existing = presets.find((item) => item.name.toLocaleLowerCase('tr-TR') === name.toLocaleLowerCase('tr-TR'));
+    const nextPreset: CandidateFilterPreset = existing
+      ? {
+          ...existing,
+          query: query.trim(),
+          filters: { ...draftFilters },
+          updated_at: now,
+        }
+      : {
+          id: `preset_${Math.random().toString(36).slice(2, 10)}`,
+          name,
+          query: query.trim(),
+          filters: { ...draftFilters },
+          created_at: now,
+          updated_at: now,
+        };
+    const next = [...presets.filter((item) => item.id !== nextPreset.id), nextPreset].sort((a, b) =>
+      a.name.localeCompare(b.name, 'tr-TR'),
+    );
+    setPresets(next);
+    setSelectedPresetId(nextPreset.id);
+    saveCandidateFilterPresets(next);
+    setMessage(`Preset kaydedildi: ${nextPreset.name}`);
+    setErrorMessage('');
+  };
+
+  const handleApplyPreset = () => {
+    const preset = presets.find((item) => item.id === selectedPresetId);
+    if (!preset) {
+      setErrorMessage('Uygulanacak bir preset seçin.');
+      return;
+    }
+    setQuery(preset.query);
+    setDraftFilters({ ...preset.filters });
+    setAppliedQuery(preset.query);
+    setAppliedFilters({ ...preset.filters });
+    setPage(1);
+    setMessage(`Preset uygulandı: ${preset.name}`);
+    setErrorMessage('');
+  };
+
+  const handleDeletePreset = () => {
+    const preset = presets.find((item) => item.id === selectedPresetId);
+    if (!preset) {
+      setErrorMessage('Silinecek bir preset seçin.');
+      return;
+    }
+    const confirmed = window.confirm(`"${preset.name}" presetini silmek istiyor musunuz?`);
+    if (!confirmed) return;
+    const next = presets.filter((item) => item.id !== preset.id);
+    setPresets(next);
+    setSelectedPresetId('');
+    saveCandidateFilterPresets(next);
+    setMessage(`Preset silindi: ${preset.name}`);
+    setErrorMessage('');
+  };
 
   useEffect(() => {
     if (!active) return;
@@ -436,7 +571,46 @@ export default function CandidateOperationsPanel({
         </p>
       ) : null}
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="sticky top-[70px] z-20 mt-4 space-y-3 rounded-2xl border border-[#1A273A] bg-[#050f1f]/95 p-3 backdrop-blur-sm">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto_auto]">
+          <select
+            value={selectedPresetId}
+            onChange={(event) => setSelectedPresetId(event.target.value)}
+            className="h-[42px] rounded-xl border border-[#1A273A] bg-[#030B18] px-3 text-[13px] text-white/90 outline-none focus:border-[#2D4363]"
+          >
+            <option value="">Kayıtlı filtre preset seçin</option>
+            {presets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.name}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={handleSavePreset}
+            className="rounded-xl border border-[#1A273A] bg-[#0A192B]/90 px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.11em] text-white/80 transition hover:border-[#2D4363]"
+          >
+            Preset Kaydet
+          </button>
+          <button
+            type="button"
+            onClick={handleApplyPreset}
+            disabled={!selectedPresetId}
+            className="rounded-xl border border-[#1A273A] bg-[#0A192B]/90 px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.11em] text-white/80 transition hover:border-[#2D4363] disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            Preset Uygula
+          </button>
+          <button
+            type="button"
+            onClick={handleDeletePreset}
+            disabled={!selectedPresetId}
+            className="rounded-xl border border-[#6F2824] bg-[#2B1214]/80 px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.11em] text-[#FFB8B1] transition hover:border-[#8D3430] disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            Preset Sil
+          </button>
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -521,9 +695,9 @@ export default function CandidateOperationsPanel({
             </option>
           ))}
         </select>
-      </div>
+        </div>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => {
@@ -552,6 +726,7 @@ export default function CandidateOperationsPanel({
         >
           Filtreleri Temizle
         </button>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -683,7 +858,18 @@ export default function CandidateOperationsPanel({
                     <td className="px-2 py-2">{readActionBoolean(booleans.resultViewed)}</td>
                     <td className="px-2 py-2">{readActionBoolean(booleans.waSent)}</td>
                     <td className="px-2 py-2">{item.wa_result_status || '-'}</td>
-                    <td className="px-2 py-2">{item.last_error_code || '-'}</td>
+                    <td className="px-2 py-2">
+                      {item.last_error_code ? (
+                        <span
+                          className="cursor-help rounded border border-[#1A273A] bg-[#0A192B]/90 px-2 py-1 text-[11px] text-white/85"
+                          title={resolveErrorCodeHelp(item.last_error_code)}
+                        >
+                          {item.last_error_code}
+                        </span>
+                      ) : (
+                        '-'
+                      )}
+                    </td>
                     <td className="px-2 py-2">{formatDate(item.updated_at)}</td>
                     <td className="max-w-[280px] px-2 py-2">
                       <p className="line-clamp-2">{item.operator_note || '-'}</p>
@@ -728,6 +914,10 @@ export default function CandidateOperationsPanel({
             Sonraki
           </button>
         </div>
+      </div>
+
+      <div className="mt-3 rounded-lg border border-[#1A273A] bg-[#0A192B]/70 px-3 py-2 text-[11px] text-white/62">
+        Hata kodu sözlüğü: <span className="text-white/78">Son Hata Kodu</span> kolonunda kodun üzerine gelerek açıklamayı görebilirsiniz.
       </div>
     </section>
   );

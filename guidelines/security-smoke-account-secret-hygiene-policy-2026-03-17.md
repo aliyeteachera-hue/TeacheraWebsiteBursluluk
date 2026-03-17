@@ -31,6 +31,15 @@ Kapsam: `panel-api` tam-auth smoke testleri, CI/CD, Vercel production secret yö
 - Rotasyon sonrası CI/Vercel secret’ları güncellenir ve `frontend:uat:rc` yeniden koşturulur.
 - Rotasyon kanıtı olarak tarih damgalı audit kaydı tutulur.
 
+## CI Bağlantısı (Zorunlu)
+- GitHub Actions secret isimleri:
+  - `PANEL_EMAIL`
+  - `PANEL_PASSWORD`
+  - `PANEL_SMOKE_TOTP_SECRET`
+- CI workflow env:
+  - `REQUIRE_PANEL_FULL_AUTH=true`
+- Bu kombinasyon ile pipeline, panel full-auth smoke adımlarını zorunlu çalıştırır.
+
 ## Uygulama Komutları (Kısa)
 
 ```bash

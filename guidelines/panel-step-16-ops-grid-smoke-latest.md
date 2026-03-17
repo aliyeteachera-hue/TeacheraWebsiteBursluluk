@@ -1,6 +1,6 @@
 # Panel Step-16 Ops Grid Smoke
 
-- Timestamp: 2026-03-17T08:08:08.052Z
+- Timestamp: 2026-03-17T21:26:04.132Z
 - overall_ready_for_step_16: **true**
 - pass: 46, fail: 0, warn: 0, skip: 0
 
@@ -22,8 +22,8 @@
 | unauth_post_/api/panel/notifications/actions | PASS | HTTP 401 |
 | unauth_post_/api/panel/dlq/actions | PASS | HTTP 401 |
 | unauth_post_/api/panel/unviewed-results/actions | PASS | HTTP 401 |
-| bundle_index_path | PASS | Found /assets/index-DCW-KWgh.js |
-| bundle_dashboard_chunk | PASS | Found assets/PanelDashboardPage-DVfUl_fC.js |
+| bundle_index_path | PASS | Found /assets/index-Bzm-7yTJ.js |
+| bundle_dashboard_chunk | PASS | Found assets/PanelDashboardPage-CBI34tY-.js |
 | marker_focus_candidates_route | PASS | Marker found: /panel/candidates |
 | marker_candidates_api | PASS | Marker found: /api/panel/candidates |
 | marker_notifications_api | PASS | Marker found: /api/panel/notifications |
