@@ -306,7 +306,7 @@ jobs:
             pnpm run panel:step18:rbac-policy
             pnpm run panel:step19:data-contract
             pnpm run panel:step20:final-closeout
-            pnpm run frontend:uat:rc
+            REQUIRE_PANEL_FULL_AUTH=false pnpm run frontend:uat:rc
             exit 0
           fi
 

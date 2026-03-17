@@ -287,6 +287,21 @@ function main() {
     steps.push(runStep('panel-step-20-final-closeout', npmCmd, ['run', 'panel:step20:final-closeout']));
   }
 
+  if (
+    steps[0].ok
+    && steps[1]?.ok
+    && steps[2]?.ok
+    && steps[3]?.ok
+    && steps[4]?.ok
+    && steps[5]?.ok
+    && steps[6]?.ok
+    && steps[7]?.ok
+    && steps[8]?.ok
+    && steps[9]?.ok
+  ) {
+    steps.push(runStep('frontend-uat-rc', npmCmd, ['run', 'frontend:uat:rc']));
+  }
+
   const summary = {
     timestamp: new Date().toISOString(),
     ok: steps.every((step) => step.ok),
@@ -301,6 +316,7 @@ function main() {
       panel_step_18_rbac_policy_included: true,
       panel_step_19_data_contract_included: true,
       panel_step_20_final_closeout_included: true,
+      frontend_uat_rc_included: true,
     },
     env: {
       production_env_file_loaded: envMeta.loaded,

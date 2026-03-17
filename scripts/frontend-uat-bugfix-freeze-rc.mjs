@@ -9,6 +9,14 @@ function safeTrim(value) {
   return String(value ?? '').trim();
 }
 
+function parseBool(value, fallback = false) {
+  const raw = safeTrim(value).toLowerCase();
+  if (!raw) return fallback;
+  if (['1', 'true', 'yes', 'y', 'on'].includes(raw)) return true;
+  if (['0', 'false', 'no', 'n', 'off'].includes(raw)) return false;
+  return fallback;
+}
+
 function normalizeBase(value, fallback) {
   const raw = safeTrim(value || fallback);
   if (!raw) throw new Error('missing_base_url');
@@ -43,6 +51,30 @@ function decodeBase32(rawSecret) {
   return Buffer.from(bytes);
 }
 
+function normalizeTotpSecret(rawSecret) {
+  let secret = safeTrim(rawSecret);
+  if (!secret) return '';
+
+  if (
+    (secret.startsWith('"') && secret.endsWith('"'))
+    || (secret.startsWith("'") && secret.endsWith("'"))
+  ) {
+    secret = safeTrim(secret.slice(1, -1));
+  }
+
+  if (secret.toLowerCase().startsWith('otpauth://')) {
+    try {
+      const url = new URL(secret);
+      const fromQuery = safeTrim(url.searchParams.get('secret'));
+      if (fromQuery) secret = fromQuery;
+    } catch {
+      // keep raw secret if URL parsing fails
+    }
+  }
+
+  return secret;
+}
+
 function hotp(secretBuffer, counter, digits = 6) {
   const counterBuffer = Buffer.alloc(8);
   counterBuffer.writeBigUInt64BE(BigInt(counter));
@@ -57,11 +89,37 @@ function hotp(secretBuffer, counter, digits = 6) {
 }
 
 function maybeResolvePanelMfaCode({ panelMfaCode, panelTotpSecret }) {
-  if (safeTrim(panelMfaCode)) return safeTrim(panelMfaCode);
-  const secret = safeTrim(panelTotpSecret);
-  if (!secret) return '';
-  const step = Math.floor(Date.now() / 1000 / 30);
-  return hotp(decodeBase32(secret), step, 6);
+  if (safeTrim(panelMfaCode)) {
+    return {
+      code: safeTrim(panelMfaCode),
+      source: 'PANEL_MFA_CODE',
+      error: '',
+    };
+  }
+
+  const secret = normalizeTotpSecret(panelTotpSecret);
+  if (!secret) {
+    return {
+      code: '',
+      source: 'none',
+      error: '',
+    };
+  }
+
+  try {
+    const step = Math.floor(Date.now() / 1000 / 30);
+    return {
+      code: hotp(decodeBase32(secret), step, 6),
+      source: 'PANEL_SMOKE_TOTP_SECRET',
+      error: '',
+    };
+  } catch (error) {
+    return {
+      code: '',
+      source: 'PANEL_SMOKE_TOTP_SECRET',
+      error: safeTrim(error?.message || error) || 'totp_generation_failed',
+    };
+  }
 }
 
 async function readEnvFileMap(filepath) {
@@ -201,10 +259,14 @@ async function run() {
     panelPassword: safeTrim(process.env.PANEL_PASSWORD),
     panelTotpSecret: safeTrim(process.env.PANEL_SMOKE_TOTP_SECRET || process.env.PANEL_TOTP_SECRET),
     panelMfaCode: safeTrim(process.env.PANEL_MFA_CODE),
+    requirePanelFullAuth: parseBool(process.env.REQUIRE_PANEL_FULL_AUTH, false),
     loadTestBypassKey: resolveLoadTestKey(envFileMap),
   };
 
-  cfg.panelMfaCode = maybeResolvePanelMfaCode(cfg);
+  const panelMfa = maybeResolvePanelMfaCode(cfg);
+  cfg.panelMfaCode = panelMfa.code;
+  cfg.panelMfaSource = panelMfa.source;
+  cfg.panelMfaResolutionError = panelMfa.error;
 
   const checks = [];
   const startedAt = nowIso();
@@ -262,6 +324,21 @@ async function run() {
       },
     ),
   );
+
+  if (cfg.panelMfaResolutionError) {
+    checks.push(
+      makeCheck(
+        'panel_mfa_resolution',
+        cfg.requirePanelFullAuth ? 'FAIL' : 'WARN',
+        `panel_mfa_code_generation_failed: ${cfg.panelMfaResolutionError}`,
+        {
+          source: cfg.panelMfaSource,
+          error: cfg.panelMfaResolutionError,
+        },
+        { check_group: 'optional-admin-check', required: cfg.requirePanelFullAuth },
+      ),
+    );
+  }
 
   const loginMissingResp = await httpRequest({
     url: `${cfg.examApiBase}/api/exam/candidate/login`,
@@ -650,27 +727,56 @@ async function run() {
       ));
     }
   } else {
-    checks.push(makeCheck(
-      'panel_login',
-      'PASS',
-      'optional-admin-check: skipped full panel auth smoke (set PANEL_EMAIL/PANEL_PASSWORD/PANEL_MFA_CODE).',
-      { skipped: true },
-      { check_group: 'optional-admin-check' },
-    ));
-    checks.push(makeCheck(
-      'panel_auth_me',
-      'PASS',
-      'optional-admin-check: skipped (missing env).',
-      { skipped: true },
-      { check_group: 'optional-admin-check' },
-    ));
-    checks.push(makeCheck(
-      'panel_dashboard',
-      'PASS',
-      'optional-admin-check: skipped (missing env).',
-      { skipped: true },
-      { check_group: 'optional-admin-check' },
-    ));
+    const missing = [];
+    if (!cfg.panelEmail) missing.push('PANEL_EMAIL');
+    if (!cfg.panelPassword) missing.push('PANEL_PASSWORD');
+    if (!cfg.panelMfaCode) missing.push('PANEL_MFA_CODE|PANEL_SMOKE_TOTP_SECRET');
+
+    if (cfg.requirePanelFullAuth) {
+      checks.push(makeCheck(
+        'panel_login',
+        'FAIL',
+        `required-admin-check: missing env (${missing.join(', ')})`,
+        { missing },
+        { check_group: 'optional-admin-check', required: true },
+      ));
+      checks.push(makeCheck(
+        'panel_auth_me',
+        'FAIL',
+        'required-admin-check: skipped because panel login prerequisites are missing.',
+        { missing },
+        { check_group: 'optional-admin-check', required: true },
+      ));
+      checks.push(makeCheck(
+        'panel_dashboard',
+        'FAIL',
+        'required-admin-check: skipped because panel login prerequisites are missing.',
+        { missing },
+        { check_group: 'optional-admin-check', required: true },
+      ));
+    } else {
+      checks.push(makeCheck(
+        'panel_login',
+        'PASS',
+        'optional-admin-check: skipped full panel auth smoke (set PANEL_EMAIL/PANEL_PASSWORD/PANEL_MFA_CODE).',
+        { skipped: true },
+        { check_group: 'optional-admin-check' },
+      ));
+      checks.push(makeCheck(
+        'panel_auth_me',
+        'PASS',
+        'optional-admin-check: skipped (missing env).',
+        { skipped: true },
+        { check_group: 'optional-admin-check' },
+      ));
+      checks.push(makeCheck(
+        'panel_dashboard',
+        'PASS',
+        'optional-admin-check: skipped (missing env).',
+        { skipped: true },
+        { check_group: 'optional-admin-check' },
+      ));
+    }
   }
 
   const totals = checks.reduce(
@@ -682,7 +788,10 @@ async function run() {
     { pass: 0, fail: 0, warn: 0, skip: 0 },
   );
 
-  const blockingFailures = checks.filter((check) => check.status === 'FAIL' && check.check_group !== 'optional-admin-check');
+  const blockingFailures = checks.filter((check) => check.status === 'FAIL' && (
+    check.check_group !== 'optional-admin-check'
+    || cfg.requirePanelFullAuth
+  ));
 
   const report = {
     timestamp: nowIso(),
@@ -690,7 +799,9 @@ async function run() {
     mode: {
       http: true,
       panel_full_auth: Boolean(cfg.panelEmail && cfg.panelPassword && cfg.panelMfaCode),
-      panel_mfa_source: safeTrim(process.env.PANEL_MFA_CODE) ? 'PANEL_MFA_CODE' : (cfg.panelTotpSecret ? 'PANEL_SMOKE_TOTP_SECRET' : 'none'),
+      require_panel_full_auth: cfg.requirePanelFullAuth,
+      panel_mfa_source: cfg.panelMfaSource || 'none',
+      panel_mfa_resolution_error: cfg.panelMfaResolutionError || null,
       load_test_bypass_key_available: Boolean(cfg.loadTestBypassKey),
     },
     totals,
