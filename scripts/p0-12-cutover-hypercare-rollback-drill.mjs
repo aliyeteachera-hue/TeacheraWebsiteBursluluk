@@ -16,6 +16,7 @@ const STATUS = {
 };
 
 const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const NON_STRICT_SSL_MODES = new Set(['prefer', 'require', 'verify-ca']);
 
 function trim(value) {
   return String(value ?? '').trim();
@@ -144,7 +145,55 @@ function expectStatus(response, expected) {
 }
 
 function sanitizeConnectionString(value) {
-  return trim(value).replace(/\\n/g, '').replace(/[\r\n]/g, '');
+  const base = trim(value).replace(/\\n/g, '').replace(/[\r\n]/g, '');
+  if (!base) return '';
+
+  try {
+    const url = new URL(base);
+    if (!['postgres:', 'postgresql:'].includes(url.protocol)) {
+      return base;
+    }
+
+    const sslMode = trim(url.searchParams.get('sslmode')).toLowerCase();
+    if (NON_STRICT_SSL_MODES.has(sslMode)) {
+      url.searchParams.set('sslmode', 'verify-full');
+    } else if (!sslMode) {
+      url.searchParams.set('sslmode', 'verify-full');
+    }
+
+    return url.toString();
+  } catch {
+    return base;
+  }
+}
+
+function resolveDbSslForScript() {
+  const sslMode = trim(process.env.PG_SSL_MODE).toLowerCase();
+  const isProduction = trim(process.env.NODE_ENV).toLowerCase() === 'production';
+
+  if (sslMode === 'disable') {
+    if (isProduction) {
+      throw new Error('PG_SSL_MODE=disable is not allowed in production.');
+    }
+    return false;
+  }
+
+  if (sslMode === 'relaxed') {
+    if (isProduction) {
+      throw new Error('PG_SSL_MODE=relaxed is not allowed in production.');
+    }
+    return { rejectUnauthorized: false };
+  }
+
+  if (sslMode === 'strict') {
+    return { rejectUnauthorized: true };
+  }
+
+  if (!sslMode) {
+    return isProduction ? { rejectUnauthorized: true } : { rejectUnauthorized: false };
+  }
+
+  throw new Error('Invalid PG_SSL_MODE. Allowed values: strict, relaxed, disable.');
 }
 
 function encodeBase32(buffer) {
@@ -231,7 +280,7 @@ async function readAdminUserColumnAvailability(client) {
 async function createTempPanelUser({ connectionString, runId }) {
   const pool = new pg.Pool({
     connectionString,
-    ssl: { rejectUnauthorized: false },
+    ssl: resolveDbSslForScript(),
   });
 
   const email = `cutover.smoke.${Date.now()}@teachera.com.tr`;

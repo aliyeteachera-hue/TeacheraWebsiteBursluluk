@@ -2,7 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { Pool } from 'pg';
+import { getPool } from '../packages/shared/backend/db.js';
 
 function resolveDatabaseUrl() {
   return (process.env.DATABASE_URL || process.env.POSTGRES_URL || '').trim();
@@ -33,10 +33,7 @@ async function main() {
     return;
   }
 
-  const pool = new Pool({
-    connectionString,
-    ssl: { rejectUnauthorized: false },
-  });
+  const pool = getPool();
 
   try {
     for (const fileName of migrationFiles) {

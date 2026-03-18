@@ -1,5 +1,5 @@
-import { Pool } from 'pg';
 import { computePiiLookupHash, decryptPii, encryptPii } from '../api/_lib/piiCrypto.js';
+import { getPool } from '../packages/shared/backend/db.js';
 
 const REDACTED_NAME = '[ENCRYPTED_PII]';
 
@@ -212,10 +212,7 @@ async function main() {
   const dryRun = hasFlag('--dry-run');
   const repairHashAll = hasFlag('--repair-hash-all');
 
-  const pool = new Pool({
-    connectionString,
-    ssl: { rejectUnauthorized: false },
-  });
+  const pool = getPool();
 
   try {
     const guardians = await backfillGuardians(pool, dryRun, batchSize, repairHashAll);

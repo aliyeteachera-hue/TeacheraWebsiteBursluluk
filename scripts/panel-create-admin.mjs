@@ -1,5 +1,5 @@
 import process from 'node:process';
-import { Pool } from 'pg';
+import { getPool } from '../packages/shared/backend/db.js';
 
 const ALLOWED_ROLES = new Set(['SUPER_ADMIN', 'OPERATIONS', 'READ_ONLY']);
 
@@ -82,10 +82,7 @@ async function main() {
   const totpSecret = requireArg('totp-secret').replace(/[\s-]/g, '').toUpperCase();
   const requirePasswordReset = parseBooleanArg('require-password-reset', false);
 
-  const pool = new Pool({
-    connectionString,
-    ssl: { rejectUnauthorized: false },
-  });
+  const pool = getPool();
 
   const client = await pool.connect();
   try {
