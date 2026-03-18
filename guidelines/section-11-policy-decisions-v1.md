@@ -1,29 +1,30 @@
 # Section 11 Policy Decisions v1
 
-Status: DRAFT_FOR_SIGNOFF
+Status: APPROVED
 Version: v1
 Created_at_utc: 2026-03-18T00:00:00Z
-Last_updated_utc: 2026-03-18T00:00:00Z
-Effective_from_utc: TBD
+Last_updated_utc: 2026-03-18T09:15:00Z
+Effective_from_utc: 2026-03-18T09:15:00Z
 Review_cycle: Monthly
+Governance_mode: SINGLE_OWNER_SELF_ATTESTED
 
 ## Purpose
 This document converts Section 11 open items into binding policy decisions with clear ownership, implementation mapping, and exception handling.
 
 ## Decision Lifecycle
 - Status values: DRAFT_FOR_SIGNOFF | APPROVED | REJECTED | SUPERSEDED
-- Change rule: Any change requires Legal + Product + Ops + Engineering re-approval.
+- Change rule: In SINGLE_OWNER_SELF_ATTESTED mode, change is approved by Project Owner self-attestation + change-log entry. If ownership model changes to multi-role, re-approval is required.
 - Exception rule: Temporary exceptions must include owner, end date, and audit record.
 
 ## Decision 01 - Multi-application dedupe rule
 - Decision_id: S11-01
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: Candidate application dedupe is enforced by phone_e164 + campaign_code + normalized student_full_name. When duplicate is detected, system reuses existing candidate and creates an activity event.
 - Business_owner: Product Owner
 - Operational_owner: Admissions Ops Lead
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Backend Lead
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - API: /api/exam/session/start
   - DB: applications.dedupe_hash, candidates, activity_events
@@ -34,13 +35,13 @@ This document converts Section 11 open items into binding policy decisions with 
 
 ## Decision 02 - Forgot password and credential regeneration flow
 - Decision_id: S11-02
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: Candidate credentials can be regenerated only through controlled flow with rate limit and audit logging. Previous credentials are revoked on regeneration.
 - Business_owner: Product Owner
 - Operational_owner: Support Lead
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Identity Service Owner
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - API: /api/exam/candidate/login, credential regeneration endpoint (if enabled)
   - DB: credentials, notification_jobs, notification_events, activity_events
@@ -51,13 +52,13 @@ This document converts Section 11 open items into binding policy decisions with 
 
 ## Decision 03 - Late candidate exam entry policy
 - Decision_id: S11-03
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: Late entry is allowed for a fixed grace window after exam_open_at. After grace window, new starts are blocked; existing active sessions may continue.
 - Business_owner: Academic Director
 - Operational_owner: Exam Ops Lead
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Exam Service Owner
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - API: /api/exam/session/start, /api/exam/session/status
   - Config: exam_open_at, late_entry_grace_minutes
@@ -68,13 +69,13 @@ This document converts Section 11 open items into binding policy decisions with 
 
 ## Decision 04 - Resume policy on connection loss
 - Decision_id: S11-04
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: Candidate can resume same attempt using valid session token until attempt expires. Autosave is authoritative source for restoration.
 - Business_owner: Product Owner
 - Operational_owner: Exam Ops Lead
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Exam Service Owner
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - API: /api/exam/session/answer, /api/exam/session/status
   - DB: exam_attempts, exam_answers, exam_session_tokens
@@ -85,13 +86,13 @@ This document converts Section 11 open items into binding policy decisions with 
 
 ## Decision 05 - Result publish schedule policy
 - Decision_id: S11-05
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: Results are published at configured schedule scope (global or campaign-segment). Before publish time, result endpoint returns pending state.
 - Business_owner: Academic Director
 - Operational_owner: Result Ops Lead
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Result Service Owner
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - API: /api/exam/results/:attemptId
   - DB: results.status, results.published_at
@@ -102,13 +103,13 @@ This document converts Section 11 open items into binding policy decisions with 
 
 ## Decision 06 - WhatsApp opt-in and template ownership
 - Decision_id: S11-06
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: WhatsApp sends are permitted only for users with recorded opt-in and approved template version. Template ownership and approval trail is mandatory.
 - Business_owner: Marketing/Comms Lead
 - Operational_owner: Messaging Ops Lead
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Notification Service Owner
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - API: /api/ops/unviewed-results/auto-whatsapp, provider webhook
   - DB: notification_jobs, notification_events, consent_records
@@ -119,13 +120,13 @@ This document converts Section 11 open items into binding policy decisions with 
 
 ## Decision 07 - Anti-cheat level policy
 - Decision_id: S11-07
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: Baseline anti-cheat includes session integrity, rate-limit, tokenized attempts, and behavior telemetry. Additional proctoring controls require explicit legal and product approval.
 - Business_owner: Academic Director
 - Operational_owner: Exam Integrity Lead
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Exam Service Owner
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - API: session start/login/answer/submit guards
   - DB: activity_events, exam_attempts metadata
@@ -136,13 +137,13 @@ This document converts Section 11 open items into binding policy decisions with 
 
 ## Decision 08 - Result objection process
 - Decision_id: S11-08
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: Result objection requests are accepted within defined SLA window and tracked with immutable audit trail. Any score change requires dual approval.
 - Business_owner: Academic Director
 - Operational_owner: Support Lead
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Result Service Owner
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - API: objection intake endpoint (if enabled)
   - DB: activity_events/audit_log_entries + objection table (if enabled)
@@ -153,13 +154,13 @@ This document converts Section 11 open items into binding policy decisions with 
 
 ## Decision 09 - KVKK retention and anonymization periods
 - Decision_id: S11-09
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: PII retention periods are fixed by legal basis; expired records are anonymized or deleted via scheduled job with audit proof.
 - Business_owner: Legal/KVKK Officer
 - Operational_owner: Data Protection Officer
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Data Platform Owner
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - DB: pii fields, consent_records, audit_log_entries
   - Jobs: retention/anonymization scheduler
@@ -170,13 +171,13 @@ This document converts Section 11 open items into binding policy decisions with 
 
 ## Decision 10 - Operational escalation SLA
 - Decision_id: S11-10
-- Status: DRAFT_FOR_SIGNOFF
+- Status: APPROVED
 - Policy_statement: Incident escalation follows severity-based SLA with named owners, response deadlines, and communication channels.
 - Business_owner: Operations Director
 - Operational_owner: On-call Manager
 - Legal_owner: Legal/KVKK Officer
 - Engineering_owner: Platform Lead
-- Effective_from_utc: TBD
+- Effective_from_utc: 2026-03-18T09:15:00Z
 - System_mapping:
   - Runbook: P0-12 go-live package
   - Monitoring: CloudWatch/SNS/SLO alarms
@@ -186,11 +187,9 @@ This document converts Section 11 open items into binding policy decisions with 
 - Notes: TBD
 
 ## Required Approvals (Gate)
-A decision can move to APPROVED only when all required approvers sign:
-- Product Owner
-- Operations Lead
-- Legal/KVKK Officer
-- Engineering Lead
+A decision can move to APPROVED when Project Owner signs in SINGLE_OWNER_SELF_ATTESTED mode.
+- Project Owner: Aliye Teachera (`aliye@teachera.com.tr`)
+- Delegation rule: If additional owners/maintainers are added, governance must switch to multi-role approval model.
 
 ## Signoff Link
 - Signoff record file: guidelines/section-11-signoff-v1.json
