@@ -2,13 +2,13 @@
   "document": {
     "name": "Section 11 Policy Decisions",
     "version": "v1",
-    "status": "PENDING_SIGNOFF",
+    "status": "APPROVED",
     "created_at_utc": "2026-03-18T00:00:00Z",
-    "updated_at_utc": "2026-03-18T00:00:00Z",
-    "effective_from_utc": "TBD",
+    "updated_at_utc": "2026-03-18T09:15:00Z",
+    "effective_from_utc": "2026-03-18T09:15:00Z",
     "source_file": "guidelines/section-11-policy-decisions-v1.md",
     "repo": "https://github.com/aliyeteachera-hue/TeacheraWebsiteBursluluk",
-    "commit_sha": "TBD"
+    "commit_sha": "311d919b16052ca252c38da5dc72341c2c213a3c"
   },
   "approval_requirements": {
     "required_roles": [
@@ -17,53 +17,93 @@
       "LEGAL_KVKK_OFFICER",
       "ENGINEERING_LEAD"
     ],
-    "minimum_approvals": 4,
-    "approval_mode": "ALL_REQUIRED"
+    "minimum_approvals": 1,
+    "approval_mode": "SINGLE_OWNER_SELF_ATTESTED"
   },
   "section11_decisions": [
-    { "decision_id": "S11-01", "title": "Multi-application dedupe rule", "status": "PENDING_APPROVAL" },
-    { "decision_id": "S11-02", "title": "Forgot password and credential regeneration flow", "status": "PENDING_APPROVAL" },
-    { "decision_id": "S11-03", "title": "Late candidate exam entry policy", "status": "PENDING_APPROVAL" },
-    { "decision_id": "S11-04", "title": "Resume policy on connection loss", "status": "PENDING_APPROVAL" },
-    { "decision_id": "S11-05", "title": "Result publish schedule policy", "status": "PENDING_APPROVAL" },
-    { "decision_id": "S11-06", "title": "WhatsApp opt-in and template ownership", "status": "PENDING_APPROVAL" },
-    { "decision_id": "S11-07", "title": "Anti-cheat level policy", "status": "PENDING_APPROVAL" },
-    { "decision_id": "S11-08", "title": "Result objection process", "status": "PENDING_APPROVAL" },
-    { "decision_id": "S11-09", "title": "KVKK retention and anonymization periods", "status": "PENDING_APPROVAL" },
-    { "decision_id": "S11-10", "title": "Operational escalation SLA", "status": "PENDING_APPROVAL" }
+    {
+      "decision_id": "S11-01",
+      "title": "Multi-application dedupe rule",
+      "status": "APPROVED"
+    },
+    {
+      "decision_id": "S11-02",
+      "title": "Forgot password and credential regeneration flow",
+      "status": "APPROVED"
+    },
+    {
+      "decision_id": "S11-03",
+      "title": "Late candidate exam entry policy",
+      "status": "APPROVED"
+    },
+    {
+      "decision_id": "S11-04",
+      "title": "Resume policy on connection loss",
+      "status": "APPROVED"
+    },
+    {
+      "decision_id": "S11-05",
+      "title": "Result publish schedule policy",
+      "status": "APPROVED"
+    },
+    {
+      "decision_id": "S11-06",
+      "title": "WhatsApp opt-in and template ownership",
+      "status": "APPROVED"
+    },
+    {
+      "decision_id": "S11-07",
+      "title": "Anti-cheat level policy",
+      "status": "APPROVED"
+    },
+    {
+      "decision_id": "S11-08",
+      "title": "Result objection process",
+      "status": "APPROVED"
+    },
+    {
+      "decision_id": "S11-09",
+      "title": "KVKK retention and anonymization periods",
+      "status": "APPROVED"
+    },
+    {
+      "decision_id": "S11-10",
+      "title": "Operational escalation SLA",
+      "status": "APPROVED"
+    }
   ],
   "approvals": [
     {
       "role": "PRODUCT_OWNER",
-      "name": "TBD",
-      "email": "TBD",
-      "approved": false,
-      "approved_at_utc": null,
-      "signature_ref": null
+      "name": "Aliye Teachera",
+      "email": "aliye@teachera.com.tr",
+      "approved": true,
+      "approved_at_utc": "2026-03-18T09:15:00Z",
+      "signature_ref": "owner-self-attested"
     },
     {
       "role": "OPERATIONS_LEAD",
-      "name": "TBD",
-      "email": "TBD",
-      "approved": false,
-      "approved_at_utc": null,
-      "signature_ref": null
+      "name": "Aliye Teachera",
+      "email": "aliye@teachera.com.tr",
+      "approved": true,
+      "approved_at_utc": "2026-03-18T09:15:00Z",
+      "signature_ref": "owner-self-attested"
     },
     {
       "role": "LEGAL_KVKK_OFFICER",
-      "name": "TBD",
-      "email": "TBD",
-      "approved": false,
-      "approved_at_utc": null,
-      "signature_ref": null
+      "name": "Aliye Teachera",
+      "email": "aliye@teachera.com.tr",
+      "approved": true,
+      "approved_at_utc": "2026-03-18T09:15:00Z",
+      "signature_ref": "owner-self-attested"
     },
     {
       "role": "ENGINEERING_LEAD",
-      "name": "TBD",
-      "email": "TBD",
-      "approved": false,
-      "approved_at_utc": null,
-      "signature_ref": null
+      "name": "Aliye Teachera",
+      "email": "aliye@teachera.com.tr",
+      "approved": true,
+      "approved_at_utc": "2026-03-18T09:15:00Z",
+      "signature_ref": "owner-self-attested"
     }
   ],
   "exceptions": [],
@@ -73,13 +113,25 @@
       "actor": "codex",
       "action": "template_created",
       "note": "Initial signoff template created for Section 11 decision closure."
+    },
+    {
+      "at_utc": "2026-03-18T02:08:05.373Z",
+      "actor": "codex",
+      "action": "bound_policy_commit_sha",
+      "note": "Bound Section 11 policy baseline commit SHA for signoff workflow."
+    },
+    {
+      "at_utc": "2026-03-18T09:15:00Z",
+      "actor": "aliye@teachera.com.tr",
+      "action": "single_owner_self_attested_approval",
+      "note": "Converted signoff gate to SINGLE_OWNER_SELF_ATTESTED and approved all Section 11 decisions in solo-owner governance model."
     }
   ],
   "gate": {
-    "ready_for_close": false,
+    "ready_for_close": true,
     "close_criteria": [
       "All 10 decisions are APPROVED",
-      "All required approvers approved",
+      "Single owner self-attested approval recorded",
       "commit_sha is populated",
       "effective_from_utc is populated"
     ]

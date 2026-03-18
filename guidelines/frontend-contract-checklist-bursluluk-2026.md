@@ -2,7 +2,7 @@
 
 Status: Draft v1 (must-have contract before implementation freeze)
 Owner: Product + Frontend + Backend + Ops
-Scope: `www.teachera.com.tr`, `exam.teachera.com.tr`, `api.teachera.com.tr`, `panel.teachera.com.tr`
+Scope: `teachera.com.tr` (web + candidate + panel UI routes), `exam-api.teachera.com.tr`, `panel-api.teachera.com.tr`, `ops-api.teachera.com.tr`
 
 ## 1) Must-have Screens (Frontend)
 1. `/bursluluk-2026` landing: tanitim/video + CTA

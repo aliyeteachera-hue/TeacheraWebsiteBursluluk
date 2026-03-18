@@ -19,7 +19,7 @@ It consolidates and resolves differences across:
 - Panel APIs: `https://panel-api.teachera.com.tr`
 - Operations APIs (health/observability/ops): `https://ops-api.teachera.com.tr`
 - Panel UI canonical route: `https://teachera.com.tr/panel/*`
-- `panel.teachera.com.tr` host alias is not canonical in v1; if used, it must redirect to `https://teachera.com.tr/panel/*`.
+- `panel.teachera.com.tr` and `api.teachera.com.tr` are deprecated aliases in v1 and are not provisioned; canonical hosts are `teachera.com.tr`, `exam-api.teachera.com.tr`, `panel-api.teachera.com.tr`, `ops-api.teachera.com.tr`.
 
 ### 2.2 Mandatory Frontend Flows
 Candidate flow routes must exist and be operational:
